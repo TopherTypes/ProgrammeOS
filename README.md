@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.13**
+Current version: **0.0.14**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -125,11 +125,20 @@ The delivered People feature set now includes:
   - a toolbar (`New Project` button + live status text)
   - a data-backed list container
   - a detail panel container with explicit empty prompts
-- Projects list hydration now runs asynchronously from IndexedDB (`listEntities("projects")`) after the static frame is mounted.
+- Projects list hydration now runs asynchronously from IndexedDB through the dedicated projects data module (`listProjects`) after the static frame is mounted.
 - The route includes deterministic mount checks for required `data-role` nodes and throws a predictable error if the page cannot mount correctly.
 - Empty-state messaging is explicit when no projects are stored, and the detail panel prompts users to select a project when applicable.
 
-## Manual Verification (v0.0.13)
+
+## Projects Data Access Layer (Milestone 3 / Task 3.1)
+
+- Added `js/features/projects/project-record.js` for project normalization and validation.
+- Project normalization now enforces safe defaults: `description: ""`, `status: "active"`, and `stakeholderIds: []`.
+- Added `js/features/projects/data.js` with `createProject`, `updateProject`, `getProject`, and `listProjects`, all backed by generic database helpers for the `projects` store.
+- `updateProject` preserves immutable fields (`id`, `createdAt`) and always refreshes `updatedAt`.
+- Added a lightweight verification script: `node js/features/projects/project-record.check.mjs`.
+
+## Manual Verification (v0.0.14)
 
 1. Open `index.html` and navigate to `#/people`.
 2. Select **New Person**, enter values for all fields, and save.
@@ -137,7 +146,7 @@ The delivered People feature set now includes:
 4. Open the modal again and press `Escape`; confirm the modal closes and focus returns to the **New Person** trigger.
 5. Re-open the modal and submit with an empty name; confirm validation prevents save.
 
-## Smoke Checklist Outcomes (v0.0.13)
+## Smoke Checklist Outcomes (v0.0.14)
 
 - ⚠️ Entity creation: **People pass; Projects partial** (projects list/detail frame and empty-state delivered, create modal still pending milestone work).
 - ⚠️ Meeting logging: **Pending milestone implementation**.

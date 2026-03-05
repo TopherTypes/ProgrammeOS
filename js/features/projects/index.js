@@ -1,4 +1,4 @@
-import { listEntities } from "../../db.js";
+import { listProjects } from "./data.js";
 import { renderPageFrame } from "../../layout.js";
 
 /**
@@ -133,7 +133,7 @@ function renderProjectDetail(detailContainer, project) {
  * @param {{ selectedProjectId: string|null }} config.state
  */
 async function refreshProjectsView({ listContainer, detailContainer, statusText, state }) {
-  const projects = await listEntities("projects");
+  const projects = await listProjects();
   const selectedProject = projects.find((project) => project.id === state.selectedProjectId) ?? null;
 
   // If the current selection no longer exists, default to the first record.
