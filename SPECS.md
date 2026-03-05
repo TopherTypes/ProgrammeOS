@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.10 people page rendering: `#/people` must render a people directory table (name + organisation), show an explicit empty state when no records exist, and refresh in place after create actions by loading data through the people data module.
 - v0.0.9 people data module: add `js/features/people/data.js` to wrap generic DB helpers with `createPerson`/`updatePerson` paths, required-name validation, immutable `id`/`createdAt` handling, and normalized person retrieval for consistent UI rendering.
 - v0.0.8 schema version management: add explicit migration planning in `js/db-schema.js` and execute upgrades automatically via IndexedDB `upgrade` handling with persisted `meta.schemaVersion`.
 - v0.0.7 database access layer: add Promise-based CRUD wrapper functions in `js/db.js` (`createEntity`, `updateEntity`, `deleteEntity`, `getEntity`, `listEntities`) with store validation and defensive error handling.
@@ -91,6 +92,8 @@ for each item
 
 The system must allow people to be easily selected and linked when
 creating meetings, actions, decisions, or updates.
+
+In the MVP UI, the People page must present a visible list/table of existing people and support immediate list refresh after new people are created in-page (no full app reload).
 
 ------------------------------------------------------------------------
 
