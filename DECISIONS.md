@@ -154,6 +154,7 @@ Rationale:
   - `#/people/:id`
   - `#/meetings`
   - `#/meetings/:id`
+  - `#/focus`
 - Routing must support deep links and browser navigation (back/forward).
 
 Rationale:

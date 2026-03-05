@@ -7,19 +7,35 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ## [Unreleased]
 
 ### Added
-- Created the Milestone 0 base repository structure with runnable HTML/CSS/JS scaffolding and feature directories.
+- None.
 
 ### Changed
-- Added initial app bootstrap, shell layout, and hash-route module wiring for foundation readiness.
+- None.
 
 ### Fixed
-- Updated project documentation to reflect repository structure and baseline module conventions.
+- None.
 
 ### Removed
 - None.
 
 ---
 
+## [0.0.2] - 2026-03-05
+
+### Added
+- Implemented Milestone 0 Task 0.2 hash-based routing for `#/dashboard`, `#/projects`, `#/people`, `#/meetings`, and `#/focus`.
+- Added sidebar navigation links to enable direct route switching through the shell UI.
+- Added a Focus feature placeholder module to support the required `#/focus` route.
+
+### Changed
+- Updated router startup logic to render the active hash route on load and respond to browser hash history navigation.
+- Updated project documentation to reflect routing behaviour and the current version.
+
+### Fixed
+- Aligned architectural routing documentation with the implemented foundation route set by including `#/focus`.
+
+### Removed
+- None.
 
 ## [0.0.1] - 2026-03-05
 ### Added
@@ -33,4 +49,3 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ### Added
 - Initial project documentation scaffold (SPEC, DECISIONS, AGENTS, PLANS).
 - Project conventions: local-first, IndexedDB storage, GitHub Pages deployment.
-

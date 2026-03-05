@@ -275,3 +275,21 @@ The initial application foundation must include a runnable static shell with:
   - `js/ui/*` (shared UI modules)
 
 This baseline exists to keep future milestones modular and predictable while remaining zero-build.
+
+
+### 11.1 Routing baseline (Milestone 0 / Task 0.2)
+
+The application foundation must include a hash-based router that:
+
+- listens to `hashchange` events
+- renders the page module mapped to the active route
+- supports browser back/forward navigation
+- supports direct navigation via URL hash
+
+Required foundation routes:
+
+- `#/dashboard`
+- `#/projects`
+- `#/people`
+- `#/meetings`
+- `#/focus`
