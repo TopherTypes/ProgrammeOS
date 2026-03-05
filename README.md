@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.11**
+Current version: **0.0.12**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -108,3 +108,27 @@ The app now renders all routes inside a shared layout shell:
 - The modal captures `name`, `organisation`, and `notes` and validates required input before save.
 - Escape key and Cancel controls close the modal predictably and restore focus to the launch button.
 - Successful saves immediately refresh the people list so new records appear without route reloads.
+
+## Delivered People Directory Capabilities (Milestone 2 Complete)
+
+The delivered People feature set now includes:
+
+- **People model**: each person record persists `id`, `name`, `organisation`, `notes`, `createdAt`, and `updatedAt`.
+- **People list**: `#/people` renders a directory table with `name` and `organisation`, backed by IndexedDB and a clear empty state when no records exist.
+- **Creation flow**: `New Person` opens a modal that captures `name`, `organisation`, and `notes`, validates required name input, supports Cancel/Escape dismissal, and refreshes the list immediately after save.
+
+## Manual Verification (v0.0.12)
+
+1. Open `index.html` and navigate to `#/people`.
+2. Select **New Person**, enter values for all fields, and save.
+3. Confirm the modal closes and the new row appears in the people table without reloading the page.
+4. Open the modal again and press `Escape`; confirm the modal closes and focus returns to the **New Person** trigger.
+5. Re-open the modal and submit with an empty name; confirm validation prevents save.
+
+## Smoke Checklist Outcomes (v0.0.12)
+
+- ✅ Entity creation: **Pass for People** (implemented and verified in-app); Projects/Meetings remain planned for later milestones.
+- ⚠️ Meeting logging: **Pending milestone implementation**.
+- ⚠️ Action/decision/update creation: **Pending milestone implementation**.
+- ⚠️ Communication tracking: **Pending milestone implementation**.
+- ⚠️ JSON export/import: **Pending milestone implementation**.

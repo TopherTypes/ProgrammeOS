@@ -20,6 +20,24 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.0.12] - 2026-03-05
+
+### Added
+- Added explicit documentation of delivered People directory capabilities (data model, list behaviour, and modal create workflow) in README and SPECS.
+- Added manual verification steps and smoke checklist outcomes for current milestone coverage, including People entity creation status and pending areas (meetings, outputs, communication tracking, JSON import/export).
+
+### Changed
+- Updated roadmap and plan status markers to show Milestone 2 (People System) as completed and Milestone 3 onward as pending/in progress.
+- Bumped project version to `0.0.12` and aligned version references across project documentation.
+
+### Fixed
+- Aligned product-definition documents with shipped People behaviour to reduce mismatch between planned vs implemented scope.
+
+### Removed
+- None.
+
+---
+
 ## [0.0.11] - 2026-03-05
 
 ### Added
