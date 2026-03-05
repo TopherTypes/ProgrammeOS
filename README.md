@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.7**
+Current version: **0.0.8**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -74,3 +74,11 @@ The app now renders all routes inside a shared layout shell:
   - `listEntities(store)`
 - Added store validation and defensive error wrapping so data-layer failures surface with clear context.
 
+
+
+## Schema Version Management (Milestone 1 / Task 1.3)
+
+- Added explicit migration planning in `js/db-schema.js` via version-keyed migration handlers.
+- Database upgrades now run migrations automatically through IndexedDB `upgrade` hooks.
+- Schema version metadata is written during upgrades and defensively re-asserted at startup.
+- Added a lightweight Node verification script: `node js/db-schema.check.mjs` to simulate version changes.

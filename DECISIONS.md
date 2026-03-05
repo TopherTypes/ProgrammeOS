@@ -64,6 +64,7 @@ Even though runtime storage is IndexedDB, the app maintains a single logical dat
 - Metadata is stored separately (e.g., `meta` store or a single meta record).
 
 ### 3.3 Schema versioning and migrations
+- Migration planning is implemented as explicit, version-keyed handlers in `js/db-schema.js`, executed sequentially for each pending version during IndexedDB upgrades.
 - The database must include a `schemaVersion` integer.
 - Any future schema change must include a migration path.
 - Migrations apply:
