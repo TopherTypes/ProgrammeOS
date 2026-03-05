@@ -12,8 +12,8 @@ function bootstrap() {
     throw new Error("App root element '#app' was not found.");
   }
 
-  const { contentOutlet } = createLayout(appRoot);
-  const router = createRouter(contentOutlet);
+  const outlets = createLayout(appRoot);
+  const router = createRouter(outlets);
 
   router.start();
 }

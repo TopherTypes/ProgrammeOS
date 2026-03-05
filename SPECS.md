@@ -235,7 +235,7 @@ All routes must render inside a shared application shell with:
 
 - persistent sidebar navigation
 - main content container for page rendering
-- optional detail panel region where needed
+- optional detail panel container that stays available in the shell when a route needs it
 
 This layout foundation avoids duplicated page-level shell markup and keeps route transitions visually consistent.
 

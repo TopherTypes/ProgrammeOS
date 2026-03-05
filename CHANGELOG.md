@@ -22,6 +22,22 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.0.4] - 2026-03-05
+
+### Added
+- Added a dedicated optional detail panel container directly in the global layout shell so every route shares the same sidebar/main/detail structure.
+
+### Changed
+- Updated routing and feature render signatures to use shared layout outlets (`mainOutlet`, `detailOutlet`) instead of container-only rendering.
+- Updated styles to make the shell-level content grid responsible for optional two-column layout behaviour.
+- Updated project documentation and version metadata for the layout framework correction.
+
+### Fixed
+- Corrected layout architecture so the optional detail panel is part of the base shell structure rather than being recreated inside page content.
+
+### Removed
+- None.
+
 ## [0.0.3] - 2026-03-05
 
 ### Added

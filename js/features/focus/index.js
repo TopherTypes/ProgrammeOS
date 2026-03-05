@@ -2,10 +2,10 @@ import { renderPageFrame } from "../../layout.js";
 
 /**
  * Renders the focus page placeholder.
- * @param {HTMLElement} container
+ * @param {{ mainOutlet: HTMLElement, detailOutlet: HTMLElement }} outlets
  */
-export function renderFocusPage(container) {
-  renderPageFrame(container, {
+export function renderFocusPage(outlets) {
+  renderPageFrame(outlets, {
     title: "Focus",
     bodyHtml:
       '<p class="small-note">Focus feature module scaffold is in place.</p>',
