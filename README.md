@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.9**
+Current version: **0.0.10**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -92,3 +92,11 @@ The app now renders all routes inside a shared layout shell:
 - Added lightweight validation (`name` required) and normalization helpers in `js/features/people/person-record.js`.
 - Added a lightweight verification script: `node js/features/people/person-record.check.mjs`.
 
+
+
+## People Directory UI (Milestone 2 / Task 2.2)
+
+- `#/people` now loads records through `js/features/people/data.js` (`listPeople`/`createPerson`).
+- The People page renders a table with `name` and `organisation` columns.
+- Added explicit empty-state messaging when no people are stored.
+- Creating a person immediately refreshes the list in-place without requiring an app reload.

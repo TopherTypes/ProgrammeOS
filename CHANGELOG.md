@@ -20,6 +20,22 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.0.10] - 2026-03-05
+
+### Added
+- Implemented a functional People page at `#/people` with an in-page create form and a rendered table of people records (`name`, `organisation`).
+- Added explicit empty-state messaging in the People list area when no people records exist.
+
+### Changed
+- Updated People feature rendering to load records via the dedicated people data module (`listPeople`) and refresh list output immediately after successful create operations.
+- Added People-page table/form styling in `css/styles.css` and updated README, SPECS, DECISIONS, ROADMAP, and VERSION documentation metadata.
+
+### Fixed
+- Removed the need for a full app reload to see newly created people records in the People route.
+
+### Removed
+- None.
+
 ## [0.0.9] - 2026-03-05
 
 ### Added

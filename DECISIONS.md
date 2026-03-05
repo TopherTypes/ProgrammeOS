@@ -170,6 +170,7 @@ Rationale:
 - Use a mix of:
   - Dashboard overview page
   - Entity list pages with a two-column layout (list + detail)
+- For list pages that support in-page create actions (e.g., People), the list should refresh in place after successful creates rather than requiring route or app reload.
 
 ### 7.2 Editing approach
 - Full create/edit flows use modals (form-driven).
