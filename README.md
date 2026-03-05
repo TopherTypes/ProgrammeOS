@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.6**
+Current version: **0.0.7**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -63,3 +63,14 @@ The app now renders all routes inside a shared layout shell:
 - Database name: `programme-manager-db`.
 - Created stores: `people`, `projects`, `meetings`, `actions`, `decisions`, `updates`, `meta`.
 - The `meta` store now records `schemaVersion` for migration readiness.
+
+## Database Access Layer (Milestone 1 / Task 1.2)
+
+- Added Promise-based CRUD wrapper helpers in `js/db.js`:
+  - `createEntity(store, data)`
+  - `updateEntity(store, id, data)`
+  - `deleteEntity(store, id)`
+  - `getEntity(store, id)`
+  - `listEntities(store)`
+- Added store validation and defensive error wrapping so data-layer failures surface with clear context.
+
