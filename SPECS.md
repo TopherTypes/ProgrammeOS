@@ -257,3 +257,21 @@ The MVP is complete when the user can:
 
 Potential later features: - teams - RAID logs - governance structures -
 reporting cycles - Google Drive sync
+
+------------------------------------------------------------------------
+
+## 11. Implementation Baseline (v0.0.1)
+
+The initial application foundation must include a runnable static shell with:
+
+- `index.html` as the single entry page
+- shared styling in `css/styles.css`
+- JavaScript modules organised into:
+  - `js/app.js` (bootstrap)
+  - `js/router.js` (route management)
+  - `js/layout.js` (shared shell rendering)
+  - `js/db.js` (data-layer placeholder)
+  - `js/features/*` (feature-specific modules)
+  - `js/ui/*` (shared UI modules)
+
+This baseline exists to keep future milestones modular and predictable while remaining zero-build.
