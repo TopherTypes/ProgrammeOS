@@ -227,6 +227,20 @@ Future versions may include Google Drive syncing.
 
 ------------------------------------------------------------------------
 
+
+
+### 7.1 Shared layout shell
+
+All routes must render inside a shared application shell with:
+
+- persistent sidebar navigation
+- main content container for page rendering
+- optional detail panel region where needed
+
+This layout foundation avoids duplicated page-level shell markup and keeps route transitions visually consistent.
+
+------------------------------------------------------------------------
+
 ## 8. Non-Goals
 
 Not included in MVP: - authentication systems - servers - multi-user

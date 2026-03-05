@@ -5,6 +5,7 @@ import { renderActionsPage } from "./features/actions/index.js";
 import { renderDecisionsPage } from "./features/decisions/index.js";
 import { renderUpdatesPage } from "./features/updates/index.js";
 import { renderFocusPage } from "./features/focus/index.js";
+import { renderPageFrame } from "./layout.js";
 
 /** @type {Record<string, (container: HTMLElement) => void>} */
 const ROUTE_MAP = {
@@ -57,10 +58,10 @@ export function createRouter(contentOutlet) {
  * @param {HTMLElement} container
  */
 function renderDashboardPage(container) {
-  container.innerHTML = `
-    <h2 class="page-title">Dashboard</h2>
-    <p class="small-note">Application shell loaded successfully.</p>
-  `;
+  renderPageFrame(container, {
+    title: "Dashboard",
+    bodyHtml: '<p class="small-note">Application shell loaded successfully.</p>',
+  });
 }
 
 /**
@@ -68,8 +69,8 @@ function renderDashboardPage(container) {
  * @param {HTMLElement} container
  */
 function renderNotFoundPage(container) {
-  container.innerHTML = `
-    <h2 class="page-title">Not Found</h2>
-    <p class="small-note">The requested route is not available yet.</p>
-  `;
+  renderPageFrame(container, {
+    title: "Not Found",
+    bodyHtml: '<p class="small-note">The requested route is not available yet.</p>',
+  });
 }
