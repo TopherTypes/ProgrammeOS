@@ -4,6 +4,12 @@ Programme Work Management App
 
 ------------------------------------------------------------------------
 
+## 0. Implementation Alignment Notes
+
+- v0.0.5 stability correction: the layout module must expose a single `renderPageFrame` export to keep browser module loading valid and preserve shared page-frame behaviour across routes.
+
+------------------------------------------------------------------------
+
 ## 1. Purpose
 
 This application is a browser-based programme management tool designed

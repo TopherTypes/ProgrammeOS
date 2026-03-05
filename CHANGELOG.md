@@ -16,11 +16,26 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ### Fixed
 - Ensured route fallbacks and dashboard rendering now use the same layout framework as feature pages.
+- Resolved a duplicate `renderPageFrame` export declaration in `js/layout.js` that caused browser module parsing to fail.
 
 ### Removed
 - None.
 
 ---
+
+## [0.0.5] - 2026-03-05
+
+### Added
+- None.
+
+### Changed
+- Updated README, roadmap, and spec alignment notes to document the layout module stability correction.
+
+### Fixed
+- Removed a duplicate `renderPageFrame` export declaration in `js/layout.js` that triggered `Identifier 'renderPageFrame' has already been declared`.
+
+### Removed
+- None.
 
 ## [0.0.4] - 2026-03-05
 
