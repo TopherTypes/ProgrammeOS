@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.9 people data module: add `js/features/people/data.js` to wrap generic DB helpers with `createPerson`/`updatePerson` paths, required-name validation, immutable `id`/`createdAt` handling, and normalized person retrieval for consistent UI rendering.
 - v0.0.8 schema version management: add explicit migration planning in `js/db-schema.js` and execute upgrades automatically via IndexedDB `upgrade` handling with persisted `meta.schemaVersion`.
 - v0.0.7 database access layer: add Promise-based CRUD wrapper functions in `js/db.js` (`createEntity`, `updateEntity`, `deleteEntity`, `getEntity`, `listEntities`) with store validation and defensive error handling.
 - v0.0.6 database foundation: initialise IndexedDB using the `idb` helper, create all required object stores (`people`, `projects`, `meetings`, `actions`, `decisions`, `updates`, `meta`), and persist `meta.schemaVersion` during startup.

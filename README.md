@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.8**
+Current version: **0.0.9**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -82,3 +82,13 @@ The app now renders all routes inside a shared layout shell:
 - Database upgrades now run migrations automatically through IndexedDB `upgrade` hooks.
 - Schema version metadata is written during upgrades and defensively re-asserted at startup.
 - Added a lightweight Node verification script: `node js/db-schema.check.mjs` to simulate version changes.
+
+
+## People Data Access Layer (Milestone 2 / Task 2.1)
+
+- Added a dedicated people data module at `js/features/people/data.js` that wraps generic helpers from `js/db.js`.
+- Added `createPerson` to persist normalized people with `id`, `name`, `organisation`, `notes`, `createdAt`, and `updatedAt`.
+- Added `updatePerson` to preserve immutable fields (`id`, `createdAt`) while refreshing `updatedAt`.
+- Added lightweight validation (`name` required) and normalization helpers in `js/features/people/person-record.js`.
+- Added a lightweight verification script: `node js/features/people/person-record.check.mjs`.
+
