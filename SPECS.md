@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.14 projects data model helpers: introduce canonical project normalization/validation (`name` required), safe defaults (`description`, `status`, `stakeholderIds`), dedicated project CRUD wrapper functions for the `projects` store, and immutable-field-preserving project updates with refreshed `updatedAt`.
 - v0.0.13 projects page scaffold: `#/projects` must render a static frame with toolbar (`New Project` + status), asynchronous IndexedDB-backed list hydration, explicit list/detail empty states, deterministic `data-role` mount checks, and list-driven detail selection.
 - v0.0.12 milestone 2 completion: People directory behaviour is now the baseline product definition, including the normalized people model (`id`, `name`, `organisation`, `notes`, `createdAt`, `updatedAt`), list-table rendering on `#/people` (name + organisation + empty state), and modal-based person creation with required-name validation, cancel/Escape dismissal, focus restoration, and immediate post-save list refresh.
 - v0.0.11 people create modal: `#/people` must expose a `New Person` trigger that opens a modal with `name`, `organisation`, and `notes`, support cancel + Escape dismissal, validate required name input, persist via people data module, and refresh the people table immediately after successful saves.

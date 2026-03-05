@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.13**
+Current version: **0.0.14**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -29,4 +29,4 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 - v0.0.11: Replaced inline People create form with a keyboard-friendly New Person modal including Escape/Cancel dismissal and immediate list refresh after save.
 - v0.0.12: Marked Milestone 2 complete across planning docs and aligned release/documentation/version references to delivered People directory behaviour.
 - v0.0.13: Added Projects route frame/list/detail rendering split with asynchronous hydration, deterministic mount checks, and explicit project empty states.
-
+- v0.0.14: Added projects record normalization/validation, dedicated projects data helpers (`createProject`, `updateProject`, `getProject`, `listProjects`), immutable-field-safe updates, and a lightweight project record verification script.

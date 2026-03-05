@@ -20,6 +20,26 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.0.14] - 2026-03-05
+
+### Added
+- Added `js/features/projects/project-record.js` with canonical project normalization helpers for `name`, `description`, `status`, `stakeholderIds`, `createdAt`, and `updatedAt`.
+- Added project validation enforcing required `name` and safe defaults for optional fields (`description: ""`, `status: "active"`, `stakeholderIds: []`).
+- Added dedicated projects data access module `js/features/projects/data.js` exposing `createProject`, `updateProject`, `getProject`, and `listProjects` backed by generic store helpers.
+- Added lightweight verification script `js/features/projects/project-record.check.mjs` mirroring the People normalization/validation check approach.
+
+### Changed
+- Updated the Projects route hydration path to consume `listProjects` from the dedicated projects data module.
+- Updated README, SPECS, DECISIONS, ROADMAP, and VERSION metadata to align docs with the delivered Projects data-layer capability.
+
+### Fixed
+- Ensured project updates preserve immutable fields (`id`, `createdAt`) and always refresh `updatedAt` when persisting changes.
+
+### Removed
+- None.
+
+---
+
 ## [0.0.13] - 2026-03-05
 
 ### Added

@@ -225,6 +225,7 @@ Minimum smoke checklist:
 ### 10.2 Continuous cleanliness
 - Prettier formatting is required.
 - Avoid introducing tooling beyond what is necessary for MVP.
+- Prefer lightweight Node-based checks for pure record normalization/validation logic (for example, person/project record check scripts) rather than heavy framework-based test harnesses.
 
 ---
 
