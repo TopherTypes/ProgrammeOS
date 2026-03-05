@@ -266,3 +266,13 @@ Rationale:
 - Creates stable import paths early.
 - Keeps future milestones incremental and modular.
 - Preserves zero-build simplicity for GitHub Pages.
+
+### 13.1 Feature-owned data wrappers
+- Domain features may define focused data-access modules under `js/features/<domain>/` that wrap `db.js` generic CRUD helpers.
+- These wrappers own entity-specific validation, immutable field protection, and normalization before data reaches UI routes.
+- The people feature now follows this pattern via `js/features/people/data.js` and `js/features/people/person-record.js`.
+
+Rationale:
+- Keeps `db.js` generic and reusable while keeping business rules close to each domain.
+- Improves consistency for future UI rendering by enforcing a normalized entity shape.
+

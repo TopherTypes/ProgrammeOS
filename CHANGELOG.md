@@ -7,13 +7,10 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ## [Unreleased]
 
 ### Added
-- Implemented Milestone 1 Task 1.3 schema migration planning in `js/db-schema.js` with version-keyed migration handlers.
-- Added `js/db-schema.check.mjs` to simulate version changes and verify migration scheduling logic.
+- None.
 
 ### Changed
-- Updated `js/db.js` to execute pending schema migrations automatically during IndexedDB upgrade events.
-- Updated schema metadata writes so `meta.schemaVersion` is persisted inside the upgrade transaction and defensively re-asserted on startup.
-- Updated README, SPECS, DECISIONS, ROADMAP, and VERSION for this milestone task.
+- None.
 
 ### Fixed
 - None.
@@ -22,6 +19,23 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 - None.
 
 ---
+
+## [0.0.9] - 2026-03-05
+
+### Added
+- Added a dedicated people data module in `js/features/people/data.js` that wraps generic IndexedDB helpers from `js/db.js`.
+- Added person-specific create and update flows (`createPerson`, `updatePerson`) with immutable `id`/`createdAt` handling and automatic `updatedAt` refresh.
+- Added `js/features/people/person-record.js` for person normalization and required-field validation (`name`).
+- Added lightweight verification script `js/features/people/person-record.check.mjs` for normalization and validation checks.
+
+### Changed
+- Updated README, SPECS, DECISIONS, ROADMAP, and VERSION to reflect the people data-layer milestone.
+
+### Fixed
+- Ensured people retrieval helpers return normalized record objects for consistent UI rendering.
+
+### Removed
+- None.
 
 ## [0.0.7] - 2026-03-05
 
