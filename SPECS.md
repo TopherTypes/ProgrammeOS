@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.8 schema version management: add explicit migration planning in `js/db-schema.js` and execute upgrades automatically via IndexedDB `upgrade` handling with persisted `meta.schemaVersion`.
 - v0.0.7 database access layer: add Promise-based CRUD wrapper functions in `js/db.js` (`createEntity`, `updateEntity`, `deleteEntity`, `getEntity`, `listEntities`) with store validation and defensive error handling.
 - v0.0.6 database foundation: initialise IndexedDB using the `idb` helper, create all required object stores (`people`, `projects`, `meetings`, `actions`, `decisions`, `updates`, `meta`), and persist `meta.schemaVersion` during startup.
 - v0.0.5 stability correction: the layout module must expose a single `renderPageFrame` export to keep browser module loading valid and preserve shared page-frame behaviour across routes.

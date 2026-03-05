@@ -7,10 +7,13 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ## [Unreleased]
 
 ### Added
-- None.
+- Implemented Milestone 1 Task 1.3 schema migration planning in `js/db-schema.js` with version-keyed migration handlers.
+- Added `js/db-schema.check.mjs` to simulate version changes and verify migration scheduling logic.
 
 ### Changed
-- None.
+- Updated `js/db.js` to execute pending schema migrations automatically during IndexedDB upgrade events.
+- Updated schema metadata writes so `meta.schemaVersion` is persisted inside the upgrade transaction and defensively re-asserted on startup.
+- Updated README, SPECS, DECISIONS, ROADMAP, and VERSION for this milestone task.
 
 ### Fixed
 - None.
