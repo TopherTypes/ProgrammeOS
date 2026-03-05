@@ -245,3 +245,22 @@ Rationale:
 No additional hard constraints beyond:
 - no server
 - no non-Google account auth
+
+---
+
+## 13. Repository Module Structure Baseline
+
+- Keep a single HTML entrypoint (`index.html`).
+- Keep styles under `css/`.
+- Keep JavaScript split by responsibility under `js/`:
+  - `app.js` for startup orchestration
+  - `router.js` for route matching and navigation hooks
+  - `layout.js` for global shell rendering
+  - `db.js` for storage-layer access
+  - `features/` for domain modules
+  - `ui/` for shared UI helpers/components
+
+Rationale:
+- Creates stable import paths early.
+- Keeps future milestones incremental and modular.
+- Preserves zero-build simplicity for GitHub Pages.
