@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.15**
+Current version: **0.0.16**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -119,47 +119,46 @@ The delivered People feature set now includes:
 
 
 
-## Projects Directory Frame (Milestone 3 / Task 3.1)
+## Projects System (Milestone 3)
 
-- `#/projects` now renders a dedicated route frame with:
-  - a toolbar (`New Project` button + live status text)
-  - a data-backed list container
-  - a detail panel container with explicit empty prompts
-- Projects list hydration now runs asynchronously from IndexedDB through the dedicated projects data module (`listProjects`) after the static frame is mounted.
-- The route includes deterministic mount checks for required `data-role` nodes and throws a predictable error if the page cannot mount correctly.
-- Empty-state messaging is explicit when no projects are stored, and the detail panel prompts users to select a project when applicable.
+Milestone 3 is now delivered and provides the complete shipped baseline for Project Management in the MVP:
 
-## Projects List + Detail Selection (Milestone 3 / Task 3.2)
+- **Project data model and storage**
+  - Project records are normalized through `js/features/projects/project-record.js` and persisted via `js/features/projects/data.js`.
+  - Stored fields include `id`, `name`, `description`, `status`, `stakeholderIds`, `createdAt`, and `updatedAt`.
+  - Validation enforces required project `name`, while optional values default safely (`description: ""`, `status: "active"`, `stakeholderIds: []`).
+- **Projects route frame and hydration**
+  - `#/projects` renders a dedicated toolbar (`New Project` button + live status text), list container, and detail panel.
+  - Project list hydration runs asynchronously from IndexedDB after static frame render.
+  - Route mount checks validate required `data-role` nodes and fail with a deterministic mount error if containers are missing.
+- **Projects list and detail behaviour**
+  - The list renders as a dense table (`Project`, `Status`, `Stakeholders`).
+  - Selection supports mouse and keyboard interaction (Arrow Up/Down focus movement, Enter/Space selection).
+  - The selected row is visibly highlighted and detail content updates from `getProject` reads.
+  - Detail content includes status, description, stakeholder count, and stakeholder names resolved from people records.
+  - Empty and missing-selection fallback messages are rendered explicitly to avoid stale detail content.
 
-- The Project list now renders as a dense table with `Project`, `Status`, and `Stakeholders` columns.
-- Project selection is supported through mouse click and keyboard affordances (Tab + Enter/Space to select, Arrow Up/Down to move focus between project rows).
-- The selected project row is visibly highlighted so the active Project detail view remains clear.
-- The Project detail view now fetches full project data on selection (`name`, `description`, `status`, and key stakeholders) and renders stakeholder count + stakeholder list.
-- If a selected project is missing (for example, deleted before detail hydration completes), the detail panel shows a safe fallback message instead of stale content.
+### Verification Steps (Milestone 3)
 
+1. Open `index.html` and navigate to `#/projects`.
+2. Confirm the Projects toolbar displays `New Project` and a live status message area.
+3. Confirm the projects list renders as a table with `Project`, `Status`, and `Stakeholders` headers.
+4. Select a project row with a mouse click and confirm selected-row highlighting appears.
+5. Confirm the detail panel updates with status, description, stakeholder count, and stakeholder names.
+6. Focus a project row button and use Arrow Up/Arrow Down to move between rows.
+7. Press Enter or Space on a focused row and confirm selection + detail hydration updates.
+8. Remove a selected project from storage (or select a stale ID during testing) and confirm the detail panel shows the safe missing-project fallback message.
 
-## Projects Data Access Layer (Milestone 3 / Task 3.1)
-
-- Added `js/features/projects/project-record.js` for project normalization and validation.
-- Project normalization now enforces safe defaults: `description: ""`, `status: "active"`, and `stakeholderIds: []`.
-- Added `js/features/projects/data.js` with `createProject`, `updateProject`, `getProject`, and `listProjects`, all backed by generic database helpers for the `projects` store.
-- `updateProject` preserves immutable fields (`id`, `createdAt`) and always refreshes `updatedAt`.
-- Added a lightweight verification script: `node js/features/projects/project-record.check.mjs`.
-
-## Manual Verification (v0.0.15)
+## Manual Verification (v0.0.16)
 
 1. Open `index.html` and navigate to `#/people`.
-2. Select **New Person**, enter values for all fields, and save.
-3. Confirm the modal closes and the new row appears in the people table without reloading the page.
-4. Open the modal again and press `Escape`; confirm the modal closes and focus returns to the **New Person** trigger.
-5. Re-open the modal and submit with an empty name; confirm validation prevents save.
-6. Navigate to `#/projects` and confirm the Project list appears as a dense table.
-7. Select a row and confirm the selected row is highlighted and the Project detail view shows status, description, stakeholder count, and key stakeholders list.
-8. With focus on a project row button, use Arrow Up/Arrow Down to move focus and Enter/Space to select; confirm detail content updates.
+2. Create a person from **New Person** and confirm the row appears immediately without reload.
+3. Navigate to `#/projects` and complete the Milestone 3 verification steps above.
+4. Run `node js/features/projects/project-record.check.mjs` and confirm validation/normalization checks pass.
 
-## Smoke Checklist Outcomes (v0.0.15)
+## Smoke Checklist Outcomes (v0.0.16)
 
-- ⚠️ Entity creation: **People pass; Projects partial** (projects list/detail frame and empty-state delivered, create modal still pending milestone work).
+- ⚠️ Entity creation: **People pass; Projects pass via data model + list/detail management baseline** (UI create/edit workflows remain future enhancement work).
 - ⚠️ Meeting logging: **Pending milestone implementation**.
 - ⚠️ Action/decision/update creation: **Pending milestone implementation**.
 - ⚠️ Communication tracking: **Pending milestone implementation**.
