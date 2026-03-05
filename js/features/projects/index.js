@@ -1,4 +1,5 @@
-import { listProjects } from "./data.js";
+import { listPeople } from "../people/data.js";
+import { getProject, listProjects } from "./data.js";
 import { renderPageFrame } from "../../layout.js";
 
 /**
@@ -64,33 +65,47 @@ function renderProjectsList(listContainer, projects, selectedProjectId) {
     return;
   }
 
-  const listItems = projects
+  const rowsHtml = projects
     .map((project) => {
       const label = escapeHtml(project.name?.trim() || "Untitled project");
       const status = escapeHtml(project.status?.trim() || "No status");
       const isSelected = project.id === selectedProjectId;
+      const stakeholderCount = project.stakeholderIds?.length ?? 0;
 
       return `
-        <li>
-          <button
-            class="projects-list-item"
-            type="button"
-            data-role="project-item"
-            data-project-id="${project.id}"
-            aria-pressed="${isSelected ? "true" : "false"}"
-          >
-            <strong>${label}</strong>
-            <span class="small-note">${status}</span>
-          </button>
-        </li>
+        <tr data-role="project-row" data-project-id="${project.id}" aria-selected="${
+          isSelected ? "true" : "false"
+        }" class="${isSelected ? "is-selected" : ""}">
+          <td>
+            <button
+              class="projects-list-item"
+              type="button"
+              data-role="project-item"
+              data-project-id="${project.id}"
+              aria-pressed="${isSelected ? "true" : "false"}"
+            >
+              ${label}
+            </button>
+          </td>
+          <td>${status}</td>
+          <td>${stakeholderCount}</td>
+        </tr>
       `;
     })
     .join("");
 
   listContainer.innerHTML = `
-    <ul class="projects-list-items" data-role="projects-list-items">
-      ${listItems}
-    </ul>
+    <table class="people-table projects-table" data-role="projects-list-items">
+      <caption class="visually-hidden">Project list</caption>
+      <thead>
+        <tr>
+          <th scope="col">Project</th>
+          <th scope="col">Status</th>
+          <th scope="col">Stakeholders</th>
+        </tr>
+      </thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
   `;
 }
 
@@ -98,13 +113,24 @@ function renderProjectsList(listContainer, projects, selectedProjectId) {
  * Renders detail content for the currently selected project.
  *
  * @param {HTMLElement} detailContainer
- * @param {{id: string, name?: string, description?: string, status?: string}|null} project
+ * @param {{id: string, name?: string, description?: string, status?: string, stakeholderIds?: string[]}|null} project
+ * @param {Map<string, string>} stakeholderNamesById
+ * @param {boolean} isMissingSelection
  */
-function renderProjectDetail(detailContainer, project) {
+function renderProjectDetail(detailContainer, project, stakeholderNamesById, isMissingSelection) {
+  if (isMissingSelection) {
+    detailContainer.innerHTML = `
+      <p class="small-note" data-role="project-detail-missing">
+        Project detail view is unavailable because the selected project could not be found.
+      </p>
+    `;
+    return;
+  }
+
   if (!project) {
     detailContainer.innerHTML = `
       <p class="small-note" data-role="project-detail-empty">
-        Select a project to view details.
+        Select a project from the project list to view details.
       </p>
     `;
     return;
@@ -113,14 +139,49 @@ function renderProjectDetail(detailContainer, project) {
   const name = escapeHtml(project.name?.trim() || "Untitled project");
   const status = escapeHtml(project.status?.trim() || "No status");
   const description = escapeHtml(project.description?.trim() || "No description captured yet.");
+  const stakeholderNames = (project.stakeholderIds ?? [])
+    .map((stakeholderId) => stakeholderNamesById.get(stakeholderId) || "Unknown person")
+    .map((nameValue) => escapeHtml(nameValue));
+
+  const stakeholderListHtml =
+    stakeholderNames.length === 0
+      ? `<p class="small-note">No key stakeholders linked yet.</p>`
+      : `<ul>${stakeholderNames.map((stakeholderName) => `<li>${stakeholderName}</li>`).join("")}</ul>`;
 
   detailContainer.innerHTML = `
     <article class="project-detail-card" data-role="project-detail-card">
       <h3>${name}</h3>
       <p><strong>Status:</strong> ${status}</p>
       <p>${description}</p>
+      <p><strong>Stakeholder count:</strong> ${stakeholderNames.length}</p>
+      <section aria-label="Project key stakeholders">
+        <h4>Key stakeholders</h4>
+        ${stakeholderListHtml}
+      </section>
     </article>
   `;
+}
+
+/**
+ * Handles both click and keyboard interactions for project selection.
+ *
+ * @param {Event} event
+ * @returns {string|null}
+ */
+function getSelectedProjectIdFromEvent(event) {
+  const target = event.target;
+
+  if (!(target instanceof Element)) {
+    return null;
+  }
+
+  const projectItem = target.closest('[data-role="project-item"]');
+
+  if (!(projectItem instanceof HTMLButtonElement)) {
+    return null;
+  }
+
+  return projectItem.dataset.projectId ?? null;
 }
 
 /**
@@ -134,18 +195,45 @@ function renderProjectDetail(detailContainer, project) {
  */
 async function refreshProjectsView({ listContainer, detailContainer, statusText, state }) {
   const projects = await listProjects();
-  const selectedProject = projects.find((project) => project.id === state.selectedProjectId) ?? null;
+  const people = await listPeople();
+
+  state.projects = projects;
+  state.peopleById = new Map(people.map((person) => [person.id, person.name]));
+
+  const selectedProjectInList =
+    projects.find((project) => project.id === state.selectedProjectId) ?? null;
+  const hadExplicitSelection = Boolean(state.selectedProjectId);
+  let shouldShowMissingSelectionFallback = false;
 
   // If the current selection no longer exists, default to the first record.
-  if (!selectedProject && projects.length > 0) {
+  if (!selectedProjectInList && projects.length > 0 && !hadExplicitSelection) {
     state.selectedProjectId = projects[0].id;
   }
 
-  const hydratedSelection =
-    projects.find((project) => project.id === state.selectedProjectId) ?? null;
+  if (!selectedProjectInList && hadExplicitSelection) {
+    shouldShowMissingSelectionFallback = true;
+    state.selectedProjectId = null;
+  }
+
+  let hydratedSelection = null;
+
+  if (state.selectedProjectId) {
+    hydratedSelection = await getProject(state.selectedProjectId);
+
+    // Guard against races where the selected record is deleted between list and detail reads.
+    if (!hydratedSelection) {
+      shouldShowMissingSelectionFallback = true;
+      state.selectedProjectId = null;
+    }
+  }
 
   renderProjectsList(listContainer, projects, state.selectedProjectId);
-  renderProjectDetail(detailContainer, hydratedSelection);
+  renderProjectDetail(
+    detailContainer,
+    hydratedSelection,
+    state.peopleById,
+    shouldShowMissingSelectionFallback
+  );
 
   statusText.textContent =
     projects.length === 0
@@ -179,6 +267,8 @@ export function renderProjectsPage(outlets) {
 
   const state = {
     selectedProjectId: null,
+    projects: [],
+    peopleById: new Map(),
   };
 
   refreshProjectsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
@@ -186,23 +276,45 @@ export function renderProjectsPage(outlets) {
   });
 
   listContainer.addEventListener("click", (event) => {
-    const target = event.target;
+    const selectedProjectId = getSelectedProjectIdFromEvent(event);
 
-    if (!(target instanceof Element)) {
+    if (!selectedProjectId) {
       return;
     }
 
-    const projectItem = target.closest('[data-role="project-item"]');
-
-    if (!(projectItem instanceof HTMLButtonElement)) {
-      return;
-    }
-
-    state.selectedProjectId = projectItem.dataset.projectId ?? null;
+    state.selectedProjectId = selectedProjectId;
 
     refreshProjectsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
       statusText.textContent = `Unable to load project details: ${error.message}`;
     });
+  });
+
+  listContainer.addEventListener("keydown", (event) => {
+    if (!(event.target instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") {
+      return;
+    }
+
+    const buttons = [...listContainer.querySelectorAll('[data-role="project-item"]')].filter(
+      (element) => element instanceof HTMLButtonElement
+    );
+
+    const currentIndex = buttons.indexOf(event.target);
+
+    if (currentIndex < 0) {
+      return;
+    }
+
+    const nextIndex =
+      event.key === "ArrowDown"
+        ? Math.min(buttons.length - 1, currentIndex + 1)
+        : Math.max(0, currentIndex - 1);
+
+    buttons[nextIndex]?.focus();
+    event.preventDefault();
   });
 
   // Creation modal is not delivered yet; this keeps intent explicit in the UI.
