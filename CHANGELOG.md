@@ -20,6 +20,24 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.0.11] - 2026-03-05
+
+### Added
+- Added a `New Person` trigger on `#/people` that opens a dedicated modal form with `name`, `organisation`, and `notes` fields.
+- Added an accessible modal interaction model for People create flow, including Cancel control, Escape-key dismissal, focus restoration, and inline modal status messaging.
+
+### Changed
+- Replaced the inline People create form with a modal-based submit flow wired to `createPerson` and immediate in-page list refresh.
+- Updated README, SPECS, ROADMAP, and VERSION metadata for the People modal milestone.
+
+### Fixed
+- Ensured new People records appear instantly after successful save without route or full app reload.
+
+### Removed
+- Removed the inline People create form from the page body in favor of a dedicated modal lifecycle.
+
+---
+
 ## [0.0.10] - 2026-03-05
 
 ### Added
