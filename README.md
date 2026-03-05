@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.14**
+Current version: **0.0.15**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -129,6 +129,14 @@ The delivered People feature set now includes:
 - The route includes deterministic mount checks for required `data-role` nodes and throws a predictable error if the page cannot mount correctly.
 - Empty-state messaging is explicit when no projects are stored, and the detail panel prompts users to select a project when applicable.
 
+## Projects List + Detail Selection (Milestone 3 / Task 3.2)
+
+- The Project list now renders as a dense table with `Project`, `Status`, and `Stakeholders` columns.
+- Project selection is supported through mouse click and keyboard affordances (Tab + Enter/Space to select, Arrow Up/Down to move focus between project rows).
+- The selected project row is visibly highlighted so the active Project detail view remains clear.
+- The Project detail view now fetches full project data on selection (`name`, `description`, `status`, and key stakeholders) and renders stakeholder count + stakeholder list.
+- If a selected project is missing (for example, deleted before detail hydration completes), the detail panel shows a safe fallback message instead of stale content.
+
 
 ## Projects Data Access Layer (Milestone 3 / Task 3.1)
 
@@ -138,15 +146,18 @@ The delivered People feature set now includes:
 - `updateProject` preserves immutable fields (`id`, `createdAt`) and always refreshes `updatedAt`.
 - Added a lightweight verification script: `node js/features/projects/project-record.check.mjs`.
 
-## Manual Verification (v0.0.14)
+## Manual Verification (v0.0.15)
 
 1. Open `index.html` and navigate to `#/people`.
 2. Select **New Person**, enter values for all fields, and save.
 3. Confirm the modal closes and the new row appears in the people table without reloading the page.
 4. Open the modal again and press `Escape`; confirm the modal closes and focus returns to the **New Person** trigger.
 5. Re-open the modal and submit with an empty name; confirm validation prevents save.
+6. Navigate to `#/projects` and confirm the Project list appears as a dense table.
+7. Select a row and confirm the selected row is highlighted and the Project detail view shows status, description, stakeholder count, and key stakeholders list.
+8. With focus on a project row button, use Arrow Up/Arrow Down to move focus and Enter/Space to select; confirm detail content updates.
 
-## Smoke Checklist Outcomes (v0.0.14)
+## Smoke Checklist Outcomes (v0.0.15)
 
 - ⚠️ Entity creation: **People pass; Projects partial** (projects list/detail frame and empty-state delivered, create modal still pending milestone work).
 - ⚠️ Meeting logging: **Pending milestone implementation**.

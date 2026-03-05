@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.14**
+Current version: **0.0.15**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -30,3 +30,4 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 - v0.0.12: Marked Milestone 2 complete across planning docs and aligned release/documentation/version references to delivered People directory behaviour.
 - v0.0.13: Added Projects route frame/list/detail rendering split with asynchronous hydration, deterministic mount checks, and explicit project empty states.
 - v0.0.14: Added projects record normalization/validation, dedicated projects data helpers (`createProject`, `updateProject`, `getProject`, `listProjects`), immutable-field-safe updates, and a lightweight project record verification script.
+- v0.0.15: Added Milestone 3 Task 3.2 Project list/detail selection behaviour (dense Project list table, keyboard/click selection affordances, selected-row highlight, stakeholder-resolved detail rendering, and safe missing-project fallback UI).

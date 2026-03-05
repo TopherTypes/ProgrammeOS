@@ -153,6 +153,31 @@ body {
   border-bottom: 1px solid #e0e7ef;
 }
 
+.projects-table td {
+  padding: 0.3rem 0.5rem;
+}
+
+.projects-table [data-role="project-row"].is-selected {
+  background: #eaf1ff;
+}
+
+.projects-list-item {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 0.15rem 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.projects-list-item:focus-visible {
+  outline: 2px solid #2f65b7;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

@@ -20,6 +20,26 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.0.15] - 2026-03-05
+
+### Added
+- Added dense Project list table rendering with explicit `Project`, `Status`, and `Stakeholders` columns plus selected-row highlighting in `#/projects`.
+- Added keyboard navigation affordances for Project list selection (Arrow Up/Down focus movement between rows, with native button Enter/Space activation).
+- Added stakeholder-aware Project detail rendering with stakeholder count and key stakeholder names resolved from People records.
+- Added safe missing-selection fallback messaging when a previously selected project can no longer be loaded (for example, deleted between list/detail reads).
+
+### Changed
+- Updated Projects route state handling to keep selection in-memory for the active route render cycle while supporting explicit list/detail re-hydration.
+- Updated README, SPECS, ROADMAP, and VERSION metadata to reflect the delivered Milestone 3 Task 3.2 Project list/detail behaviour.
+
+### Fixed
+- Prevented stale Project detail rendering when a selected record disappears before detail hydration completes.
+
+### Removed
+- None.
+
+---
+
 ## [0.0.14] - 2026-03-05
 
 ### Added
