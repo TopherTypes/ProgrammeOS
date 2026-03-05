@@ -25,6 +25,28 @@ body {
   padding: 1rem;
 }
 
+.sidebar-note {
+  margin-bottom: 1rem;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-nav a {
+  color: #e4ecf7;
+  text-decoration: none;
+  padding: 0.25rem 0;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a:focus-visible {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
 .content {
   padding: 1rem 1.25rem;
 }

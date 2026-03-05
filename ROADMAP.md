@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.1**
+Current version: **0.0.2**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 

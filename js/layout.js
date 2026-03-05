@@ -8,7 +8,14 @@ export function createLayout(mountNode) {
     <div class="app-shell">
       <aside class="sidebar">
         <h1>Programme OS</h1>
-        <p class="small-note">Milestone 0 foundation scaffold</p>
+        <p class="small-note sidebar-note">Milestone 0 foundation scaffold</p>
+        <nav class="sidebar-nav" aria-label="Primary navigation">
+          <a href="#/dashboard">Dashboard</a>
+          <a href="#/projects">Projects</a>
+          <a href="#/people">People</a>
+          <a href="#/meetings">Meetings</a>
+          <a href="#/focus">Focus</a>
+        </nav>
       </aside>
       <main class="content" id="content-outlet"></main>
     </div>
