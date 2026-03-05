@@ -1,14 +1,15 @@
 # ROADMAP.md
 
-Current version: **0.0.11**
+Current version: **0.0.12**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
 ## Near-term milestones
 
-- Milestone 0 (v0.0.1): Application foundation.
-- Milestone 1 (v0.0.2): IndexedDB persistence layer.
-- Milestone 2 (v0.0.3): People system.
+- [x] Milestone 0 (v0.0.1): Application foundation.
+- [x] Milestone 1 (v0.0.2): IndexedDB persistence layer.
+- [x] Milestone 2 (v0.0.3): People system (model, list, creation modal) — **complete**.
+- [ ] Milestone 3 (v0.0.4): Projects system — in progress.
 
 For detailed tasks and acceptance criteria, see `PLANS.md`.
 
@@ -26,3 +27,5 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 - v0.0.10: Added a functional People directory page with in-route create flow, empty-state messaging, and immediate post-create list refresh.
 
 - v0.0.11: Replaced inline People create form with a keyboard-friendly New Person modal including Escape/Cancel dismissal and immediate list refresh after save.
+- v0.0.12: Marked Milestone 2 complete across planning docs and aligned release/documentation/version references to delivered People directory behaviour.
+

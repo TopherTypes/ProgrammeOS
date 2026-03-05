@@ -15,6 +15,21 @@ AI agents must follow the operational rules defined in **AGENTS.md** and respect
 
 ---
 
+## Milestone Status
+
+- [x] Milestone 0 — Application Foundation
+- [x] Milestone 1 — Database Layer
+- [x] Milestone 2 — People System
+- [ ] Milestone 3 — Projects System
+- [ ] Milestone 4 — Meetings System
+- [ ] Milestone 5 — Actions, Decisions, Updates
+- [ ] Milestone 6 — Communication Tracking
+- [ ] Milestone 7 — Entity Linking UX
+- [ ] Milestone 8 — Dashboard and Focus
+- [ ] Milestone 9 — Import / Export
+
+---
+
 # Versioning Strategy
 
 | Version | Meaning |
@@ -188,10 +203,11 @@ Verification
 
 # Milestone 2 — People System
 Target Version: v0.0.3
+Status: **Completed (v0.0.12 documentation alignment)**
 
 Goal: Implement the people directory.
 
-## Task 2.1 — People Data Model
+## Task 2.1 — People Data Model ✅
 
 Fields:
 
@@ -210,7 +226,7 @@ Verification
 
 ---
 
-## Task 2.2 — People List Page
+## Task 2.2 — People List Page ✅
 
 Features
 - List all people.
@@ -225,7 +241,7 @@ Verification
 
 ---
 
-## Task 2.3 — Person Creation Modal
+## Task 2.3 — Person Creation Modal ✅
 
 Features
 - Modal form.
