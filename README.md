@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.12**
+Current version: **0.0.13**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -117,7 +117,19 @@ The delivered People feature set now includes:
 - **People list**: `#/people` renders a directory table with `name` and `organisation`, backed by IndexedDB and a clear empty state when no records exist.
 - **Creation flow**: `New Person` opens a modal that captures `name`, `organisation`, and `notes`, validates required name input, supports Cancel/Escape dismissal, and refreshes the list immediately after save.
 
-## Manual Verification (v0.0.12)
+
+
+## Projects Directory Frame (Milestone 3 / Task 3.1)
+
+- `#/projects` now renders a dedicated route frame with:
+  - a toolbar (`New Project` button + live status text)
+  - a data-backed list container
+  - a detail panel container with explicit empty prompts
+- Projects list hydration now runs asynchronously from IndexedDB (`listEntities("projects")`) after the static frame is mounted.
+- The route includes deterministic mount checks for required `data-role` nodes and throws a predictable error if the page cannot mount correctly.
+- Empty-state messaging is explicit when no projects are stored, and the detail panel prompts users to select a project when applicable.
+
+## Manual Verification (v0.0.13)
 
 1. Open `index.html` and navigate to `#/people`.
 2. Select **New Person**, enter values for all fields, and save.
@@ -125,9 +137,9 @@ The delivered People feature set now includes:
 4. Open the modal again and press `Escape`; confirm the modal closes and focus returns to the **New Person** trigger.
 5. Re-open the modal and submit with an empty name; confirm validation prevents save.
 
-## Smoke Checklist Outcomes (v0.0.12)
+## Smoke Checklist Outcomes (v0.0.13)
 
-- ✅ Entity creation: **Pass for People** (implemented and verified in-app); Projects/Meetings remain planned for later milestones.
+- ⚠️ Entity creation: **People pass; Projects partial** (projects list/detail frame and empty-state delivered, create modal still pending milestone work).
 - ⚠️ Meeting logging: **Pending milestone implementation**.
 - ⚠️ Action/decision/update creation: **Pending milestone implementation**.
 - ⚠️ Communication tracking: **Pending milestone implementation**.
