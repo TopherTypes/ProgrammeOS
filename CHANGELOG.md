@@ -20,6 +20,23 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.0.13] - 2026-03-05
+
+### Added
+- Added a Projects route frame on `#/projects` with an explicit toolbar (`New Project` + live status), list container, and detail container with empty prompt messaging.
+- Added async IndexedDB hydration for the Projects route using a list/detail render split (frame render, list render, refresh function, and event wiring).
+- Added deterministic mount validation for required Projects `data-role` nodes, with a stable error message when mount prerequisites are missing.
+
+### Changed
+- Updated README, SPECS, ROADMAP, and VERSION metadata to align product documentation with delivered Projects page scaffold behaviour.
+
+### Fixed
+- Replaced the previous Projects placeholder text-only implementation with structured, stateful route rendering and explicit empty states when no projects exist.
+
+### Removed
+- Removed the Projects route placeholder body text.
+
+---
 ## [0.0.12] - 2026-03-05
 
 ### Added

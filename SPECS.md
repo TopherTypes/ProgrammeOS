@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.13 projects page scaffold: `#/projects` must render a static frame with toolbar (`New Project` + status), asynchronous IndexedDB-backed list hydration, explicit list/detail empty states, deterministic `data-role` mount checks, and list-driven detail selection.
 - v0.0.12 milestone 2 completion: People directory behaviour is now the baseline product definition, including the normalized people model (`id`, `name`, `organisation`, `notes`, `createdAt`, `updatedAt`), list-table rendering on `#/people` (name + organisation + empty state), and modal-based person creation with required-name validation, cancel/Escape dismissal, focus restoration, and immediate post-save list refresh.
 - v0.0.11 people create modal: `#/people` must expose a `New Person` trigger that opens a modal with `name`, `organisation`, and `notes`, support cancel + Escape dismissal, validate required name input, persist via people data module, and refresh the people table immediately after successful saves.
 - v0.0.10 people page rendering: `#/people` must render a people directory table (name + organisation), show an explicit empty state when no records exist, and refresh in place after create actions by loading data through the people data module.
@@ -112,6 +113,8 @@ actions - linked decisions - linked updates
 
 Projects serve as containers for programme work but should not impose
 rigid task management structures.
+
+In the current MVP implementation baseline, the Projects page provides the route frame and read-only list/detail hydration scaffolding (including empty states and deterministic mount checks). Full create/edit project workflows remain part of upcoming Milestone 3 tasks.
 
 ------------------------------------------------------------------------
 
