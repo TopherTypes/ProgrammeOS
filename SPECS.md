@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.19 projects CRUD UI completion: `#/projects` detail panel must expose delegated `Edit` and `Delete` controls for the active project; edit must open a prefilled modal with inline name-required validation and persist via `updateProject(projectId, patch)`; delete must require confirmation, execute `deleteProject(projectId)`, clear invalid selection state, refresh list/detail hydration, and communicate success/failure status outcomes.
 - v0.0.18 projects delete helper: the projects data module must expose `deleteProject(projectId)` with non-empty id validation, delegated `deleteEntity("projects", projectId)` persistence, and contextual failure errors; lightweight project checks should cover create -> delete lifecycle expectations for get/list behaviour.
 - v0.0.17 projects create modal: `#/projects` must expose a `New Project` modal with `name`, `description`, `status`, and multi-select `stakeholderIds`, including Escape/cancel/overlay dismissal, focus restoration, inline modal status/error messaging, async persistence via `createProject`, and post-save list/detail refresh.
 - v0.0.16 milestone 3 completion alignment: Project Management implementation status now reflects delivered Milestone 3 scope (project data model persistence + Projects list/detail route behaviour) and roadmap markers updated to complete.
@@ -121,7 +122,7 @@ rigid task management structures.
 
 Current implementation status: **Delivered in Milestone 3**.
 
-In the current MVP implementation baseline, Project Management includes project record persistence through a dedicated data module and normalized project schema (`id`, `name`, `description`, `status`, `stakeholderIds`, `createdAt`, `updatedAt`), a modal-driven project creation flow (`New Project`) with required-name validation and multi-select stakeholder linking, and a Projects route with dense list rendering, keyboard/mouse selection, selected-row highlighting, stakeholder-aware detail hydration, and safe empty/missing detail fallback messaging.
+In the current MVP implementation baseline, Project Management includes project record persistence through a dedicated data module and normalized project schema (`id`, `name`, `description`, `status`, `stakeholderIds`, `createdAt`, `updatedAt`), modal-driven project create/edit flows with required-name validation and multi-select stakeholder linking, and a Projects route with dense list rendering, keyboard/mouse selection, selected-row highlighting, stakeholder-aware detail hydration, delegated detail-panel Edit/Delete controls, confirmed deletion handling, and safe empty/missing detail fallback messaging.
 
 ------------------------------------------------------------------------
 

@@ -15,23 +15,25 @@ import { openProjectModal } from "./project-modal.js";
  */
 
 /**
- * @typedef {Object} NewProjectModalOptions
+ * @typedef {Object} EditProjectModalOptions
  * @property {ProjectModalPerson[]} people
+ * @property {ProjectFormValues} initialValues
  * @property {(values: ProjectFormValues) => Promise<void>} onSubmit
  * @property {() => void} [onClose]
  */
 
 /**
- * Creates and opens the modal for creating a project.
+ * Opens the edit project modal with pre-filled values.
  *
- * @param {NewProjectModalOptions} options
+ * @param {EditProjectModalOptions} options
  * @returns {{ close: () => void }}
  */
-export function openNewProjectModal(options) {
+export function openEditProjectModal(options) {
   return openProjectModal({
     people: options.people,
-    title: "New Project",
-    submitLabel: "Save project",
+    initialValues: options.initialValues,
+    title: "Edit Project",
+    submitLabel: "Save changes",
     onSubmit: options.onSubmit,
     onClose: options.onClose,
   });

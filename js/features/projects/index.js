@@ -1,5 +1,6 @@
 import { listPeople } from "../people/data.js";
-import { createProject, getProject, listProjects } from "./data.js";
+import { createProject, deleteProject, getProject, listProjects, updateProject } from "./data.js";
+import { openEditProjectModal } from "./edit-project-modal.js";
 import { openNewProjectModal } from "./new-project-modal.js";
 import { renderPageFrame } from "../../layout.js";
 
@@ -152,6 +153,18 @@ function renderProjectDetail(detailContainer, project, stakeholderNamesById, isM
   detailContainer.innerHTML = `
     <article class="project-detail-card" data-role="project-detail-card">
       <h3>${name}</h3>
+      <div class="modal-actions" aria-label="Project detail actions">
+        <button class="people-button people-button-muted" type="button" data-role="project-edit-trigger" data-project-id="${
+          project.id
+        }">
+          Edit
+        </button>
+        <button class="people-button people-button-muted" type="button" data-role="project-delete-trigger" data-project-id="${
+          project.id
+        }">
+          Delete
+        </button>
+      </div>
       <p><strong>Status:</strong> ${status}</p>
       <p>${description}</p>
       <p><strong>Stakeholder count:</strong> ${stakeholderNames.length}</p>
@@ -288,6 +301,87 @@ export function renderProjectsPage(outlets) {
     refreshProjectsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
       statusText.textContent = `Unable to load project details: ${error.message}`;
     });
+  });
+
+  // Detail panel actions are delegated so re-renders do not require listener re-attachment.
+  detailContainer.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const editTrigger = event.target.closest('[data-role="project-edit-trigger"]');
+
+    if (editTrigger instanceof HTMLButtonElement) {
+      const projectId = editTrigger.dataset.projectId ?? state.selectedProjectId;
+      const selectedProject = state.projects.find((project) => project.id === projectId);
+
+      if (!selectedProject || !projectId) {
+        statusText.textContent = "Unable to edit project: selection is no longer valid.";
+        return;
+      }
+
+      openEditProjectModal({
+        people: [...state.peopleById.entries()].map(([id, name]) => ({ id, name })),
+        initialValues: {
+          name: selectedProject.name,
+          description: selectedProject.description,
+          status: selectedProject.status,
+          stakeholderIds: selectedProject.stakeholderIds,
+        },
+        onSubmit: async ({ name, description, status, stakeholderIds }) => {
+          try {
+            await updateProject(projectId, { name, description, status, stakeholderIds });
+            state.selectedProjectId = projectId;
+            await refreshProjectsView({ listContainer, detailContainer, statusText, state });
+            statusText.textContent = "Project updated successfully.";
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            statusText.textContent = `Unable to update project: ${message}`;
+            throw error;
+          }
+        },
+      });
+
+      return;
+    }
+
+    const deleteTrigger = event.target.closest('[data-role="project-delete-trigger"]');
+
+    if (!(deleteTrigger instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    const projectId = deleteTrigger.dataset.projectId ?? state.selectedProjectId;
+    const selectedProject = state.projects.find((project) => project.id === projectId);
+
+    if (!selectedProject || !projectId) {
+      statusText.textContent = "Unable to delete project: selection is no longer valid.";
+      return;
+    }
+
+    const shouldDelete = window.confirm(
+      `Delete project \"${selectedProject.name}\"? This cannot be undone.`
+    );
+
+    if (!shouldDelete) {
+      statusText.textContent = "Project deletion cancelled.";
+      return;
+    }
+
+    deleteProject(projectId)
+      .then(async () => {
+        // Ensure stale selection state is dropped before re-hydration.
+        if (state.selectedProjectId === projectId) {
+          state.selectedProjectId = null;
+        }
+
+        await refreshProjectsView({ listContainer, detailContainer, statusText, state });
+        statusText.textContent = "Project deleted successfully.";
+      })
+      .catch((error) => {
+        const message = error instanceof Error ? error.message : String(error);
+        statusText.textContent = `Unable to delete project: ${message}`;
+      });
   });
 
   listContainer.addEventListener("keydown", (event) => {
