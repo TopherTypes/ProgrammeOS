@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.18 projects delete helper: the projects data module must expose `deleteProject(projectId)` with non-empty id validation, delegated `deleteEntity("projects", projectId)` persistence, and contextual failure errors; lightweight project checks should cover create -> delete lifecycle expectations for get/list behaviour.
 - v0.0.17 projects create modal: `#/projects` must expose a `New Project` modal with `name`, `description`, `status`, and multi-select `stakeholderIds`, including Escape/cancel/overlay dismissal, focus restoration, inline modal status/error messaging, async persistence via `createProject`, and post-save list/detail refresh.
 - v0.0.16 milestone 3 completion alignment: Project Management implementation status now reflects delivered Milestone 3 scope (project data model persistence + Projects list/detail route behaviour) and roadmap markers updated to complete.
 - v0.0.14 projects data model helpers: introduce canonical project normalization/validation (`name` required), safe defaults (`description`, `status`, `stakeholderIds`), dedicated project CRUD wrapper functions for the `projects` store, and immutable-field-preserving project updates with refreshed `updatedAt`.

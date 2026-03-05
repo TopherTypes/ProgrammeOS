@@ -1,5 +1,6 @@
 import {
   createEntity,
+  deleteEntity,
   getEntity,
   listEntities,
   updateEntity,
@@ -147,4 +148,27 @@ export async function getProject(projectId) {
 export async function listProjects() {
   const projects = await listEntities(PROJECTS_STORE);
   return projects.map(normalizeProject);
+}
+
+/**
+ * Deletes a project record by id.
+ *
+ * @param {string} projectId
+ * @returns {Promise<void>}
+ */
+export async function deleteProject(projectId) {
+  const normalizedProjectId =
+    typeof projectId === "string" ? projectId.trim() : "";
+
+  if (!normalizedProjectId) {
+    throw new Error("Project id is required to delete a project.");
+  }
+
+  try {
+    await deleteEntity(PROJECTS_STORE, normalizedProjectId);
+  } catch (error) {
+    throw new Error(`Failed to delete project for id "${normalizedProjectId}".`, {
+      cause: error,
+    });
+  }
 }

@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.17**
+Current version: **0.0.18**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -35,3 +35,4 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 - v0.0.16: Marked Milestone 3 complete across roadmap/spec/readme docs and aligned implementation-status language with shipped Project Management behaviour.
 
 - v0.0.17: Added New Project modal lifecycle (Escape/cancel/overlay close, focus restoration, inline status/error messaging), wired async `createProject` persistence, and refreshed Projects list/detail hydration after successful saves.
+- v0.0.18: Added `deleteProject(projectId)` in the projects data module with explicit id validation and contextual delete error handling, and expanded lightweight project checks to cover create -> delete -> get/list lifecycle expectations.
