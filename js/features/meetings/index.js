@@ -1,10 +1,13 @@
+import { renderPageFrame } from "../../layout.js";
+
 /**
  * Renders the meetings page placeholder.
- * @param {HTMLElement} container
+ * @param {{ mainOutlet: HTMLElement, detailOutlet: HTMLElement }} outlets
  */
-export function renderMeetingsPage(container) {
-  container.innerHTML = `
-    <h2 class="page-title">Meetings</h2>
-    <p class="small-note">Meetings feature module scaffold is in place.</p>
-  `;
+export function renderMeetingsPage(outlets) {
+  renderPageFrame(outlets, {
+    title: "Meetings",
+    bodyHtml:
+      '<p class="small-note">Meetings feature module scaffold is in place.</p>',
+  });
 }

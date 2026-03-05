@@ -1,10 +1,13 @@
+import { renderPageFrame } from "../../layout.js";
+
 /**
  * Renders the projects page placeholder.
- * @param {HTMLElement} container
+ * @param {{ mainOutlet: HTMLElement, detailOutlet: HTMLElement }} outlets
  */
-export function renderProjectsPage(container) {
-  container.innerHTML = `
-    <h2 class="page-title">Projects</h2>
-    <p class="small-note">Projects feature module scaffold is in place.</p>
-  `;
+export function renderProjectsPage(outlets) {
+  renderPageFrame(outlets, {
+    title: "Projects",
+    bodyHtml:
+      '<p class="small-note">Projects feature module scaffold is in place.</p>',
+  });
 }

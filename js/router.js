@@ -5,8 +5,9 @@ import { renderActionsPage } from "./features/actions/index.js";
 import { renderDecisionsPage } from "./features/decisions/index.js";
 import { renderUpdatesPage } from "./features/updates/index.js";
 import { renderFocusPage } from "./features/focus/index.js";
+import { renderPageFrame } from "./layout.js";
 
-/** @type {Record<string, (container: HTMLElement) => void>} */
+/** @type {Record<string, (outlets: { mainOutlet: HTMLElement, detailOutlet: HTMLElement }) => void>} */
 const ROUTE_MAP = {
   "#/dashboard": renderDashboardPage,
   "#/projects": renderProjectsPage,
@@ -20,9 +21,9 @@ const ROUTE_MAP = {
 
 /**
  * Returns a lightweight hash router implementation.
- * @param {HTMLElement} contentOutlet
+ * @param {{ mainOutlet: HTMLElement, detailOutlet: HTMLElement }} outlets
  */
-export function createRouter(contentOutlet) {
+export function createRouter(outlets) {
   /**
    * Normalises the current hash and returns a supported route key.
    * Unknown routes fall back to not-found rendering.
@@ -35,7 +36,7 @@ export function createRouter(contentOutlet) {
     const route = getCurrentRoute();
     const renderFn = ROUTE_MAP[route] ?? renderNotFoundPage;
 
-    renderFn(contentOutlet);
+    renderFn(outlets);
   };
 
   return {
@@ -54,22 +55,22 @@ export function createRouter(contentOutlet) {
 
 /**
  * Renders the dashboard placeholder page.
- * @param {HTMLElement} container
+ * @param {{ mainOutlet: HTMLElement, detailOutlet: HTMLElement }} outlets
  */
-function renderDashboardPage(container) {
-  container.innerHTML = `
-    <h2 class="page-title">Dashboard</h2>
-    <p class="small-note">Application shell loaded successfully.</p>
-  `;
+function renderDashboardPage(outlets) {
+  renderPageFrame(outlets, {
+    title: "Dashboard",
+    bodyHtml: '<p class="small-note">Application shell loaded successfully.</p>',
+  });
 }
 
 /**
  * Renders a fallback page for unknown routes.
- * @param {HTMLElement} container
+ * @param {{ mainOutlet: HTMLElement, detailOutlet: HTMLElement }} outlets
  */
-function renderNotFoundPage(container) {
-  container.innerHTML = `
-    <h2 class="page-title">Not Found</h2>
-    <p class="small-note">The requested route is not available yet.</p>
-  `;
+function renderNotFoundPage(outlets) {
+  renderPageFrame(outlets, {
+    title: "Not Found",
+    bodyHtml: '<p class="small-note">The requested route is not available yet.</p>',
+  });
 }
