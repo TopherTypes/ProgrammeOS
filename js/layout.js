@@ -68,3 +68,30 @@ export function renderPageFrame(outlets, config) {
   outlets.detailOutlet.hidden = true;
   outlets.detailOutlet.innerHTML = "";
 }
+
+/**
+ * Renders a consistent page frame inside the main content area.
+ *
+ * All route modules use this helper so page-level layout is defined in one place
+ * rather than duplicated across feature files.
+ *
+ * @param {HTMLElement} container
+ * @param {{ title: string, bodyHtml: string, detailHtml?: string }} config
+ */
+export function renderPageFrame(container, config) {
+  const detailPanelMarkup = config.detailHtml
+    ? `<aside class="page-detail-panel">${config.detailHtml}</aside>`
+    : "";
+
+  container.innerHTML = `
+    <section class="page-frame" aria-label="${config.title} page">
+      <header class="page-header">
+        <h2 class="page-title">${config.title}</h2>
+      </header>
+      <div class="page-body-grid">
+        <div class="page-main-panel">${config.bodyHtml}</div>
+        ${detailPanelMarkup}
+      </div>
+    </section>
+  `;
+}
