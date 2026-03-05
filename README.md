@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.10**
+Current version: **0.0.11**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -100,3 +100,11 @@ The app now renders all routes inside a shared layout shell:
 - The People page renders a table with `name` and `organisation` columns.
 - Added explicit empty-state messaging when no people are stored.
 - Creating a person immediately refreshes the list in-place without requiring an app reload.
+
+
+## People Create Modal (Milestone 2 / Task 2.3)
+
+- `#/people` now provides a `New Person` trigger that opens a dedicated modal form.
+- The modal captures `name`, `organisation`, and `notes` and validates required input before save.
+- Escape key and Cancel controls close the modal predictably and restore focus to the launch button.
+- Successful saves immediately refresh the people list so new records appear without route reloads.

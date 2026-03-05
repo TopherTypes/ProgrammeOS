@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.10**
+Current version: **0.0.11**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -24,3 +24,5 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 
 
 - v0.0.10: Added a functional People directory page with in-route create flow, empty-state messaging, and immediate post-create list refresh.
+
+- v0.0.11: Replaced inline People create form with a keyboard-friendly New Person modal including Escape/Cancel dismissal and immediate list refresh after save.

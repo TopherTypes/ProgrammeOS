@@ -1,5 +1,6 @@
 import { renderPageFrame } from "../../layout.js";
 import { createPerson, listPeople } from "./data.js";
+import { openNewPersonModal } from "./new-person-modal.js";
 
 /**
  * Builds the static frame for the people page.
@@ -13,27 +14,16 @@ function renderPeoplePageFrame(outlets) {
     title: "People",
     bodyHtml: `
       <section class="people-page" aria-label="People management">
-        <form class="people-form" data-role="person-form">
-          <div class="people-form-row">
-            <label class="people-label" for="person-name">Name</label>
-            <input id="person-name" name="name" class="people-input" type="text" required />
-          </div>
-          <div class="people-form-row">
-            <label class="people-label" for="person-organisation">Organisation</label>
-            <input id="person-organisation" name="organisation" class="people-input" type="text" />
-          </div>
-          <div class="people-form-actions">
-            <button class="people-button" type="submit">Add person</button>
-          </div>
+        <section class="people-toolbar" aria-label="People actions">
+          <button class="people-button" type="button" data-role="new-person-trigger">New Person</button>
           <p class="small-note" data-role="people-status" aria-live="polite"></p>
-        </form>
+        </section>
 
         <section class="people-list" data-role="people-list" aria-label="People records"></section>
       </section>
     `,
   });
 }
-
 
 /**
  * Escapes user-provided strings before injecting into HTML templates.
@@ -61,7 +51,7 @@ function renderPeopleList(listContainer, people) {
   if (people.length === 0) {
     listContainer.innerHTML = `
       <p class="small-note" data-role="people-empty-state">
-        No people have been added yet. Create the first person using the form above.
+        No people have been added yet. Create the first person using the New Person button.
       </p>
     `;
     return;
@@ -110,11 +100,13 @@ async function refreshPeopleList(listContainer) {
 export function renderPeoplePage(outlets) {
   renderPeoplePageFrame(outlets);
 
-  const form = outlets.mainOutlet.querySelector('[data-role="person-form"]');
   const listContainer = outlets.mainOutlet.querySelector('[data-role="people-list"]');
   const statusText = outlets.mainOutlet.querySelector('[data-role="people-status"]');
+  const newPersonTrigger = outlets.mainOutlet.querySelector(
+    '[data-role="new-person-trigger"]'
+  );
 
-  if (!(form instanceof HTMLFormElement) || !listContainer || !statusText) {
+  if (!listContainer || !statusText || !(newPersonTrigger instanceof HTMLButtonElement)) {
     throw new Error("People page failed to mount required containers.");
   }
 
@@ -123,22 +115,21 @@ export function renderPeoplePage(outlets) {
     statusText.textContent = `Unable to load people: ${error.message}`;
   });
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  newPersonTrigger.addEventListener("click", () => {
+    openNewPersonModal({
+      onSubmit: async ({ name, organisation, notes }) => {
+        await createPerson({ name, organisation, notes });
 
-    const formData = new FormData(form);
-    const name = String(formData.get("name") || "");
-    const organisation = String(formData.get("organisation") || "");
-
-    try {
-      await createPerson({ name, organisation });
-      form.reset();
-      statusText.textContent = "Person added.";
-
-      // Re-render immediately so the new record is visible after create actions.
-      await refreshPeopleList(listContainer);
-    } catch (error) {
-      statusText.textContent = `Unable to add person: ${error.message}`;
-    }
+        // Refresh immediately after save so the People table is always current.
+        await refreshPeopleList(listContainer);
+        statusText.textContent = "Person added.";
+      },
+      onClose: () => {
+        // Keep status non-intrusive when modal closes without an error.
+        if (!statusText.textContent) {
+          statusText.textContent = "";
+        }
+      },
+    });
   });
 }
