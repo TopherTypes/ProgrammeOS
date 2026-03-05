@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.15**
+Current version: **0.0.16**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -9,7 +9,7 @@ This file mirrors milestone planning in `PLANS.md` and exists as a lightweight r
 - [x] Milestone 0 (v0.0.1): Application foundation.
 - [x] Milestone 1 (v0.0.2): IndexedDB persistence layer.
 - [x] Milestone 2 (v0.0.3): People system (model, list, creation modal) — **complete**.
-- [ ] Milestone 3 (v0.0.4): Projects system — in progress (list/detail frame delivered, create flow pending).
+- [x] Milestone 3 (v0.0.4): Projects system (project model persistence + Projects list/detail interaction baseline) — **complete**.
 
 For detailed tasks and acceptance criteria, see `PLANS.md`.
 
@@ -31,3 +31,5 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 - v0.0.13: Added Projects route frame/list/detail rendering split with asynchronous hydration, deterministic mount checks, and explicit project empty states.
 - v0.0.14: Added projects record normalization/validation, dedicated projects data helpers (`createProject`, `updateProject`, `getProject`, `listProjects`), immutable-field-safe updates, and a lightweight project record verification script.
 - v0.0.15: Added Milestone 3 Task 3.2 Project list/detail selection behaviour (dense Project list table, keyboard/click selection affordances, selected-row highlight, stakeholder-resolved detail rendering, and safe missing-project fallback UI).
+
+- v0.0.16: Marked Milestone 3 complete across roadmap/spec/readme docs and aligned implementation-status language with shipped Project Management behaviour.

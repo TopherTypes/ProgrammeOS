@@ -20,7 +20,7 @@ AI agents must follow the operational rules defined in **AGENTS.md** and respect
 - [x] Milestone 0 — Application Foundation
 - [x] Milestone 1 — Database Layer
 - [x] Milestone 2 — People System
-- [ ] Milestone 3 — Projects System
+- [x] Milestone 3 — Projects System
 - [ ] Milestone 4 — Meetings System
 - [ ] Milestone 5 — Actions, Decisions, Updates
 - [ ] Milestone 6 — Communication Tracking
@@ -261,7 +261,7 @@ Target Version: v0.0.4
 
 Goal: Implement project tracking.
 
-## Task 3.1 — Project Data Model
+## Task 3.1 — Project Data Model ✅
 
 Fields:
 
@@ -281,7 +281,7 @@ Verification
 
 ---
 
-## Task 3.2 — Project UI
+## Task 3.2 — Project UI ✅
 
 Features
 - Project list

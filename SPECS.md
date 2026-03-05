@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.16 milestone 3 completion alignment: Project Management implementation status now reflects delivered Milestone 3 scope (project data model persistence + Projects list/detail route behaviour) and roadmap markers updated to complete.
 - v0.0.14 projects data model helpers: introduce canonical project normalization/validation (`name` required), safe defaults (`description`, `status`, `stakeholderIds`), dedicated project CRUD wrapper functions for the `projects` store, and immutable-field-preserving project updates with refreshed `updatedAt`.
 - v0.0.15 projects list/detail selection: `#/projects` must present a dense Project list table with click + keyboard selection affordances, keep selected-project route state in memory, highlight the active row, fetch full Project detail on selection (including key stakeholder count/list), and provide safe fallback messaging when a selected project is missing.
 - v0.0.13 projects page scaffold: `#/projects` must render a static frame with toolbar (`New Project` + status), asynchronous IndexedDB-backed list hydration, explicit list/detail empty states, deterministic `data-role` mount checks, and list-driven detail selection.
@@ -116,7 +117,9 @@ actions - linked decisions - linked updates
 Projects serve as containers for programme work but should not impose
 rigid task management structures.
 
-In the current MVP implementation baseline, the Projects page provides a dense Project list table and read-only Project detail view with in-memory route selection state, row highlighting, stakeholder-aware detail hydration, deterministic mount checks, and safe empty/missing detail fallbacks. Full create/edit project workflows remain part of upcoming Milestone 3 tasks.
+Current implementation status: **Delivered in Milestone 3**.
+
+In the current MVP implementation baseline, Project Management includes project record persistence through a dedicated data module and normalized project schema (`id`, `name`, `description`, `status`, `stakeholderIds`, `createdAt`, `updatedAt`), plus a Projects route with dense list rendering, keyboard/mouse selection, selected-row highlighting, stakeholder-aware detail hydration, and safe empty/missing detail fallback messaging.
 
 ------------------------------------------------------------------------
 

@@ -20,6 +20,24 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.0.16] - 2026-03-05
+
+### Added
+- Added a dedicated `Projects System (Milestone 3)` section to `README.md` documenting delivered Project Management capabilities and explicit verification steps for list/detail behaviour.
+
+### Changed
+- Updated `SPECS.md` Project Management implementation status to mark Milestone 3 as delivered and describe the shipped project persistence + Projects route baseline.
+- Updated milestone status markers in `ROADMAP.md` and `PLANS.md` to show Milestone 3 as complete, including Task 3.1 and Task 3.2 completion indicators.
+- Bumped project version references in documentation and `VERSION` from `0.0.15` to `0.0.16`.
+
+### Fixed
+- Fixed documentation drift where milestone/status notes still described Projects System as in progress despite shipped Milestone 3 scope.
+
+### Removed
+- None.
+
+---
+
 ## [0.0.15] - 2026-03-05
 
 ### Added
