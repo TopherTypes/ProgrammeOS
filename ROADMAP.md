@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.4**
+Current version: **0.0.5**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -11,3 +11,8 @@ This file mirrors milestone planning in `PLANS.md` and exists as a lightweight r
 - Milestone 2 (v0.0.3): People system.
 
 For detailed tasks and acceptance criteria, see `PLANS.md`.
+
+
+## Recent fixes
+
+- v0.0.5: Removed a duplicate layout helper declaration that caused browser startup failure in the layout module.
