@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.16**
+Current version: **0.0.17**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -33,3 +33,5 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 - v0.0.15: Added Milestone 3 Task 3.2 Project list/detail selection behaviour (dense Project list table, keyboard/click selection affordances, selected-row highlight, stakeholder-resolved detail rendering, and safe missing-project fallback UI).
 
 - v0.0.16: Marked Milestone 3 complete across roadmap/spec/readme docs and aligned implementation-status language with shipped Project Management behaviour.
+
+- v0.0.17: Added New Project modal lifecycle (Escape/cancel/overlay close, focus restoration, inline status/error messaging), wired async `createProject` persistence, and refreshed Projects list/detail hydration after successful saves.
