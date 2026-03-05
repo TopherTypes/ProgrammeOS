@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.17 projects create modal: `#/projects` must expose a `New Project` modal with `name`, `description`, `status`, and multi-select `stakeholderIds`, including Escape/cancel/overlay dismissal, focus restoration, inline modal status/error messaging, async persistence via `createProject`, and post-save list/detail refresh.
 - v0.0.16 milestone 3 completion alignment: Project Management implementation status now reflects delivered Milestone 3 scope (project data model persistence + Projects list/detail route behaviour) and roadmap markers updated to complete.
 - v0.0.14 projects data model helpers: introduce canonical project normalization/validation (`name` required), safe defaults (`description`, `status`, `stakeholderIds`), dedicated project CRUD wrapper functions for the `projects` store, and immutable-field-preserving project updates with refreshed `updatedAt`.
 - v0.0.15 projects list/detail selection: `#/projects` must present a dense Project list table with click + keyboard selection affordances, keep selected-project route state in memory, highlight the active row, fetch full Project detail on selection (including key stakeholder count/list), and provide safe fallback messaging when a selected project is missing.
@@ -119,7 +120,7 @@ rigid task management structures.
 
 Current implementation status: **Delivered in Milestone 3**.
 
-In the current MVP implementation baseline, Project Management includes project record persistence through a dedicated data module and normalized project schema (`id`, `name`, `description`, `status`, `stakeholderIds`, `createdAt`, `updatedAt`), plus a Projects route with dense list rendering, keyboard/mouse selection, selected-row highlighting, stakeholder-aware detail hydration, and safe empty/missing detail fallback messaging.
+In the current MVP implementation baseline, Project Management includes project record persistence through a dedicated data module and normalized project schema (`id`, `name`, `description`, `status`, `stakeholderIds`, `createdAt`, `updatedAt`), a modal-driven project creation flow (`New Project`) with required-name validation and multi-select stakeholder linking, and a Projects route with dense list rendering, keyboard/mouse selection, selected-row highlighting, stakeholder-aware detail hydration, and safe empty/missing detail fallback messaging.
 
 ------------------------------------------------------------------------
 

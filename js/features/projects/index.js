@@ -1,5 +1,6 @@
 import { listPeople } from "../people/data.js";
-import { getProject, listProjects } from "./data.js";
+import { createProject, getProject, listProjects } from "./data.js";
+import { openNewProjectModal } from "./new-project-modal.js";
 import { renderPageFrame } from "../../layout.js";
 
 /**
@@ -317,9 +318,29 @@ export function renderProjectsPage(outlets) {
     event.preventDefault();
   });
 
-  // Creation modal is not delivered yet; this keeps intent explicit in the UI.
   newProjectTrigger.addEventListener("click", () => {
-    statusText.textContent =
-      "Project creation flow is not available yet. Milestone 3 will add the modal.";
+    // Modal launch flow mirrors the People module lifecycle: capture launch context,
+    // run async persistence inside the modal submit handler, then refresh route state.
+    openNewProjectModal({
+      people: [...state.peopleById.entries()].map(([id, name]) => ({ id, name })),
+      onSubmit: async ({ name, description, status, stakeholderIds }) => {
+        // Async persistence flow: save project first, then rehydrate list/detail panes
+        // so the route UI and status text always reflect IndexedDB source-of-truth.
+        try {
+          await createProject({ name, description, status, stakeholderIds });
+          await refreshProjectsView({ listContainer, detailContainer, statusText, state });
+          statusText.textContent = "Project added successfully.";
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          statusText.textContent = `Unable to save project: ${message}`;
+          throw error;
+        }
+      },
+      onClose: () => {
+        if (!statusText.textContent) {
+          statusText.textContent = "";
+        }
+      },
+    });
   });
 }

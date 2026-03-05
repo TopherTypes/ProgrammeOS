@@ -499,3 +499,6 @@ Potential milestones:
 - Google Drive sync
 - reporting features
 - teams
+
+
+Update note (v0.0.17): Completed Projects modal creation flow wiring on `#/projects` with stakeholder multi-select and post-save route refresh.

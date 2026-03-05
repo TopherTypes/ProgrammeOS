@@ -20,6 +20,25 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+
+## [0.0.17] - 2026-03-05
+
+### Added
+- Added `js/features/projects/new-project-modal.js` implementing a dedicated New Project modal lifecycle with Escape/cancel/overlay dismissal, focus restoration, inline status messaging, and required-name validation.
+- Added stakeholder multi-select capture in the Project create modal using current People records (`stakeholderIds`).
+
+### Changed
+- Replaced the Projects toolbar placeholder click handler with live modal wiring that persists via `createProject`, refreshes list/detail hydration via `refreshProjectsView(...)`, and surfaces clear route-level success/failure status text.
+- Updated README, SPECS, ROADMAP, PLANS, and VERSION metadata to reflect the delivered Projects modal create flow.
+
+### Fixed
+- Removed the non-functional New Project placeholder messaging so project creation now works from the Projects route UI.
+
+### Removed
+- Removed the temporary "Project creation flow is not available yet" trigger behaviour from `#/projects`.
+
+---
+
 ## [0.0.16] - 2026-03-05
 
 ### Added

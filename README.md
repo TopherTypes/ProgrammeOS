@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.16**
+Current version: **0.0.17**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -131,6 +131,10 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
   - `#/projects` renders a dedicated toolbar (`New Project` button + live status text), list container, and detail panel.
   - Project list hydration runs asynchronously from IndexedDB after static frame render.
   - Route mount checks validate required `data-role` nodes and fail with a deterministic mount error if containers are missing.
+- **Projects create modal flow**
+  - `New Project` opens a dedicated modal that captures `name`, `description`, `status`, and multi-select `stakeholderIds` sourced from people records.
+  - The modal supports predictable Cancel/Escape/overlay dismissal and restores focus to the launch trigger after close.
+  - Submit uses inline modal status/error messaging and persists via `createProject`, then refreshes list/detail hydration on success.
 - **Projects list and detail behaviour**
   - The list renders as a dense table (`Project`, `Status`, `Stakeholders`).
   - Selection supports mouse and keyboard interaction (Arrow Up/Down focus movement, Enter/Space selection).
@@ -138,27 +142,30 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
   - Detail content includes status, description, stakeholder count, and stakeholder names resolved from people records.
   - Empty and missing-selection fallback messages are rendered explicitly to avoid stale detail content.
 
-### Verification Steps (Milestone 3)
+### Verification Steps (Milestone 3, updated)
 
 1. Open `index.html` and navigate to `#/projects`.
 2. Confirm the Projects toolbar displays `New Project` and a live status message area.
-3. Confirm the projects list renders as a table with `Project`, `Status`, and `Stakeholders` headers.
-4. Select a project row with a mouse click and confirm selected-row highlighting appears.
-5. Confirm the detail panel updates with status, description, stakeholder count, and stakeholder names.
-6. Focus a project row button and use Arrow Up/Arrow Down to move between rows.
-7. Press Enter or Space on a focused row and confirm selection + detail hydration updates.
-8. Remove a selected project from storage (or select a stale ID during testing) and confirm the detail panel shows the safe missing-project fallback message.
+3. Click **New Project** and confirm a modal opens with `name`, `description`, `status`, and multi-select stakeholders.
+4. Save a new project and confirm list/detail panels refresh and top-level status reports success.
+5. Trigger a validation or persistence failure and confirm inline modal messaging reports the error without closing.
+6. Select a project row with a mouse click and confirm selected-row highlighting appears.
+7. Confirm the detail panel updates with status, description, stakeholder count, and stakeholder names.
+8. Focus a project row button and use Arrow Up/Arrow Down to move between rows.
+9. Press Enter or Space on a focused row and confirm selection + detail hydration updates.
+10. Remove a selected project from storage (or select a stale ID during testing) and confirm the detail panel shows the safe missing-project fallback message.
 
-## Manual Verification (v0.0.16)
+## Manual Verification (v0.0.17)
 
 1. Open `index.html` and navigate to `#/people`.
-2. Create a person from **New Person** and confirm the row appears immediately without reload.
-3. Navigate to `#/projects` and complete the Milestone 3 verification steps above.
-4. Run `node js/features/projects/project-record.check.mjs` and confirm validation/normalization checks pass.
+2. Create at least one person from **New Person** so stakeholder options are available.
+3. Navigate to `#/projects`, open **New Project**, complete all fields (including multi-select stakeholders), and save.
+4. Confirm the new project appears in the list and detail panel without route reload.
+5. Run `node js/features/projects/project-record.check.mjs` and confirm validation/normalization checks pass.
 
-## Smoke Checklist Outcomes (v0.0.16)
+## Smoke Checklist Outcomes (v0.0.17)
 
-- ⚠️ Entity creation: **People pass; Projects pass via data model + list/detail management baseline** (UI create/edit workflows remain future enhancement work).
+- ✅ Entity creation: **People pass; Projects pass including modal-based UI creation flow**.
 - ⚠️ Meeting logging: **Pending milestone implementation**.
 - ⚠️ Action/decision/update creation: **Pending milestone implementation**.
 - ⚠️ Communication tracking: **Pending milestone implementation**.
