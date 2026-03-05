@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.5**
+Current version: **0.0.6**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -56,3 +56,10 @@ The app now renders all routes inside a shared layout shell:
 ## Stability Fixes (v0.0.5)
 
 - Resolved a JavaScript module parse error caused by a duplicated `renderPageFrame` export in `js/layout.js`.
+
+## Database Foundation (Milestone 1 / Task 1.1)
+
+- IndexedDB now initialises at application startup using `idb@8.0.3`.
+- Database name: `programme-manager-db`.
+- Created stores: `people`, `projects`, `meetings`, `actions`, `decisions`, `updates`, `meta`.
+- The `meta` store now records `schemaVersion` for migration readiness.

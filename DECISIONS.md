@@ -51,7 +51,7 @@ Rationale:
 - Use a small helper library to reduce boilerplate and provide a Promise-based API.
 
 Selected helper library:
-- **idb** (Promise-based IndexedDB wrapper), loaded via CDN and pinned to a specific version in `index.html`.
+- **idb@8.0.3** (Promise-based IndexedDB wrapper), imported from jsDelivr ESM CDN and pinned to an explicit version in `js/db.js`.
 
 Rationale:
 - Asynchronous storage avoids UI jank as the dataset grows.
