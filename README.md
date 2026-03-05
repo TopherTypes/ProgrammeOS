@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.2**
+Current version: **0.0.3**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -41,3 +41,13 @@ The app now uses a hash-based router with the following routes:
 - `#/focus`
 
 Navigation updates page content without full-page reloads and supports browser back/forward navigation.
+
+
+## Layout Framework (Milestone 0 / Task 0.3)
+
+The app now renders all routes inside a shared layout shell:
+
+- Persistent sidebar navigation
+- Main content outlet used by every route
+- Reusable page frame helper to avoid duplicated page layout logic
+- Optional detail panel slot for pages that need a secondary column

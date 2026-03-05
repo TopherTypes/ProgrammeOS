@@ -7,18 +7,34 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ## [Unreleased]
 
 ### Added
-- None.
+- Implemented Milestone 0 Task 0.3 shared layout framework for all routes with a persistent sidebar and routed content outlet.
+- Added a reusable `renderPageFrame` helper to centralise page shell rendering and support an optional detail panel.
 
 ### Changed
+- Updated all existing route placeholder modules to use the shared page frame renderer instead of duplicating page-level markup.
+- Refined base styling to support reusable page panels and optional two-column content layout.
+
+### Fixed
+- Ensured route fallbacks and dashboard rendering now use the same layout framework as feature pages.
+
+### Removed
 - None.
+
+---
+
+## [0.0.3] - 2026-03-05
+
+### Added
+- Completed Milestone 0 Task 0.3 by introducing a reusable application layout and page frame abstraction used by all routes.
+
+### Changed
+- Updated documentation and version metadata for the layout framework milestone completion.
 
 ### Fixed
 - None.
 
 ### Removed
 - None.
-
----
 
 ## [0.0.2] - 2026-03-05
 
