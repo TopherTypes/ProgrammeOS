@@ -9,10 +9,13 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ### Added
 - Implemented Milestone 0 Task 0.3 shared layout framework for all routes with a persistent sidebar and routed content outlet.
 - Added a reusable `renderPageFrame` helper to centralise page shell rendering and support an optional detail panel.
+- Implemented Milestone 1 Task 1.1 IndexedDB initialisation using `idb@8.0.3` with required MVP object stores (`people`, `projects`, `meetings`, `actions`, `decisions`, `updates`, `meta`).
 
 ### Changed
 - Updated all existing route placeholder modules to use the shared page frame renderer instead of duplicating page-level markup.
 - Refined base styling to support reusable page panels and optional two-column content layout.
+- App bootstrap now initialises the IndexedDB layer before routing, and writes schema metadata (`meta.schemaVersion`) at startup.
+- Updated project documentation and version metadata for Milestone 1 Task 1.1.
 
 ### Fixed
 - Ensured route fallbacks and dashboard rendering now use the same layout framework as feature pages.
@@ -22,6 +25,22 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 - None.
 
 ---
+
+## [0.0.6] - 2026-03-05
+
+### Added
+- Created the IndexedDB data layer in `js/db.js` with database name `programme-manager-db`.
+- Added startup schema creation for stores: `people`, `projects`, `meetings`, `actions`, `decisions`, `updates`, and `meta`.
+
+### Changed
+- Initial application bootstrap now awaits database initialisation before starting routes.
+- Updated README, SPECS, DECISIONS, ROADMAP, and VERSION for this milestone task.
+
+### Fixed
+- Ensured `meta.schemaVersion` is persisted consistently during startup initialisation.
+
+### Removed
+- None.
 
 ## [0.0.5] - 2026-03-05
 
