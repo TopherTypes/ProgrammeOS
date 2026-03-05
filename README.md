@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.17**
+Current version: **0.0.18**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -125,7 +125,7 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 
 - **Project data model and storage**
   - Project records are normalized through `js/features/projects/project-record.js` and persisted via `js/features/projects/data.js`.
-  - Stored fields include `id`, `name`, `description`, `status`, `stakeholderIds`, `createdAt`, and `updatedAt`.
+  - Stored fields include `id`, `name`, `description`, `status`, `stakeholderIds`, `createdAt`, and `updatedAt` and support dedicated deletion via `deleteProject(projectId)`.
   - Validation enforces required project `name`, while optional values default safely (`description: ""`, `status: "active"`, `stakeholderIds: []`).
 - **Projects route frame and hydration**
   - `#/projects` renders a dedicated toolbar (`New Project` button + live status text), list container, and detail panel.
@@ -155,15 +155,15 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 9. Press Enter or Space on a focused row and confirm selection + detail hydration updates.
 10. Remove a selected project from storage (or select a stale ID during testing) and confirm the detail panel shows the safe missing-project fallback message.
 
-## Manual Verification (v0.0.17)
+## Manual Verification (v0.0.18)
 
 1. Open `index.html` and navigate to `#/people`.
 2. Create at least one person from **New Person** so stakeholder options are available.
 3. Navigate to `#/projects`, open **New Project**, complete all fields (including multi-select stakeholders), and save.
 4. Confirm the new project appears in the list and detail panel without route reload.
-5. Run `node js/features/projects/project-record.check.mjs` and confirm validation/normalization checks pass.
+5. Run `node js/features/projects/project-record.check.mjs` and confirm normalization/validation plus lightweight project data lifecycle checks (create -> delete -> get/list expectations) pass.
 
-## Smoke Checklist Outcomes (v0.0.17)
+## Smoke Checklist Outcomes (v0.0.18)
 
 - ✅ Entity creation: **People pass; Projects pass including modal-based UI creation flow**.
 - ⚠️ Meeting logging: **Pending milestone implementation**.

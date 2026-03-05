@@ -21,6 +21,23 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ---
 
 
+## [0.0.18] - 2026-03-05
+
+### Added
+- Added `deleteProject(projectId)` to `js/features/projects/data.js`, including non-empty id validation and delegation to `deleteEntity("projects", projectId)` for persistence.
+- Expanded `js/features/projects/project-record.check.mjs` with a lightweight in-memory project data lifecycle verification path covering create -> delete -> get/list expectations.
+
+### Changed
+- Updated README, SPECS, ROADMAP, and VERSION metadata to document the new projects delete helper and verification coverage.
+
+### Fixed
+- Improved project deletion failure diagnostics by wrapping lower-level delete errors with project-specific context.
+
+### Removed
+- None.
+
+---
+
 ## [0.0.17] - 2026-03-05
 
 ### Added
