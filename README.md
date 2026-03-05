@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.18**
+Current version: **0.0.19**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -140,6 +140,9 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
   - Selection supports mouse and keyboard interaction (Arrow Up/Down focus movement, Enter/Space selection).
   - The selected row is visibly highlighted and detail content updates from `getProject` reads.
   - Detail content includes status, description, stakeholder count, and stakeholder names resolved from people records.
+  - Detail panel controls now expose **Edit** and **Delete** actions for the selected project.
+  - Edit opens a prefilled project modal and persists changes through `updateProject(projectId, patch)` with route-level success/failure status text.
+  - Delete requires explicit confirmation, calls `deleteProject(projectId)`, clears stale selection state, and rehydrates list/detail UI via `refreshProjectsView(...)`.
   - Empty and missing-selection fallback messages are rendered explicitly to avoid stale detail content.
 
 ### Verification Steps (Milestone 3, updated)
@@ -153,17 +156,23 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 7. Confirm the detail panel updates with status, description, stakeholder count, and stakeholder names.
 8. Focus a project row button and use Arrow Up/Arrow Down to move between rows.
 9. Press Enter or Space on a focused row and confirm selection + detail hydration updates.
-10. Remove a selected project from storage (or select a stale ID during testing) and confirm the detail panel shows the safe missing-project fallback message.
+10. Click **Edit** in the detail panel, update fields, and confirm save succeeds with updated values and success status text.
+11. Trigger an edit validation/persistence failure and confirm failure status text is shown.
+12. Click **Delete** in the detail panel, confirm deletion in the prompt, and verify the project is removed with success status text.
+13. Cancel the delete confirmation once and confirm no data is deleted and cancellation is communicated.
+14. Remove a selected project from storage (or select a stale ID during testing) and confirm the detail panel shows the safe missing-project fallback message.
 
-## Manual Verification (v0.0.18)
+## Manual Verification (v0.0.19)
 
 1. Open `index.html` and navigate to `#/people`.
 2. Create at least one person from **New Person** so stakeholder options are available.
 3. Navigate to `#/projects`, open **New Project**, complete all fields (including multi-select stakeholders), and save.
 4. Confirm the new project appears in the list and detail panel without route reload.
-5. Run `node js/features/projects/project-record.check.mjs` and confirm normalization/validation plus lightweight project data lifecycle checks (create -> delete -> get/list expectations) pass.
+5. Use **Edit** from the detail panel to update name/status and confirm changes persist after refresh.
+6. Use **Delete** from the detail panel, confirm the prompt, and verify the record is removed cleanly.
+7. Run `node js/features/projects/project-record.check.mjs` and confirm normalization/validation plus lightweight project data lifecycle checks (create -> delete -> get/list expectations) pass.
 
-## Smoke Checklist Outcomes (v0.0.18)
+## Smoke Checklist Outcomes (v0.0.19)
 
 - ✅ Entity creation: **People pass; Projects pass including modal-based UI creation flow**.
 - ⚠️ Meeting logging: **Pending milestone implementation**.

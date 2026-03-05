@@ -21,6 +21,25 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ---
 
 
+## [0.0.19] - 2026-03-05
+
+### Added
+- Added shared projects modal infrastructure in `js/features/projects/project-modal.js` and a dedicated `openEditProjectModal` wrapper for prefilled edit flows with inline required-name validation, Escape/overlay/cancel handling, and focus restoration.
+- Added delegated detail-panel action controls (`Edit`, `Delete`) in `js/features/projects/index.js` for selected project records.
+
+### Changed
+- Extended Projects detail rendering to include explicit CRUD action controls and wired edit submissions to `updateProject(projectId, patch)` with route-level success/failure status updates.
+- Implemented confirmed delete flow that calls `deleteProject(projectId)`, clears stale selection state, and refreshes the projects list/detail panes via `refreshProjectsView(...)`.
+- Updated README, SPECS, ROADMAP, and VERSION metadata to reflect delivered Projects CRUD UI availability.
+
+### Fixed
+- Improved projects route feedback so update/delete outcomes now report deterministic status text for both success and failure paths.
+
+### Removed
+- None.
+
+---
+
 ## [0.0.18] - 2026-03-05
 
 ### Added
