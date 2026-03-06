@@ -3,6 +3,21 @@ import { assertValidAction, normalizeAction } from "./action-record.js";
 
 const ACTIONS_STORE = "actions";
 
+function emitActionsChanged(actionRecord) {
+  if (typeof window === "undefined" || typeof window.dispatchEvent !== "function") {
+    return;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("programmeos:actions-changed", {
+      detail: {
+        actionId: actionRecord.id,
+        meetingId: actionRecord.meetingId,
+      },
+    })
+  );
+}
+
 /**
  * Creates a new action record with immutable identity and timestamp metadata.
  *
@@ -54,6 +69,8 @@ export async function createAction(actionInput) {
       cause: error,
     });
   }
+
+  emitActionsChanged(actionRecord);
 
   return actionRecord;
 }
@@ -192,6 +209,8 @@ export async function updateAction(actionId, patch) {
       cause: error,
     });
   }
+
+  emitActionsChanged(updatedAction);
 
   return updatedAction;
 }

@@ -3,6 +3,21 @@ import { assertValidUpdate, normalizeUpdate } from "./update-record.js";
 
 const UPDATES_STORE = "updates";
 
+function emitUpdatesChanged(updateRecord) {
+  if (typeof window === "undefined" || typeof window.dispatchEvent !== "function") {
+    return;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("programmeos:updates-changed", {
+      detail: {
+        updateId: updateRecord.id,
+        meetingId: updateRecord.meetingId,
+      },
+    })
+  );
+}
+
 /**
  * Creates a new update record with immutable identity and timestamp metadata.
  *
@@ -42,6 +57,8 @@ export async function createUpdate(updateInput) {
       cause: error,
     });
   }
+
+  emitUpdatesChanged(updateRecord);
 
   return updateRecord;
 }
@@ -160,6 +177,7 @@ export async function updateUpdate(updateId, patch) {
 
   try {
     const savedUpdate = await updateEntity(UPDATES_STORE, normalizedUpdateId, updatedUpdate);
+    emitUpdatesChanged(updatedUpdate);
     return normalizeUpdate(savedUpdate);
   } catch (error) {
     throw new Error(`Failed to persist update for id "${normalizedUpdateId}".`, {
