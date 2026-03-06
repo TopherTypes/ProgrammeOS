@@ -7,10 +7,11 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ## [Unreleased]
 
 ### Added
-- None.
+- Added `js/features/meetings/meeting-record.js` with pure meeting normalization helpers (`normalizeMeeting`) and required-field validation (`assertValidMeeting`) for meeting `title` and `date`.
+- Added `js/features/meetings/meeting-record.check.mjs` as a lightweight Node verification script for meeting normalization, ID-array de-duplication, and validation failures.
 
 ### Changed
-- None.
+- Updated README, SPECS, ROADMAP, and VERSION metadata to document the meetings record-helper baseline and verification command.
 
 ### Fixed
 - None.
