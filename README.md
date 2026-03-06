@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.23**
+Current version: **0.0.24**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -162,7 +162,7 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 13. Cancel the delete confirmation once and confirm no data is deleted and cancellation is communicated.
 14. Remove a selected project from storage (or select a stale ID during testing) and confirm the detail panel shows the safe missing-project fallback message.
 
-## Meetings Route Baseline (v0.0.23)
+## Meetings Route Baseline (v0.0.24)
 
 - `#/meetings` now renders a deterministic route frame with:
   - toolbar actions (`New Meeting` trigger + live status region with `aria-live="polite"`)
@@ -174,8 +174,10 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 - The meetings list renders as a dense table with `Title`, `Date`, `Type`, and `Attendees` columns.
 - User-provided meeting strings are escaped before template insertion to prevent unsafe HTML injection.
 - Row selection state is preserved in-memory, selected rows are visually highlighted, and detail content updates with selection changes.
+- Meeting detail now renders resolved attendee names (from `listPeople()`) and linked project names (from `listProjects()`), with explicit unknown-ID labels (`Unknown person`, `Unknown project`).
+- Meetings list keyboard interactions now support Arrow Up/Down focus movement plus Enter/Space selection to match the Projects accessibility interaction pattern.
 
-## Manual Verification (v0.0.23)
+## Manual Verification (v0.0.24)
 
 1. Open `index.html` and navigate to `#/people`.
 2. Create at least one person from **New Person** so stakeholder options are available.
@@ -189,10 +191,12 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 10. Press Escape, click Cancel, and click the backdrop in separate attempts to confirm each dismissal path closes the modal and returns focus to the **New Meeting** trigger.
 11. Reopen the modal, complete required fields, save, and confirm the list/detail panes rehydrate to include the new meeting.
 12. Trigger a persistence error (for example via invalid console-injected data) and confirm inline modal status text reports the failure.
-13. In the browser console, call `createMeeting(...)`, `getMeeting(id)`, `listMeetings()`, and `updateMeeting(id, patch)` from `js/features/meetings/data.js` and confirm immutable `id`/`createdAt` fields stay unchanged while `updatedAt` refreshes after updates.
-14. Run `node js/features/projects/project-record.check.mjs` and confirm normalization/validation plus lightweight project data lifecycle checks (create -> delete -> get/list expectations) pass.
+13. Focus a meeting row button and use Arrow Up/Arrow Down to move focus between rows, then press Enter and Space in separate attempts to confirm keyboard selection updates detail content.
+14. Create or inspect a meeting linked to people/projects and confirm the detail panel resolves names from stored IDs; for deliberately stale linked IDs, confirm fallback labels show `Unknown person` and `Unknown project`.
+15. In the browser console, call `createMeeting(...)`, `getMeeting(id)`, `listMeetings()`, and `updateMeeting(id, patch)` from `js/features/meetings/data.js` and confirm immutable `id`/`createdAt` fields stay unchanged while `updatedAt` refreshes after updates.
+16. Run `node js/features/projects/project-record.check.mjs` and confirm normalization/validation plus lightweight project data lifecycle checks (create -> delete -> get/list expectations) pass.
 
-## Smoke Checklist Outcomes (v0.0.23)
+## Smoke Checklist Outcomes (v0.0.24)
 
 - ✅ Entity creation: **People pass; Projects pass including modal-based UI creation flow**.
 - ✅ Meeting logging: **New Meeting modal shipped with required validation, relationship linking, persistence, and post-save route rehydration**.

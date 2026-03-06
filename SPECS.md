@@ -6,7 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
-- v0.0.23 meetings create modal baseline: add `js/features/meetings/new-meeting-modal.js` using established modal lifecycle patterns (Escape/cancel/overlay dismissal, launch-trigger focus restoration, inline status/error messaging), include required `title` + `date`, optional/defaulted `type`, optional `notes`, and multi-select relationship capture for `attendeeIds` (`listPeople()`) and `projectIds` (`listProjects()`), persist via `createMeeting`, and rehydrate the meetings route on successful submit.
+- v0.0.24 meetings detail/accessibility enhancement: extend `js/features/meetings/index.js` detail rendering to show `title`/`date`/`type`/`notes`, resolve attendee names from `listPeople()` and linked project names from `listProjects()`, provide safe stale-selection and unknown-link fallback messaging, and support Projects-consistent keyboard row interactions (Arrow Up/Down focus + Enter/Space selection).
 - v0.0.22 meetings route baseline: replace placeholder meetings page rendering with a deterministic frame (`renderMeetingsPageFrame`), async `refreshMeetingsView` hydration from `listMeetings()`, dense list table (`Title`, `Date`, `Type`, `Attendees`), safe HTML escaping for user-provided fields, row-selection highlighting, and explicit detail empty/missing-selection fallback states.
 - v0.0.21 meetings data access baseline: add `js/features/meetings/data.js` with `createMeeting`, `getMeeting`, `listMeetings`, and `updateMeeting` wrappers around shared DB helpers; reuse `normalizeMeeting`/`assertValidMeeting`; enforce non-empty meeting-id errors for read/update paths; preserve immutable `id`/`createdAt` during updates while refreshing `updatedAt`; and surface contextual persistence failures.
 - v0.0.20 meetings record helper baseline: add `js/features/meetings/meeting-record.js` with pure canonical normalization for meeting records (`id`, `title`, `date`, `type`, `attendeeIds`, `projectIds`, `notes`, `createdAt`, `updatedAt`), enforce required non-empty `title` and `date` validation before persistence, and keep attendee/project links as trimmed de-duplicated id arrays.
@@ -146,7 +146,7 @@ Meetings must support copying to create a future meeting shell. The new
 meeting should copy title, type, attendees, and project links but not
 actions, decisions, or updates.
 
-In the current MVP implementation baseline, Meetings include a route frame with toolbar/status/list/detail containers, async list hydration from IndexedDB (`listMeetings`), dense table rendering, selected-row highlighting, escaped user-provided text rendering, and explicit empty/missing detail fallbacks. Full meeting create/edit workflows remain pending milestone implementation.
+In the current MVP implementation baseline, Meetings include a route frame with toolbar/status/list/detail containers, async list hydration from IndexedDB (`listMeetings`) plus related people/project lookups for name resolution, dense table rendering, selected-row highlighting, click + keyboard selection (Arrow Up/Down focus and Enter/Space select), escaped user-provided text rendering, and explicit empty/missing detail fallbacks including safe unknown-linked-ID labels.
 
 ------------------------------------------------------------------------
 
