@@ -1,4 +1,5 @@
 import { createAction } from "./data.js";
+import { listMeetings } from "../meetings/data.js";
 
 /**
  * @typedef {Object} OpenNewActionModalOptions
@@ -15,6 +16,8 @@ import { createAction } from "./data.js";
  *   updatedAt: string,
  * }) => (void|Promise<void>)} [onRehydrate]
  * @property {() => void} [onClose]
+ * @property {string} [lockedMeetingId] Meeting id enforced by a parent workflow (for example Meeting Review).
+ * @property {string} [lockedMeetingLabel] Optional meeting label rendered while `lockedMeetingId` is enforced.
  */
 
 /**
@@ -39,7 +42,25 @@ function escapeHtml(value) {
  * @returns {Promise<{ close: () => void }>}
  */
 export async function openNewActionModal(options = {}) {
-  const { onRehydrate, onClose } = options;
+  const { onRehydrate, onClose, lockedMeetingId, lockedMeetingLabel } = options;
+  const meetings = await listMeetings();
+
+  const normalizedLockedMeetingId = typeof lockedMeetingId === "string" ? lockedMeetingId.trim() : "";
+  const hasLockedMeeting = normalizedLockedMeetingId.length > 0;
+  const lockedMeeting = hasLockedMeeting
+    ? meetings.find((meeting) => meeting.id === normalizedLockedMeetingId) ?? null
+    : null;
+  const meetingFieldLabel =
+    (typeof lockedMeetingLabel === "string" ? lockedMeetingLabel.trim() : "") ||
+    lockedMeeting?.title?.trim() ||
+    "Untitled meeting";
+
+  const meetingOptionsHtml = meetings
+    .map((meeting) => {
+      const label = escapeHtml(meeting.title?.trim() || "Untitled meeting");
+      return `<option value="${meeting.id}">${label}</option>`;
+    })
+    .join("");
 
   const previousActiveElement =
     document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -73,6 +94,19 @@ export async function openNewActionModal(options = {}) {
         <div class="modal-form-row">
           <label class="people-label" for="new-action-due-date">Due date</label>
           <input id="new-action-due-date" name="dueDate" class="people-input" type="date" />
+        </div>
+        <div class="modal-form-row">
+          <label class="people-label" for="new-action-meeting">Meeting</label>
+          ${
+            hasLockedMeeting
+              ? `<input id="new-action-meeting" class="people-input" type="text" value="${escapeHtml(
+                  meetingFieldLabel
+                )}" disabled aria-disabled="true" />`
+              : `<select id="new-action-meeting" name="meetingId" class="people-input">
+            <option value="">Not linked</option>
+            ${meetingOptionsHtml}
+          </select>`
+          }
         </div>
         <p class="small-note" data-role="modal-status" aria-live="polite"></p>
         <div class="modal-actions">
@@ -159,11 +193,21 @@ export async function openNewActionModal(options = {}) {
 
     const dueDateInput = form.elements.namedItem("dueDate");
     const statusInput = form.elements.namedItem("status");
+    const meetingIdInput = form.elements.namedItem("meetingId");
+
+    // Meeting Review launches can lock meeting context so this payload cannot
+    // drift even if future UI changes expose editable fields.
+    const meetingId = hasLockedMeeting
+      ? normalizedLockedMeetingId
+      : meetingIdInput instanceof HTMLSelectElement
+      ? meetingIdInput.value.trim()
+      : "";
 
     const actionInput = {
       description: descriptionInput.value.trim(),
       status: statusInput instanceof HTMLInputElement ? statusInput.value.trim() : "",
       dueDate: dueDateInput instanceof HTMLInputElement ? dueDateInput.value.trim() : "",
+      meetingId,
     };
 
     statusText.textContent = "Saving action...";

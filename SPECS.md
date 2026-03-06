@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.2.1 modal meeting-lock extension: extend `openNewActionModal`, `openNewDecisionModal`, and `openNewUpdateModal` to accept optional `lockedMeetingId`/`lockedMeetingLabel` config so meeting-scoped launches prefill and lock meeting linkage while standalone route launches retain optional editable meeting selection; submit payloads must always persist the locked meeting id when provided.
 - v0.2.0 meetings review panel extension: update `js/features/meetings/index.js` so selected meeting detail includes a new “Meeting Review” area beneath core metadata, with grouped Actions/Decisions/Updates sections showing linked-record counts (`meetingId` match), dense inline tables, row-level route actions, and explicit empty-state messaging; refresh logic now rehydrates these linked sections when selected meetings change, when linked records are created/updated, and when stale meeting selection fallback messaging is shown.
 - v0.1.0 milestone 5 completion alignment: Actions, Decisions, and Updates are now a delivered MVP baseline with deterministic route frames (toolbar/list/detail), modal-driven create workflows, required-description validation, predictable Escape/cancel/overlay dismissal + focus restoration, linked meeting/project name resolution with safe stale-selection fallback messaging, and maintained Node-runnable record verification scripts for each entity.
 - v0.0.29 updates route + data baseline: add canonical update normalization/validation (`description` required, optional `meetingId`/`projectIds`) and updates CRUD data helpers (`createUpdate`, `getUpdate`, `listUpdates`, `updateUpdate`) with immutable `id`/`createdAt` preservation; replace `#/updates` placeholder with toolbar/list/detail rendering, modal-driven create flow (Escape/cancel/overlay dismissal, focus restoration, inline validation/status), linked meeting/project name resolution where available, and Projects/Meetings-consistent stale-selection fallback handling.
@@ -220,6 +221,7 @@ In the delivered MVP baseline, `#/updates` provides a deterministic route frame 
 
 - Users open `#/actions`, `#/decisions`, or `#/updates` and create records via dedicated New-item modals.
 - Each modal enforces required description input, allows optional meeting/project linking, and supports Escape/cancel/overlay dismissal with focus returned to the launch trigger.
+- Actions/Decisions/Updates modal APIs accept optional meeting-lock config (`lockedMeetingId`, `lockedMeetingLabel`) for meeting-scoped launches; when set, the meeting control is shown as read-only and create payloads always include the locked meeting id.
 - Successful submissions persist to IndexedDB via dedicated data helpers and rehydrate list/detail panes in place.
 - Baseline verification scripts run in Node: `action-record.check.mjs`, `decision-record.check.mjs`, and `update-record.check.mjs`.
 
