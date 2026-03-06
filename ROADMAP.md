@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.21**
+Current version: **0.0.22**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -41,3 +41,5 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 - v0.0.21: Added meetings data access helpers (`createMeeting`, `getMeeting`, `listMeetings`, `updateMeeting`) using the shared `meetings` store with required-field validation, immutable `id`/`createdAt` preservation on update, refreshed `updatedAt`, and contextual persistence errors.
 - v0.0.20: Added meetings record normalization/validation helpers (`normalizeMeeting`, `assertValidMeeting`) with required `title` + `date` enforcement, deduplicated attendee/project id arrays, and a lightweight Node verification script.
 
+
+- v0.0.22: Replaced `#/meetings` placeholder rendering with a deterministic meetings frame, async `listMeetings()` hydration (`refreshMeetingsView`), dense table/empty-state rendering, safe HTML escaping for user-provided values, and selected-row/detail fallback handling.

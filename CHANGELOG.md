@@ -20,6 +20,25 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.0.22] - 2026-03-06
+
+### Added
+- Added a deterministic Meetings route frame in `js/features/meetings/index.js` with toolbar actions (`New Meeting` trigger + `aria-live="polite"` status text), list container, and detail panel container with empty-selection fallback messaging.
+- Added dense meetings table rendering (`Title`, `Date`, `Type`, `Attendees`) with selected-row highlighting and delegated row selection state handling.
+- Added an HTML-escaping helper for user-provided meeting text before template insertion to prevent unsafe rendering.
+
+### Changed
+- Replaced the previous placeholder Meetings route implementation with async route hydration via `refreshMeetingsView(...)` backed by `listMeetings()`.
+- Updated README, SPECS, ROADMAP, and VERSION metadata to align documentation/versioning with delivered meetings-route behaviour.
+
+### Fixed
+- Added deterministic mount checks for required Meetings `data-role` containers so template regressions fail predictably.
+
+### Removed
+- Removed the static Meetings placeholder message-only rendering path.
+
+---
+
 ## [0.0.21] - 2026-03-06
 
 ### Added

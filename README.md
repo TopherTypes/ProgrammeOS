@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.21**
+Current version: **0.0.22**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -162,7 +162,18 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 13. Cancel the delete confirmation once and confirm no data is deleted and cancellation is communicated.
 14. Remove a selected project from storage (or select a stale ID during testing) and confirm the detail panel shows the safe missing-project fallback message.
 
-## Manual Verification (v0.0.21)
+## Meetings Route Baseline (v0.0.22)
+
+- `#/meetings` now renders a deterministic route frame with:
+  - toolbar actions (`New Meeting` trigger + live status region with `aria-live="polite"`)
+  - dedicated meetings list container (table or explicit empty state)
+  - detail panel container with empty and missing-selection fallback messaging
+- Route hydration now runs through async `refreshMeetingsView(...)` backed by `listMeetings()`.
+- The meetings list renders as a dense table with `Title`, `Date`, `Type`, and `Attendees` columns.
+- User-provided meeting strings are escaped before template insertion to prevent unsafe HTML injection.
+- Row selection state is preserved in-memory, selected rows are visually highlighted, and detail content updates with selection changes.
+
+## Manual Verification (v0.0.22)
 
 1. Open `index.html` and navigate to `#/people`.
 2. Create at least one person from **New Person** so stakeholder options are available.
@@ -174,10 +185,10 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 8. In the browser console, call `createMeeting(...)`, `getMeeting(id)`, `listMeetings()`, and `updateMeeting(id, patch)` from `js/features/meetings/data.js` and confirm immutable `id`/`createdAt` fields stay unchanged while `updatedAt` refreshes after updates.
 9. Run `node js/features/projects/project-record.check.mjs` and confirm normalization/validation plus lightweight project data lifecycle checks (create -> delete -> get/list expectations) pass.
 
-## Smoke Checklist Outcomes (v0.0.21)
+## Smoke Checklist Outcomes (v0.0.22)
 
 - ✅ Entity creation: **People pass; Projects pass including modal-based UI creation flow**.
-- ⚠️ Meeting logging: **Pending milestone implementation**.
+- ⚠️ Meeting logging: **Partially delivered (list/detail rendering + hydration shipped; meeting create/edit modal flow still pending)**.
 - ⚠️ Action/decision/update creation: **Pending milestone implementation**.
 - ⚠️ Communication tracking: **Pending milestone implementation**.
 - ⚠️ JSON export/import: **Pending milestone implementation**.
