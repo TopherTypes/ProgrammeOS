@@ -165,7 +165,7 @@ actions, decisions, or updates.
 
 Current implementation status: **Delivered in Milestone 4**.
 
-In the delivered MVP baseline, Meetings include a route frame with toolbar/status/list/detail containers, async list hydration from IndexedDB (`listMeetings`) plus related people/project lookups for name resolution, dense table rendering, selected-row highlighting, click + keyboard selection (Arrow Up/Down focus and Enter/Space select), escaped user-provided text rendering, modal-driven meeting creation with validation and predictable dismissal/focus restoration, and explicit empty/missing detail fallbacks including safe unknown-linked-ID labels.
+In the delivered MVP baseline, Meetings include a route frame with toolbar/status/list/detail containers, async list hydration from IndexedDB (`listMeetings`) plus related people/project lookups for name resolution, dense table rendering, selected-row highlighting, click + keyboard selection (Arrow Up/Down focus and Enter/Space select), escaped user-provided text rendering, modal-driven meeting creation with validation and predictable dismissal/focus restoration, and explicit empty/missing detail fallbacks including safe unknown-linked-ID labels. Meeting review linked rows now support inline edit/save/cancel with required-description validation and in-place persistence for actions, decisions, and updates.
 
 
 

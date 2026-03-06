@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.2.1**
+Current version: **0.2.2**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -108,6 +108,17 @@ The app now renders all routes inside a shared layout shell:
 - The modal captures `name`, `organisation`, and `notes` and validates required input before save.
 - Escape key and Cancel controls close the modal predictably and restore focus to the launch button.
 - Successful saves immediately refresh the people list so new records appear without route reloads.
+
+
+## Meetings Linked-Record Inline Editing (v0.2.2)
+
+- Linked records inside `#/meetings` detail now support row-level edit mode.
+- Editable fields:
+  - Actions: `description`, `status`, `dueDate`, `ownerPersonId`
+  - Decisions: `description`
+  - Updates: `description`
+- Save uses existing data helpers and refreshes Meeting Review tables/counts after successful persistence.
+- Inline validation now blocks empty descriptions and shows row-level error/status feedback with predictable focus after save/cancel.
 
 ## Delivered People Directory Capabilities (Milestone 2 Complete)
 
