@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.25 meetings check script expansion: `js/features/meetings/meeting-record.check.mjs` must run directly in Node with explicit pass/fail output, covering normalization defaults/trimming, required-field validation failures (`title`, `date`), attendee/project id-array deduplication, and create/get/list/update sanity checks against IndexedDB-wrapper-style APIs.
 - v0.0.24 meetings detail/accessibility enhancement: extend `js/features/meetings/index.js` detail rendering to show `title`/`date`/`type`/`notes`, resolve attendee names from `listPeople()` and linked project names from `listProjects()`, provide safe stale-selection and unknown-link fallback messaging, and support Projects-consistent keyboard row interactions (Arrow Up/Down focus + Enter/Space selection).
 - v0.0.22 meetings route baseline: replace placeholder meetings page rendering with a deterministic frame (`renderMeetingsPageFrame`), async `refreshMeetingsView` hydration from `listMeetings()`, dense list table (`Title`, `Date`, `Type`, `Attendees`), safe HTML escaping for user-provided fields, row-selection highlighting, and explicit detail empty/missing-selection fallback states.
 - v0.0.21 meetings data access baseline: add `js/features/meetings/data.js` with `createMeeting`, `getMeeting`, `listMeetings`, and `updateMeeting` wrappers around shared DB helpers; reuse `normalizeMeeting`/`assertValidMeeting`; enforce non-empty meeting-id errors for read/update paths; preserve immutable `id`/`createdAt` during updates while refreshing `updatedAt`; and surface contextual persistence failures.
@@ -25,6 +26,12 @@ Programme Work Management App
 - v0.0.7 database access layer: add Promise-based CRUD wrapper functions in `js/db.js` (`createEntity`, `updateEntity`, `deleteEntity`, `getEntity`, `listEntities`) with store validation and defensive error handling.
 - v0.0.6 database foundation: initialise IndexedDB using the `idb` helper, create all required object stores (`people`, `projects`, `meetings`, `actions`, `decisions`, `updates`, `meta`), and persist `meta.schemaVersion` during startup.
 - v0.0.5 stability correction: the layout module must expose a single `renderPageFrame` export to keep browser module loading valid and preserve shared page-frame behaviour across routes.
+
+------------------------------------------------------------------------
+
+## 0.1 Verification Commands
+
+- Run `node js/features/meetings/meeting-record.check.mjs` to verify meeting record normalization, validation, deduplication, and lightweight wrapper-API lifecycle behaviour (create/get/list/update).
 
 ------------------------------------------------------------------------
 

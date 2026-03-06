@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.24**
+Current version: **0.0.25**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -46,3 +46,5 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 - v0.0.23: Added `openNewMeetingModal(...)` create flow with required `title`/`date`, optional/defaulted `type`, attendee/project multi-select linkage, notes capture, Escape/cancel/overlay dismissal, trigger-focus restoration, inline validation/persistence messaging, and successful post-save meetings rehydration.
 
 - v0.0.24: Enhanced Meetings detail rendering with attendee/project name resolution from People/Projects stores, added safe unknown-link fallback labels, and implemented Projects-consistent keyboard row interactions (Arrow Up/Down focus, Enter/Space select).
+
+- v0.0.25: Expanded `js/features/meetings/meeting-record.check.mjs` with explicit pass/fail output and coverage for normalization defaults/trimming, required-field validation failures, id-array deduplication, and create/get/list/update sanity checks via IndexedDB-wrapper-style APIs.
