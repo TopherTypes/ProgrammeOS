@@ -1,4 +1,6 @@
 import { renderPageFrame } from "../../layout.js";
+import { listPeople } from "../people/data.js";
+import { listProjects } from "../projects/data.js";
 import { listMeetings } from "./data.js";
 import { openNewMeetingModal } from "./new-meeting-modal.js";
 
@@ -116,10 +118,18 @@ function renderMeetingsList(listContainer, meetings, selectedMeetingId) {
  * Renders detail content for the selected meeting.
  *
  * @param {HTMLElement} detailContainer
- * @param {{id: string, title?: string, date?: string, type?: string, attendeeIds?: string[], notes?: string}|null} meeting
+ * @param {{id: string, title?: string, date?: string, type?: string, attendeeIds?: string[], projectIds?: string[], notes?: string}|null} meeting
+ * @param {Map<string, string>} attendeeNamesById
+ * @param {Map<string, string>} projectNamesById
  * @param {boolean} isMissingSelection
  */
-function renderMeetingDetail(detailContainer, meeting, isMissingSelection) {
+function renderMeetingDetail(
+  detailContainer,
+  meeting,
+  attendeeNamesById,
+  projectNamesById,
+  isMissingSelection
+) {
   if (isMissingSelection) {
     detailContainer.innerHTML = `
       <p class="small-note" data-role="meeting-detail-missing">
@@ -142,14 +152,36 @@ function renderMeetingDetail(detailContainer, meeting, isMissingSelection) {
   const date = escapeHtml(meeting.date?.trim() || "No date");
   const type = escapeHtml(meeting.type?.trim() || "General");
   const notes = escapeHtml(meeting.notes?.trim() || "No notes captured yet.");
-  const attendeeCount = meeting.attendeeIds?.length ?? 0;
+  const attendeeNames = (meeting.attendeeIds ?? [])
+    .map((attendeeId) => attendeeNamesById.get(attendeeId) || "Unknown person")
+    .map((nameValue) => escapeHtml(nameValue));
+  const projectNames = (meeting.projectIds ?? [])
+    .map((projectId) => projectNamesById.get(projectId) || "Unknown project")
+    .map((nameValue) => escapeHtml(nameValue));
+
+  const attendeesHtml =
+    attendeeNames.length === 0
+      ? `<p class="small-note">No attendees linked yet.</p>`
+      : `<ul>${attendeeNames.map((attendeeName) => `<li>${attendeeName}</li>`).join("")}</ul>`;
+  const projectsHtml =
+    projectNames.length === 0
+      ? `<p class="small-note">No linked projects yet.</p>`
+      : `<ul>${projectNames.map((projectName) => `<li>${projectName}</li>`).join("")}</ul>`;
 
   detailContainer.innerHTML = `
     <article class="project-detail-card" data-role="meeting-detail-card">
       <h3>${title}</h3>
       <p><strong>Date:</strong> ${date}</p>
       <p><strong>Type:</strong> ${type}</p>
-      <p><strong>Attendees:</strong> ${attendeeCount}</p>
+      <section aria-label="Meeting attendees">
+        <h4>Attendees (${attendeeNames.length})</h4>
+        ${attendeesHtml}
+      </section>
+      <section aria-label="Meeting linked projects">
+        <h4>Linked projects (${projectNames.length})</h4>
+        ${projectsHtml}
+      </section>
+      <h4>Notes</h4>
       <p>${notes}</p>
     </article>
   `;
@@ -187,9 +219,15 @@ function getSelectedMeetingIdFromEvent(event) {
  * @param {{ selectedMeetingId: string|null, meetings: Array<object> }} config.state
  */
 async function refreshMeetingsView({ listContainer, detailContainer, statusText, state }) {
-  const meetings = await listMeetings();
+  const [meetings, people, projects] = await Promise.all([
+    listMeetings(),
+    listPeople(),
+    listProjects(),
+  ]);
 
   state.meetings = meetings;
+  state.peopleById = new Map(people.map((person) => [person.id, person.name]));
+  state.projectsById = new Map(projects.map((project) => [project.id, project.name]));
 
   const selectedMeetingInList =
     meetings.find((meeting) => meeting.id === state.selectedMeetingId) ?? null;
@@ -212,7 +250,13 @@ async function refreshMeetingsView({ listContainer, detailContainer, statusText,
     : null;
 
   renderMeetingsList(listContainer, meetings, state.selectedMeetingId);
-  renderMeetingDetail(detailContainer, selectedMeeting, shouldShowMissingSelectionFallback);
+  renderMeetingDetail(
+    detailContainer,
+    selectedMeeting,
+    state.peopleById,
+    state.projectsById,
+    shouldShowMissingSelectionFallback
+  );
 
   statusText.textContent =
     meetings.length === 0
@@ -247,6 +291,8 @@ export function renderMeetingsPage(outlets) {
   const state = {
     selectedMeetingId: null,
     meetings: [],
+    peopleById: new Map(),
+    projectsById: new Map(),
   };
 
   refreshMeetingsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
@@ -265,6 +311,53 @@ export function renderMeetingsPage(outlets) {
     refreshMeetingsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
       statusText.textContent = `Unable to load meeting details: ${error.message}`;
     });
+  });
+
+  // Keyboard behavior mirrors the Projects list: Arrow keys move focus row-to-row,
+  // while Enter/Space commits selection for the focused meeting item.
+  listContainer.addEventListener("keydown", (event) => {
+    if (!(event.target instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    const meetingId = event.target.dataset.meetingId;
+
+    if (!meetingId) {
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      state.selectedMeetingId = meetingId;
+
+      refreshMeetingsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
+        statusText.textContent = `Unable to load meeting details: ${error.message}`;
+      });
+
+      event.preventDefault();
+      return;
+    }
+
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") {
+      return;
+    }
+
+    const buttons = [...listContainer.querySelectorAll('[data-role="meeting-item"]')].filter(
+      (element) => element instanceof HTMLButtonElement
+    );
+
+    const currentIndex = buttons.indexOf(event.target);
+
+    if (currentIndex < 0) {
+      return;
+    }
+
+    const nextIndex =
+      event.key === "ArrowDown"
+        ? Math.min(buttons.length - 1, currentIndex + 1)
+        : Math.max(0, currentIndex - 1);
+
+    buttons[nextIndex]?.focus();
+    event.preventDefault();
   });
 
   newMeetingTrigger.addEventListener("click", () => {

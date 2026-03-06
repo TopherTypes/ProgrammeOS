@@ -7,16 +7,37 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ## [Unreleased]
 
 ### Added
-- None.
+- Added Projects-consistent keyboard interactions for Meetings rows in `js/features/meetings/index.js`: Arrow Up/Down focus traversal and Enter/Space selection.
 
 ### Changed
-- None.
+- Extended Meetings detail rendering to resolve attendee names from `listPeople()` and linked project names from `listProjects()` and display those names in the detail panel.
+- Updated Meetings detail content to render explicit sections for title/date/type/notes, attendees list, and linked projects list.
+- Updated README, SPECS, ROADMAP, and VERSION metadata for the Meetings detail/accessibility enhancement release.
 
 ### Fixed
-- None.
+- Added safe fallback labels for stale linked IDs in Meeting detail (`Unknown person`, `Unknown project`) and preserved explicit missing-selection warning behavior when a selected meeting no longer exists.
 
 ### Removed
 - None.
+
+---
+
+## [0.0.24] - 2026-03-06
+
+### Added
+- Added Projects-consistent keyboard interactions for Meetings rows in `js/features/meetings/index.js`: Arrow Up/Down focus traversal and Enter/Space selection.
+
+### Changed
+- Extended Meetings detail rendering to resolve attendee names from `listPeople()` and linked project names from `listProjects()` and display those names in the detail panel.
+- Updated Meetings detail content to render explicit sections for title/date/type/notes, attendees list, and linked projects list.
+- Updated README, SPECS, ROADMAP, and VERSION metadata for the Meetings detail/accessibility enhancement release.
+
+### Fixed
+- Added safe fallback labels for stale linked IDs in Meeting detail (`Unknown person`, `Unknown project`) and preserved explicit missing-selection warning behavior when a selected meeting no longer exists.
+
+### Removed
+- None.
+
 
 ---
 
