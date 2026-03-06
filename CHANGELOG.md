@@ -21,6 +21,27 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ---
 
 
+## [0.0.29] - 2026-03-06
+
+### Added
+- Added `js/features/updates/update-record.js` with canonical `normalizeUpdate(...)` and `assertValidUpdate(...)` helpers, including required `description` validation and optional `meetingId`/`projectIds` normalization.
+- Added `js/features/updates/data.js` with `createUpdate`, `getUpdate`, `listUpdates`, and `updateUpdate` wrappers around shared DB helpers.
+- Added `js/features/updates/new-update-modal.js` implementing New Update modal lifecycle (required description validation, Escape/cancel/overlay close, focus restoration, and inline status/error messaging).
+- Added `js/features/updates/update-record.check.mjs` for lightweight Node-runnable update normalization/validation verification.
+
+### Changed
+- Replaced `js/features/updates/index.js` placeholder rendering with live Updates route UI: toolbar, dense list table, explicit empty state, and detail pane with linked meeting/project name resolution where available.
+- Added Projects/Meetings-consistent stale-selection safeguards in updates route hydration so missing selected records render deterministic fallback messaging.
+- Updated README, SPECS, ROADMAP, and VERSION metadata to reflect Updates baseline delivery and verification guidance.
+
+### Fixed
+- Ensured update edits preserve immutable `id`/`createdAt` fields and refresh `updatedAt` for each successful update write.
+
+### Removed
+- Removed static placeholder-only content from the Updates route.
+
+---
+
 ## [0.0.28] - 2026-03-06
 
 ### Added
