@@ -20,6 +20,28 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+
+## [0.0.27] - 2026-03-06
+
+### Added
+- Added `js/features/actions/action-record.js` with canonical `normalizeAction(...)` and `assertValidAction(...)` helpers, including required `description` validation, optional action-link field normalization, deduplicated `projectIds`, and normalized `requiresUpdateByPersonId` map handling.
+- Added `js/features/actions/data.js` with `createAction`, `getAction`, `listActions`, and `updateAction` wrappers around shared DB helpers.
+- Added `js/features/actions/new-action-modal.js` implementing New Action modal lifecycle (required description validation, Escape/cancel/overlay close, focus restoration, and inline status/error messaging).
+- Added `js/features/actions/action-record.check.mjs` for lightweight Node-runnable action normalization/validation verification.
+
+### Changed
+- Replaced `js/features/actions/index.js` placeholder rendering with live Actions route UI: toolbar, dense list table, explicit empty state, safe detail fallback states, and in-route hydration/refresh wiring.
+- Wired successful action create/update operations to rehydrate list + detail panels without full route reload.
+- Updated README, SPECS, ROADMAP, and VERSION metadata to reflect Actions baseline delivery and verification guidance.
+
+### Fixed
+- Ensured action updates preserve immutable `id`/`createdAt` fields and refresh `updatedAt` for each successful update write.
+
+### Removed
+- Removed static placeholder-only content from the Actions route.
+
+---
+
 ## [0.0.26] - 2026-03-06
 
 ### Added

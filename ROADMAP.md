@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.26**
+Current version: **0.0.27**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -16,6 +16,8 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 
 
 ## Recent fixes
+
+- v0.0.27: Replaced the Actions placeholder route with modal-driven create flow, list/detail hydration, and action record/data helpers including required description validation and immutable-field-safe updates.
 
 - v0.0.26: Marked Milestone 4 complete across planning/spec/readme docs and published milestone release-note alignment for delivered Meetings baseline behaviour.
 
