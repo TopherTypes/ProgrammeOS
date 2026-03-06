@@ -21,6 +21,24 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ---
 
 
+## [0.0.30] - 2026-03-06
+
+### Added
+- Expanded `js/features/actions/action-record.check.mjs` with Node-runnable create/get/list/update lifecycle sanity checks (IndexedDB-wrapper-style simulation), explicit per-check pass/fail output, and additional coverage for normalization defaults, required-field failure handling, and ID deduplication behaviour.
+- Expanded `js/features/decisions/decision-record.check.mjs` with Node-runnable create/get/list/update lifecycle sanity checks (IndexedDB-wrapper-style simulation), explicit per-check pass/fail output, and additional coverage for normalization defaults, required-field failure handling, and ID deduplication behaviour.
+- Expanded `js/features/updates/update-record.check.mjs` with Node-runnable create/get/list/update lifecycle sanity checks (IndexedDB-wrapper-style simulation), explicit per-check pass/fail output, and additional coverage for normalization defaults, required-field failure handling, and ID deduplication behaviour.
+
+### Changed
+- Aligned Actions/Decisions/Updates record-check script output format with the meetings check style so each verification now reports deterministic `PASS`/`FAIL` lines and a final summary count.
+
+### Fixed
+- Improved diagnostics for action/decision/update record regressions by making failure output explicit per check with non-zero exit status when any check fails.
+
+### Removed
+- None.
+
+---
+
 ## [0.0.29] - 2026-03-06
 
 ### Added

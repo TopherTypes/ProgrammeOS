@@ -233,7 +233,7 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 6. Reopen modal, create an action with description, optional status, and optional due date; confirm list/detail rehydrate immediately without full reload.
 7. Select different rows and confirm detail panel updates; use a stale selected id during testing and confirm missing-selection fallback appears.
 8. In detail panel, click **Mark Done**/**Mark Open** and confirm update status persists and list/detail refresh in-place.
-9. Run `node js/features/actions/action-record.check.mjs` and confirm action normalization/validation checks pass.
+9. Run `node js/features/actions/action-record.check.mjs` and confirm action normalization defaults, required-field validation failures, ID deduplication, and create/get/list/update lifecycle sanity checks all pass with explicit PASS/FAIL output.
 
 ## Smoke Checklist Outcomes (v0.0.27)
 
@@ -282,7 +282,7 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 6. Reopen modal, create an update with description, optional meeting, and optional linked projects; confirm list/detail rehydrate immediately without full reload.
 7. Select different rows and confirm detail panel updates; use a stale selected id during testing and confirm missing-selection fallback appears.
 8. Confirm linked meeting and project names are resolved in list/detail when those records exist, and stale IDs show fallback labels.
-9. Run `node js/features/updates/update-record.check.mjs` and confirm update normalization/validation checks pass.
+9. Run `node js/features/updates/update-record.check.mjs` and confirm update normalization defaults, required-field validation failures, ID deduplication, and create/get/list/update lifecycle sanity checks all pass with explicit PASS/FAIL output.
 
 ## Decisions Route Baseline (v0.0.28)
 
@@ -310,4 +310,4 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 6. Reopen modal, create a decision with description, optional meeting, and optional linked projects; confirm list/detail rehydrate immediately without full reload.
 7. Select different rows and confirm detail panel updates; use a stale selected id during testing and confirm missing-selection fallback appears.
 8. Confirm linked meeting and project names are resolved in list/detail when those records exist, and stale IDs show fallback labels.
-9. Run `node js/features/decisions/decision-record.check.mjs` and confirm decision normalization/validation checks pass.
+9. Run `node js/features/decisions/decision-record.check.mjs` and confirm decision normalization defaults, required-field validation failures, ID deduplication, and create/get/list/update lifecycle sanity checks all pass with explicit PASS/FAIL output.
