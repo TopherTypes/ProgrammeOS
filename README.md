@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.24**
+Current version: **0.0.25**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -185,7 +185,7 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 4. Confirm the new project appears in the list and detail panel without route reload.
 5. Use **Edit** from the detail panel to update name/status and confirm changes persist after refresh.
 6. Use **Delete** from the detail panel, confirm the prompt, and verify the record is removed cleanly.
-7. Run `node js/features/meetings/meeting-record.check.mjs` and confirm meeting normalization/validation checks pass.
+7. Run `node js/features/meetings/meeting-record.check.mjs` and confirm meeting normalization defaults/trimming, validation failures, id-array deduplication, and create/get/list/update wrapper-API sanity checks all pass.
 8. Navigate to `#/meetings`, click **New Meeting**, and verify the modal opens with fields for title, date, type, attendees, projects, and notes.
 9. Submit with empty title/date and verify inline validation messages appear without closing the modal.
 10. Press Escape, click Cancel, and click the backdrop in separate attempts to confirm each dismissal path closes the modal and returns focus to the **New Meeting** trigger.
@@ -213,4 +213,4 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 - `assertValidMeeting(meeting)` enforces required non-empty `title` and `date` fields used by create/update persistence paths.
 - Internal normalization ensures `attendeeIds` and `projectIds` are trimmed, non-empty, and de-duplicated.
 - Added lightweight verification script:
-  - `node js/features/meetings/meeting-record.check.mjs`
+  - `node js/features/meetings/meeting-record.check.mjs` (normalization/validation + lightweight wrapper-API lifecycle sanity checks)

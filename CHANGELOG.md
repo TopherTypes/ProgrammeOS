@@ -7,15 +7,31 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ## [Unreleased]
 
 ### Added
-- Added Projects-consistent keyboard interactions for Meetings rows in `js/features/meetings/index.js`: Arrow Up/Down focus traversal and Enter/Space selection.
+- None.
 
 ### Changed
-- Extended Meetings detail rendering to resolve attendee names from `listPeople()` and linked project names from `listProjects()` and display those names in the detail panel.
-- Updated Meetings detail content to render explicit sections for title/date/type/notes, attendees list, and linked projects list.
-- Updated README, SPECS, ROADMAP, and VERSION metadata for the Meetings detail/accessibility enhancement release.
+- None.
 
 ### Fixed
-- Added safe fallback labels for stale linked IDs in Meeting detail (`Unknown person`, `Unknown project`) and preserved explicit missing-selection warning behavior when a selected meeting no longer exists.
+- None.
+
+### Removed
+- None.
+
+---
+
+## [0.0.25] - 2026-03-06
+
+### Added
+- Expanded `js/features/meetings/meeting-record.check.mjs` into a full Node-runnable verification script with explicit per-check pass/fail output and non-zero exit behaviour on failures.
+- Added meeting lifecycle sanity checks (create/get/list/update) built around a lightweight IndexedDB-wrapper-style simulation so data-helper expectations can be validated outside the browser runtime.
+
+### Changed
+- Expanded meetings verification coverage to include normalization defaults/trimming, required-field validation failures (`title`, `date`), and attendee/project id-array deduplication assertions.
+- Updated README, SPECS, ROADMAP, and VERSION metadata to reference the expanded meetings verification command and release version.
+
+### Fixed
+- Improved diagnostics from `node js/features/meetings/meeting-record.check.mjs` by replacing single-line success output with explicit check-level results that are easier to troubleshoot when a regression occurs.
 
 ### Removed
 - None.
