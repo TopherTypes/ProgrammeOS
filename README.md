@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.19**
+Current version: **0.0.20**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -162,7 +162,7 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 13. Cancel the delete confirmation once and confirm no data is deleted and cancellation is communicated.
 14. Remove a selected project from storage (or select a stale ID during testing) and confirm the detail panel shows the safe missing-project fallback message.
 
-## Manual Verification (v0.0.19)
+## Manual Verification (v0.0.20)
 
 1. Open `index.html` and navigate to `#/people`.
 2. Create at least one person from **New Person** so stakeholder options are available.
@@ -170,12 +170,23 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 4. Confirm the new project appears in the list and detail panel without route reload.
 5. Use **Edit** from the detail panel to update name/status and confirm changes persist after refresh.
 6. Use **Delete** from the detail panel, confirm the prompt, and verify the record is removed cleanly.
-7. Run `node js/features/projects/project-record.check.mjs` and confirm normalization/validation plus lightweight project data lifecycle checks (create -> delete -> get/list expectations) pass.
+7. Run `node js/features/meetings/meeting-record.check.mjs` and confirm meeting normalization/validation checks pass.
+8. Run `node js/features/projects/project-record.check.mjs` and confirm normalization/validation plus lightweight project data lifecycle checks (create -> delete -> get/list expectations) pass.
 
-## Smoke Checklist Outcomes (v0.0.19)
+## Smoke Checklist Outcomes (v0.0.20)
 
 - ✅ Entity creation: **People pass; Projects pass including modal-based UI creation flow**.
 - ⚠️ Meeting logging: **Pending milestone implementation**.
 - ⚠️ Action/decision/update creation: **Pending milestone implementation**.
 - ⚠️ Communication tracking: **Pending milestone implementation**.
 - ⚠️ JSON export/import: **Pending milestone implementation**.
+
+## Meetings Record Normalization Baseline (v0.0.20)
+
+- Added shared meeting record helpers in `js/features/meetings/meeting-record.js`.
+- `normalizeMeeting(meeting)` now returns the canonical shape:
+  - `id`, `title`, `date`, `type`, `attendeeIds`, `projectIds`, `notes`, `createdAt`, `updatedAt`
+- `assertValidMeeting(meeting)` enforces required non-empty `title` and `date` fields.
+- Internal normalization ensures `attendeeIds` and `projectIds` are trimmed, non-empty, and de-duplicated.
+- Added lightweight verification script:
+  - `node js/features/meetings/meeting-record.check.mjs`

@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.19**
+Current version: **0.0.20**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -38,3 +38,5 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 - v0.0.18: Added `deleteProject(projectId)` in the projects data module with explicit id validation and contextual delete error handling, and expanded lightweight project checks to cover create -> delete -> get/list lifecycle expectations.
 
 - v0.0.19: Completed Projects UI CRUD by adding detail-panel Edit/Delete actions with prefilled edit modal validation, confirmed delete flow, selection-state cleanup, and status-aware route rehydration.
+- v0.0.20: Added meetings record normalization/validation helpers (`normalizeMeeting`, `assertValidMeeting`) with required `title` + `date` enforcement, deduplicated attendee/project id arrays, and a lightweight Node verification script.
+
