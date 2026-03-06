@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.26**
+Current version: **0.0.27**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -205,11 +205,41 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 15. In the browser console, call `createMeeting(...)`, `getMeeting(id)`, `listMeetings()`, and `updateMeeting(id, patch)` from `js/features/meetings/data.js` and confirm immutable `id`/`createdAt` fields stay unchanged while `updatedAt` refreshes after updates.
 16. Run `node js/features/projects/project-record.check.mjs` and confirm normalization/validation plus lightweight project data lifecycle checks (create -> delete -> get/list expectations) pass.
 
-## Smoke Checklist Outcomes (v0.0.26)
+
+
+## Actions Route Baseline (v0.0.27)
+
+- `#/actions` now renders a deterministic frame with:
+  - toolbar actions (`New Action` trigger + `aria-live="polite"` status text)
+  - actions list container rendered as a dense table or explicit empty state
+  - detail panel with empty and missing-selection fallback messaging
+- Added `js/features/actions/action-record.js` with `normalizeAction(...)` and `assertValidAction(...)`:
+  - required `description` validation
+  - optional normalization for `ownerPersonId`, `status`, `dueDate`, `meetingId`, `projectIds`, and `requiresUpdateByPersonId`
+  - deduplicated/trimmmed `projectIds` and canonical per-person requires-update map shaping
+- Added `js/features/actions/data.js` create/read/list/update helpers backed by shared `js/db.js` wrappers.
+- `updateAction(...)` now preserves immutable `id`/`createdAt` metadata while refreshing `updatedAt`.
+- Added `js/features/actions/new-action-modal.js` with required description validation, Escape/cancel/overlay dismissal, trigger focus restoration, and inline status/error messaging.
+- Route hydration now runs through `refreshActionsView(...)`, and successful create/update operations refresh list + detail in place without route reload.
+- Added lightweight verification script: `node js/features/actions/action-record.check.mjs`.
+
+## Manual Verification (v0.0.27)
+
+1. Open `index.html` and navigate to `#/actions`.
+2. Confirm Actions toolbar renders with **New Action** and live status text.
+3. Confirm explicit empty-state messaging appears when no action records exist.
+4. Click **New Action** and submit empty description; verify inline required-field validation appears and modal remains open.
+5. Dismiss the modal via Escape, Cancel, and overlay click in separate attempts; confirm each path closes and restores focus to the trigger.
+6. Reopen modal, create an action with description, optional status, and optional due date; confirm list/detail rehydrate immediately without full reload.
+7. Select different rows and confirm detail panel updates; use a stale selected id during testing and confirm missing-selection fallback appears.
+8. In detail panel, click **Mark Done**/**Mark Open** and confirm update status persists and list/detail refresh in-place.
+9. Run `node js/features/actions/action-record.check.mjs` and confirm action normalization/validation checks pass.
+
+## Smoke Checklist Outcomes (v0.0.27)
 
 - ✅ Entity creation: **People pass; Projects pass including modal-based UI creation flow**.
 - ✅ Meeting logging: **Pass — meetings model/data helpers, modal create flow, list/detail rendering, relationship name resolution, and keyboard interactions verified as delivered Milestone 4 baseline**.
-- ⚠️ Action/decision/update creation: **Pending milestone implementation**.
+- ⚠️ Action/decision/update creation: **Partially delivered — Actions create/update/list/detail baseline is now implemented; Decisions/Updates remain pending.**
 - ⚠️ Communication tracking: **Pending milestone implementation**.
 - ⚠️ JSON export/import: **Pending milestone implementation**.
 
