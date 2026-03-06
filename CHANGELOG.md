@@ -7,14 +7,30 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ## [Unreleased]
 
 ### Added
-- Added `js/features/meetings/meeting-record.js` with pure meeting normalization helpers (`normalizeMeeting`) and required-field validation (`assertValidMeeting`) for meeting `title` and `date`.
-- Added `js/features/meetings/meeting-record.check.mjs` as a lightweight Node verification script for meeting normalization, ID-array de-duplication, and validation failures.
+- None.
 
 ### Changed
-- Updated README, SPECS, ROADMAP, and VERSION metadata to document the meetings record-helper baseline and verification command.
+- None.
 
 ### Fixed
 - None.
+
+### Removed
+- None.
+
+---
+
+## [0.0.21] - 2026-03-06
+
+### Added
+- Added `js/features/meetings/data.js` with dedicated meetings data helpers: `createMeeting(meetingInput)`, `getMeeting(meetingId)`, `listMeetings()`, and `updateMeeting(meetingId, patch)`.
+- Added contextual error handling for missing meeting identifiers and persistence failures across create/read/list/update meeting flows.
+
+### Changed
+- Updated README, SPECS, ROADMAP, and VERSION metadata to document meetings data access coverage and updated verification guidance.
+
+### Fixed
+- Ensured meeting updates preserve immutable fields (`id`, `createdAt`) while always refreshing `updatedAt` on successful writes.
 
 ### Removed
 - None.
