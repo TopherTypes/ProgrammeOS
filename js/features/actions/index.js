@@ -1,4 +1,5 @@
 import { renderPageFrame } from "../../layout.js";
+import { listMeetings } from "../meetings/data.js";
 import { listPeople } from "../people/data.js";
 import { listProjects } from "../projects/data.js";
 import { listActions, updateAction } from "./data.js";
@@ -31,6 +32,8 @@ function renderActionsPageFrame(outlets) {
       <section class="actions-page" aria-label="Actions management">
         <section class="people-toolbar" aria-label="Action actions">
           <button class="people-button" type="button" data-role="new-action-trigger">New Action</button>
+          <label class="visually-hidden" for="actions-meeting-filter">Filter actions by meeting</label>
+          <select id="actions-meeting-filter" class="people-input" data-role="actions-meeting-filter"></select>
           <p class="small-note" data-role="actions-status" aria-live="polite"></p>
         </section>
 
@@ -45,6 +48,48 @@ function renderActionsPageFrame(outlets) {
       </section>
     `,
   });
+}
+
+/**
+ * @param {HTMLSelectElement} filterSelect
+ * @param {Array<{id: string, title?: string}>} meetings
+ * @param {string} selectedMeetingFilter
+ */
+function renderMeetingFilterOptions(filterSelect, meetings, selectedMeetingFilter) {
+  const options = [
+    '<option value="">All meetings</option>',
+    ...meetings.map((meeting) => {
+      const title = escapeHtml(meeting.title?.trim() || "Untitled meeting");
+      return `<option value="${meeting.id}">${title}</option>`;
+    }),
+  ].join("");
+
+  filterSelect.innerHTML = options;
+  filterSelect.value = selectedMeetingFilter;
+
+  if (filterSelect.value !== selectedMeetingFilter) {
+    filterSelect.value = "";
+  }
+}
+
+/**
+ * @param {number} totalCount
+ * @param {number} filteredCount
+ * @param {boolean} isFilterActive
+ * @returns {string}
+ */
+function getActionsStatusText(totalCount, filteredCount, isFilterActive) {
+  const label = `${filteredCount} action${filteredCount === 1 ? "" : "s"}`;
+
+  if (totalCount === 0) {
+    return "No actions stored yet.";
+  }
+
+  if (!isFilterActive) {
+    return `${label} loaded.`;
+  }
+
+  return `${label} shown (filtered by meeting, ${totalCount} total).`;
 }
 
 /**
@@ -207,11 +252,19 @@ function getSelectedActionIdFromEvent(event) {
  * @param {HTMLElement} config.listContainer
  * @param {HTMLElement} config.detailContainer
  * @param {HTMLElement} config.statusText
- * @param {{selectedActionId: string|null, actions: Array<object>, peopleById: Map<string,string>, projectsById: Map<string,string>}} config.state
+ * @param {HTMLSelectElement} config.meetingFilterSelect
+ * @param {{selectedActionId: string|null, selectedMeetingFilter: string, actions: Array<object>, peopleById: Map<string,string>, projectsById: Map<string,string>}} config.state
  */
-async function refreshActionsView({ listContainer, detailContainer, statusText, state }) {
-  const [actions, people, projects] = await Promise.all([
+async function refreshActionsView({
+  listContainer,
+  detailContainer,
+  statusText,
+  meetingFilterSelect,
+  state,
+}) {
+  const [actions, meetings, people, projects] = await Promise.all([
     listActions(),
+    listMeetings(),
     listPeople(),
     listProjects(),
   ]);
@@ -219,14 +272,20 @@ async function refreshActionsView({ listContainer, detailContainer, statusText, 
   state.actions = actions;
   state.peopleById = new Map(people.map((person) => [person.id, person.name]));
   state.projectsById = new Map(projects.map((project) => [project.id, project.name]));
+  renderMeetingFilterOptions(meetingFilterSelect, meetings, state.selectedMeetingFilter);
+
+  const isFilterActive = Boolean(state.selectedMeetingFilter);
+  const visibleActions = isFilterActive
+    ? actions.filter((action) => action.meetingId === state.selectedMeetingFilter)
+    : actions;
 
   const selectedActionInList =
-    actions.find((action) => action.id === state.selectedActionId) ?? null;
+    visibleActions.find((action) => action.id === state.selectedActionId) ?? null;
   const hadExplicitSelection = Boolean(state.selectedActionId);
   let shouldShowMissingSelectionFallback = false;
 
-  if (!selectedActionInList && actions.length > 0 && !hadExplicitSelection) {
-    state.selectedActionId = actions[0].id;
+  if (!selectedActionInList && visibleActions.length > 0 && !hadExplicitSelection) {
+    state.selectedActionId = visibleActions[0].id;
   }
 
   if (!selectedActionInList && hadExplicitSelection) {
@@ -235,10 +294,10 @@ async function refreshActionsView({ listContainer, detailContainer, statusText, 
   }
 
   const selectedAction = state.selectedActionId
-    ? actions.find((action) => action.id === state.selectedActionId) ?? null
+    ? visibleActions.find((action) => action.id === state.selectedActionId) ?? null
     : null;
 
-  renderActionsList(listContainer, actions, state.peopleById, state.selectedActionId);
+  renderActionsList(listContainer, visibleActions, state.peopleById, state.selectedActionId);
   renderActionDetail(
     detailContainer,
     selectedAction,
@@ -247,10 +306,7 @@ async function refreshActionsView({ listContainer, detailContainer, statusText, 
     shouldShowMissingSelectionFallback
   );
 
-  statusText.textContent =
-    actions.length === 0
-      ? "No actions stored yet."
-      : `${actions.length} action${actions.length === 1 ? "" : "s"} loaded.`;
+  statusText.textContent = getActionsStatusText(actions.length, visibleActions.length, isFilterActive);
 }
 
 /**
@@ -263,6 +319,7 @@ export function renderActionsPage(outlets) {
 
   const listContainer = outlets.mainOutlet.querySelector('[data-role="actions-list"]');
   const statusText = outlets.mainOutlet.querySelector('[data-role="actions-status"]');
+  const meetingFilterSelect = outlets.mainOutlet.querySelector('[data-role="actions-meeting-filter"]');
   const newActionTrigger = outlets.mainOutlet.querySelector('[data-role="new-action-trigger"]');
   const detailContainer = outlets.detailOutlet.querySelector('[data-role="action-detail"]');
 
@@ -270,6 +327,7 @@ export function renderActionsPage(outlets) {
     !listContainer ||
     !statusText ||
     !detailContainer ||
+    !(meetingFilterSelect instanceof HTMLSelectElement) ||
     !(newActionTrigger instanceof HTMLButtonElement)
   ) {
     throw new Error("Actions page failed to mount required containers.");
@@ -277,13 +335,24 @@ export function renderActionsPage(outlets) {
 
   const state = {
     selectedActionId: null,
+    selectedMeetingFilter: "",
     actions: [],
     peopleById: new Map(),
     projectsById: new Map(),
   };
 
-  refreshActionsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
+  refreshActionsView({ listContainer, detailContainer, statusText, meetingFilterSelect, state }).catch((error) => {
     statusText.textContent = `Unable to load actions: ${error.message}`;
+  });
+
+  meetingFilterSelect.addEventListener("change", () => {
+    state.selectedMeetingFilter = meetingFilterSelect.value;
+
+    refreshActionsView({ listContainer, detailContainer, statusText, meetingFilterSelect, state }).catch(
+      (error) => {
+        statusText.textContent = `Unable to apply actions meeting filter: ${error.message}`;
+      }
+    );
   });
 
   listContainer.addEventListener("click", (event) => {
@@ -295,7 +364,7 @@ export function renderActionsPage(outlets) {
 
     state.selectedActionId = selectedActionId;
 
-    refreshActionsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
+    refreshActionsView({ listContainer, detailContainer, statusText, meetingFilterSelect, state }).catch((error) => {
       statusText.textContent = `Unable to load action details: ${error.message}`;
     });
   });
@@ -329,7 +398,7 @@ export function renderActionsPage(outlets) {
     updateAction(actionId, { status: nextStatus })
       .then(async () => {
         statusText.textContent = `Action updated (${nextStatus}).`;
-        await refreshActionsView({ listContainer, detailContainer, statusText, state });
+        await refreshActionsView({ listContainer, detailContainer, statusText, meetingFilterSelect, state });
       })
       .catch((error) => {
         statusText.textContent = `Unable to update action: ${error.message}`;
@@ -340,7 +409,7 @@ export function renderActionsPage(outlets) {
     openNewActionModal({
       onRehydrate: async (createdAction) => {
         state.selectedActionId = createdAction.id;
-        await refreshActionsView({ listContainer, detailContainer, statusText, state });
+        await refreshActionsView({ listContainer, detailContainer, statusText, meetingFilterSelect, state });
         statusText.textContent = "Action created successfully.";
       },
     }).catch((error) => {

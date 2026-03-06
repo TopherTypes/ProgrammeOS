@@ -31,6 +31,8 @@ function renderUpdatesPageFrame(outlets) {
       <section class="updates-page" aria-label="Updates management">
         <section class="people-toolbar" aria-label="Update actions">
           <button class="people-button" type="button" data-role="new-update-trigger">New Update</button>
+          <label class="visually-hidden" for="updates-meeting-filter">Filter updates by meeting</label>
+          <select id="updates-meeting-filter" class="people-input" data-role="updates-meeting-filter"></select>
           <p class="small-note" data-role="updates-status" aria-live="polite"></p>
         </section>
 
@@ -45,6 +47,48 @@ function renderUpdatesPageFrame(outlets) {
       </section>
     `,
   });
+}
+
+/**
+ * @param {HTMLSelectElement} filterSelect
+ * @param {Array<{id: string, title?: string}>} meetings
+ * @param {string} selectedMeetingFilter
+ */
+function renderMeetingFilterOptions(filterSelect, meetings, selectedMeetingFilter) {
+  const options = [
+    '<option value="">All meetings</option>',
+    ...meetings.map((meeting) => {
+      const title = escapeHtml(meeting.title?.trim() || "Untitled meeting");
+      return `<option value="${meeting.id}">${title}</option>`;
+    }),
+  ].join("");
+
+  filterSelect.innerHTML = options;
+  filterSelect.value = selectedMeetingFilter;
+
+  if (filterSelect.value !== selectedMeetingFilter) {
+    filterSelect.value = "";
+  }
+}
+
+/**
+ * @param {number} totalCount
+ * @param {number} filteredCount
+ * @param {boolean} isFilterActive
+ * @returns {string}
+ */
+function getUpdatesStatusText(totalCount, filteredCount, isFilterActive) {
+  const label = `${filteredCount} update${filteredCount === 1 ? "" : "s"}`;
+
+  if (totalCount === 0) {
+    return "No updates stored yet.";
+  }
+
+  if (!isFilterActive) {
+    return `${label} loaded.`;
+  }
+
+  return `${label} shown (filtered by meeting, ${totalCount} total).`;
 }
 
 /**
@@ -192,9 +236,16 @@ function getSelectedUpdateIdFromEvent(event) {
  * @param {HTMLElement} config.listContainer
  * @param {HTMLElement} config.detailContainer
  * @param {HTMLElement} config.statusText
- * @param {{selectedUpdateId: string|null, updates: Array<object>, meetingsById: Map<string,string>, projectsById: Map<string,string>}} config.state
+ * @param {HTMLSelectElement} config.meetingFilterSelect
+ * @param {{selectedUpdateId: string|null, selectedMeetingFilter: string, updates: Array<object>, meetingsById: Map<string,string>, projectsById: Map<string,string>}} config.state
  */
-async function refreshUpdatesView({ listContainer, detailContainer, statusText, state }) {
+async function refreshUpdatesView({
+  listContainer,
+  detailContainer,
+  statusText,
+  meetingFilterSelect,
+  state,
+}) {
   const [updates, meetings, projects] = await Promise.all([
     listUpdates(),
     listMeetings(),
@@ -204,15 +255,22 @@ async function refreshUpdatesView({ listContainer, detailContainer, statusText, 
   state.updates = updates;
   state.meetingsById = new Map(meetings.map((meeting) => [meeting.id, meeting.title]));
   state.projectsById = new Map(projects.map((project) => [project.id, project.name]));
+  renderMeetingFilterOptions(meetingFilterSelect, meetings, state.selectedMeetingFilter);
 
-  const selectedUpdateInList = updates.find((update) => update.id === state.selectedUpdateId) ?? null;
+  const isFilterActive = Boolean(state.selectedMeetingFilter);
+  const visibleUpdates = isFilterActive
+    ? updates.filter((update) => update.meetingId === state.selectedMeetingFilter)
+    : updates;
+
+  const selectedUpdateInList =
+    visibleUpdates.find((update) => update.id === state.selectedUpdateId) ?? null;
   const hadExplicitSelection = Boolean(state.selectedUpdateId);
   let shouldShowMissingSelectionFallback = false;
 
   // Preserve predictable selection behavior: first-load auto-select, but
   // stale explicit selections should render a user-visible missing-state message.
-  if (!selectedUpdateInList && updates.length > 0 && !hadExplicitSelection) {
-    state.selectedUpdateId = updates[0].id;
+  if (!selectedUpdateInList && visibleUpdates.length > 0 && !hadExplicitSelection) {
+    state.selectedUpdateId = visibleUpdates[0].id;
   }
 
   if (!selectedUpdateInList && hadExplicitSelection) {
@@ -221,10 +279,10 @@ async function refreshUpdatesView({ listContainer, detailContainer, statusText, 
   }
 
   const selectedUpdate = state.selectedUpdateId
-    ? updates.find((update) => update.id === state.selectedUpdateId) ?? null
+    ? visibleUpdates.find((update) => update.id === state.selectedUpdateId) ?? null
     : null;
 
-  renderUpdatesList(listContainer, updates, state.meetingsById, state.selectedUpdateId);
+  renderUpdatesList(listContainer, visibleUpdates, state.meetingsById, state.selectedUpdateId);
   renderUpdateDetail(
     detailContainer,
     selectedUpdate,
@@ -233,10 +291,7 @@ async function refreshUpdatesView({ listContainer, detailContainer, statusText, 
     shouldShowMissingSelectionFallback
   );
 
-  statusText.textContent =
-    updates.length === 0
-      ? "No updates stored yet."
-      : `${updates.length} update${updates.length === 1 ? "" : "s"} loaded.`;
+  statusText.textContent = getUpdatesStatusText(updates.length, visibleUpdates.length, isFilterActive);
 }
 
 /**
@@ -249,6 +304,7 @@ export function renderUpdatesPage(outlets) {
 
   const listContainer = outlets.mainOutlet.querySelector('[data-role="updates-list"]');
   const statusText = outlets.mainOutlet.querySelector('[data-role="updates-status"]');
+  const meetingFilterSelect = outlets.mainOutlet.querySelector('[data-role="updates-meeting-filter"]');
   const newUpdateTrigger = outlets.mainOutlet.querySelector('[data-role="new-update-trigger"]');
   const detailContainer = outlets.detailOutlet.querySelector('[data-role="update-detail"]');
 
@@ -256,6 +312,7 @@ export function renderUpdatesPage(outlets) {
     !listContainer ||
     !statusText ||
     !detailContainer ||
+    !(meetingFilterSelect instanceof HTMLSelectElement) ||
     !(newUpdateTrigger instanceof HTMLButtonElement)
   ) {
     throw new Error("Updates page failed to mount required containers.");
@@ -263,13 +320,24 @@ export function renderUpdatesPage(outlets) {
 
   const state = {
     selectedUpdateId: null,
+    selectedMeetingFilter: "",
     updates: [],
     meetingsById: new Map(),
     projectsById: new Map(),
   };
 
-  refreshUpdatesView({ listContainer, detailContainer, statusText, state }).catch((error) => {
+  refreshUpdatesView({ listContainer, detailContainer, statusText, meetingFilterSelect, state }).catch((error) => {
     statusText.textContent = `Unable to load updates: ${error.message}`;
+  });
+
+  meetingFilterSelect.addEventListener("change", () => {
+    state.selectedMeetingFilter = meetingFilterSelect.value;
+
+    refreshUpdatesView({ listContainer, detailContainer, statusText, meetingFilterSelect, state }).catch(
+      (error) => {
+        statusText.textContent = `Unable to apply updates meeting filter: ${error.message}`;
+      }
+    );
   });
 
   listContainer.addEventListener("click", (event) => {
@@ -281,7 +349,7 @@ export function renderUpdatesPage(outlets) {
 
     state.selectedUpdateId = selectedUpdateId;
 
-    refreshUpdatesView({ listContainer, detailContainer, statusText, state }).catch((error) => {
+    refreshUpdatesView({ listContainer, detailContainer, statusText, meetingFilterSelect, state }).catch((error) => {
       statusText.textContent = `Unable to load update details: ${error.message}`;
     });
   });
@@ -290,7 +358,7 @@ export function renderUpdatesPage(outlets) {
     openNewUpdateModal({
       onRehydrate: async (createdUpdate) => {
         state.selectedUpdateId = createdUpdate.id;
-        await refreshUpdatesView({ listContainer, detailContainer, statusText, state });
+        await refreshUpdatesView({ listContainer, detailContainer, statusText, meetingFilterSelect, state });
         statusText.textContent = "Update created successfully.";
       },
     }).catch((error) => {

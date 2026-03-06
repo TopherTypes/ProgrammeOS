@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.2.2**
+Current version: **0.3.0**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -109,6 +109,14 @@ The app now renders all routes inside a shared layout shell:
 - Escape key and Cancel controls close the modal predictably and restore focus to the launch button.
 - Successful saves immediately refresh the people list so new records appear without route reloads.
 
+
+
+## Actions/Decisions/Updates Meeting Filter (v0.3.0)
+
+- Added a `Filter by meeting` select to the Actions, Decisions, and Updates page toolbars.
+- Each filter includes a default `All meetings` option plus live options loaded from `listMeetings()` titles.
+- List rendering, active-row selection reconciliation, and detail fallback behavior now run against the filtered subset.
+- Status text now reports filtered totals and explicitly indicates when a meeting filter is active.
 
 ## Meetings Linked-Record Inline Editing (v0.2.2)
 
