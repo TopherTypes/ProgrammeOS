@@ -161,6 +161,14 @@ body {
   background: #eaf1ff;
 }
 
+.meetings-table td {
+  padding: 0.3rem 0.5rem;
+}
+
+.meetings-table [data-role="meeting-row"].is-selected {
+  background: #eaf1ff;
+}
+
 .projects-list-item {
   width: 100%;
   text-align: left;

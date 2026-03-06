@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.22 meetings route baseline: replace placeholder meetings page rendering with a deterministic frame (`renderMeetingsPageFrame`), async `refreshMeetingsView` hydration from `listMeetings()`, dense list table (`Title`, `Date`, `Type`, `Attendees`), safe HTML escaping for user-provided fields, row-selection highlighting, and explicit detail empty/missing-selection fallback states.
 - v0.0.21 meetings data access baseline: add `js/features/meetings/data.js` with `createMeeting`, `getMeeting`, `listMeetings`, and `updateMeeting` wrappers around shared DB helpers; reuse `normalizeMeeting`/`assertValidMeeting`; enforce non-empty meeting-id errors for read/update paths; preserve immutable `id`/`createdAt` during updates while refreshing `updatedAt`; and surface contextual persistence failures.
 - v0.0.20 meetings record helper baseline: add `js/features/meetings/meeting-record.js` with pure canonical normalization for meeting records (`id`, `title`, `date`, `type`, `attendeeIds`, `projectIds`, `notes`, `createdAt`, `updatedAt`), enforce required non-empty `title` and `date` validation before persistence, and keep attendee/project links as trimmed de-duplicated id arrays.
 - v0.0.19 projects CRUD UI completion: `#/projects` detail panel must expose delegated `Edit` and `Delete` controls for the active project; edit must open a prefilled modal with inline name-required validation and persist via `updateProject(projectId, patch)`; delete must require confirmation, execute `deleteProject(projectId)`, clear invalid selection state, refresh list/detail hydration, and communicate success/failure status outcomes.
@@ -143,6 +144,8 @@ Meeting types include: - General - Project - Update
 Meetings must support copying to create a future meeting shell. The new
 meeting should copy title, type, attendees, and project links but not
 actions, decisions, or updates.
+
+In the current MVP implementation baseline, Meetings include a route frame with toolbar/status/list/detail containers, async list hydration from IndexedDB (`listMeetings`), dense table rendering, selected-row highlighting, escaped user-provided text rendering, and explicit empty/missing detail fallbacks. Full meeting create/edit workflows remain pending milestone implementation.
 
 ------------------------------------------------------------------------
 
