@@ -20,6 +20,22 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.2.1] - 2026-03-06
+
+### Added
+- Added optional modal lock configuration (`lockedMeetingId`, `lockedMeetingLabel`) to New Action, New Decision, and New Update modals so meeting context can be prefilled and rendered read-only when opened from meeting-scoped workflows.
+
+### Changed
+- Updated modal submit behavior for actions/decisions/updates so a provided `lockedMeetingId` is always persisted in the create payload, while standalone route usage still keeps meeting selection optional and editable.
+
+### Fixed
+- Fixed meeting-link consistency for meeting-scoped create flows by preventing meeting linkage drift between modal render state and submit payload generation.
+
+### Removed
+- None.
+
+---
+
 ## [0.2.0] - 2026-03-06
 
 ### Added

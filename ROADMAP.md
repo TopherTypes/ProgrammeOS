@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.2.0**
+Current version: **0.2.1**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -17,6 +17,8 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 
 
 ## Recent fixes
+
+- v0.2.1: Extended New Action, New Decision, and New Update modal APIs with optional locked meeting config (`lockedMeetingId`, `lockedMeetingLabel`) so meeting-scoped launches prefill and lock meeting context while standalone routes keep meeting linkage optional/editable.
 
 - v0.2.0: Extended Meetings detail with a linked Meeting Review area (Actions/Decisions/Updates grouped dense tables, per-section linked counts, explicit empty states, and automatic rehydration when linked records are created or updated).
 

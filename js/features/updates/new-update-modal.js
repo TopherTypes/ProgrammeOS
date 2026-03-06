@@ -13,6 +13,8 @@ import { createUpdate } from "./data.js";
  *   updatedAt: string,
  * }) => (void|Promise<void>)} [onRehydrate]
  * @property {() => void} [onClose]
+ * @property {string} [lockedMeetingId] Meeting id enforced by a parent workflow (for example Meeting Review).
+ * @property {string} [lockedMeetingLabel] Optional meeting label rendered while `lockedMeetingId` is enforced.
  */
 
 /**
@@ -66,9 +68,18 @@ function getSelectedValues(selectElement) {
  * @returns {Promise<{ close: () => void }>}
  */
 export async function openNewUpdateModal(options = {}) {
-  const { onRehydrate, onClose } = options;
+  const { onRehydrate, onClose, lockedMeetingId, lockedMeetingLabel } = options;
 
   const [meetings, projects] = await Promise.all([listMeetings(), listProjects()]);
+  const normalizedLockedMeetingId = typeof lockedMeetingId === "string" ? lockedMeetingId.trim() : "";
+  const hasLockedMeeting = normalizedLockedMeetingId.length > 0;
+  const lockedMeeting = hasLockedMeeting
+    ? meetings.find((meeting) => meeting.id === normalizedLockedMeetingId) ?? null
+    : null;
+  const meetingFieldLabel =
+    (typeof lockedMeetingLabel === "string" ? lockedMeetingLabel.trim() : "") ||
+    lockedMeeting?.title?.trim() ||
+    "Untitled meeting";
 
   const previousActiveElement =
     document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -97,14 +108,20 @@ export async function openNewUpdateModal(options = {}) {
         </div>
         <div class="modal-form-row">
           <label class="people-label" for="new-update-meeting">Meeting</label>
-          <select id="new-update-meeting" name="meetingId" class="people-input">
+          ${
+            hasLockedMeeting
+              ? `<input id="new-update-meeting" class="people-input" type="text" value="${escapeHtml(
+                  meetingFieldLabel
+                )}" disabled aria-disabled="true" />`
+              : `<select id="new-update-meeting" name="meetingId" class="people-input">
             <option value="">Not linked</option>
             ${renderSelectOptions(
               meetings,
               "No meetings available",
               (meeting) => meeting.title?.trim() || "Untitled meeting"
             )}
-          </select>
+          </select>`
+          }
         </div>
         <div class="modal-form-row">
           <label class="people-label" for="new-update-projects">Projects</label>
@@ -203,10 +220,17 @@ export async function openNewUpdateModal(options = {}) {
     }
 
     const meetingIdInput = form.elements.namedItem("meetingId");
+    // Locked meeting context guarantees payload consistency for callers that
+    // open this modal from a specific meeting workflow.
+    const meetingId = hasLockedMeeting
+      ? normalizedLockedMeetingId
+      : meetingIdInput instanceof HTMLSelectElement
+      ? meetingIdInput.value.trim()
+      : "";
 
     const updateInput = {
       description: descriptionInput.value.trim(),
-      meetingId: meetingIdInput instanceof HTMLSelectElement ? meetingIdInput.value.trim() : "",
+      meetingId,
       projectIds: getSelectedValues(projectSelect),
     };
 

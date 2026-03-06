@@ -16,6 +16,8 @@ import { createDecision } from "./data.js";
  *   updatedAt: string,
  * }) => (void|Promise<void>)} [onRehydrate]
  * @property {() => void} [onClose]
+ * @property {string} [lockedMeetingId] Meeting id enforced by a parent workflow (for example Meeting Review).
+ * @property {string} [lockedMeetingLabel] Optional meeting label rendered while `lockedMeetingId` is enforced.
  */
 
 /**
@@ -73,9 +75,18 @@ function getSelectedValues(selectElement) {
  * @returns {Promise<{ close: () => void }>}
  */
 export async function openNewDecisionModal(options = {}) {
-  const { onRehydrate, onClose } = options;
+  const { onRehydrate, onClose, lockedMeetingId, lockedMeetingLabel } = options;
 
   const [meetings, projects] = await Promise.all([listMeetings(), listProjects()]);
+  const normalizedLockedMeetingId = typeof lockedMeetingId === "string" ? lockedMeetingId.trim() : "";
+  const hasLockedMeeting = normalizedLockedMeetingId.length > 0;
+  const lockedMeeting = hasLockedMeeting
+    ? meetings.find((meeting) => meeting.id === normalizedLockedMeetingId) ?? null
+    : null;
+  const meetingFieldLabel =
+    (typeof lockedMeetingLabel === "string" ? lockedMeetingLabel.trim() : "") ||
+    lockedMeeting?.title?.trim() ||
+    "Untitled meeting";
 
   const previousActiveElement =
     document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -104,14 +115,20 @@ export async function openNewDecisionModal(options = {}) {
         </div>
         <div class="modal-form-row">
           <label class="people-label" for="new-decision-meeting">Meeting</label>
-          <select id="new-decision-meeting" name="meetingId" class="people-input">
+          ${
+            hasLockedMeeting
+              ? `<input id="new-decision-meeting" class="people-input" type="text" value="${escapeHtml(
+                  meetingFieldLabel
+                )}" disabled aria-disabled="true" />`
+              : `<select id="new-decision-meeting" name="meetingId" class="people-input">
             <option value="">Not linked</option>
             ${renderSelectOptions(
               meetings,
               "No meetings available",
               (meeting) => meeting.title?.trim() || "Untitled meeting"
             )}
-          </select>
+          </select>`
+          }
         </div>
         <div class="modal-form-row">
           <label class="people-label" for="new-decision-projects">Projects</label>
@@ -210,10 +227,17 @@ export async function openNewDecisionModal(options = {}) {
     }
 
     const meetingIdInput = form.elements.namedItem("meetingId");
+    // Meeting Review launches can lock meeting context so payload linkage is
+    // deterministic even when the meeting control is rendered read-only.
+    const meetingId = hasLockedMeeting
+      ? normalizedLockedMeetingId
+      : meetingIdInput instanceof HTMLSelectElement
+      ? meetingIdInput.value.trim()
+      : "";
 
     const decisionInput = {
       description: descriptionInput.value.trim(),
-      meetingId: meetingIdInput instanceof HTMLSelectElement ? meetingIdInput.value.trim() : "",
+      meetingId,
       projectIds: getSelectedValues(projectSelect),
     };
 
