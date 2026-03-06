@@ -20,6 +20,23 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.0.26] - 2026-03-06
+
+### Added
+- Added Milestone 4 completion documentation coverage across `PLANS.md`, `ROADMAP.md`, `SPECS.md`, and `README.md`, including delivered Meetings baseline acceptance and verification references.
+
+### Changed
+- Marked Meetings System (Milestone 4) complete with refined acceptance criteria for meeting model validation, modal lifecycle behaviour, list/detail interactions, and keyboard selection expectations.
+- Updated implementation-status and smoke-checklist messaging to reflect shipped Meetings outcomes and aligned release metadata to version `0.0.26`.
+
+### Fixed
+- Fixed documentation drift where milestone status and release-note index did not explicitly record Milestone 4 completion as a delivered baseline.
+
+### Removed
+- None.
+
+---
+
 ## [0.0.25] - 2026-03-06
 
 ### Added
