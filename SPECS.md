@@ -36,9 +36,9 @@ Programme Work Management App
 ## 0.1 Verification Commands
 
 - Run `node js/features/meetings/meeting-record.check.mjs` to verify meeting record normalization, validation, deduplication, and lightweight wrapper-API lifecycle behaviour (create/get/list/update).
-- Run `node js/features/actions/action-record.check.mjs` to verify action normalization/validation behaviour.
-- Run `node js/features/decisions/decision-record.check.mjs` to verify decision normalization/validation behaviour.
-- Run `node js/features/updates/update-record.check.mjs` to verify update normalization/validation behaviour.
+- Run `node js/features/actions/action-record.check.mjs` to verify action normalization defaults, required-field failures, ID deduplication, and lightweight wrapper-API lifecycle behaviour (create/get/list/update) with explicit pass/fail output.
+- Run `node js/features/decisions/decision-record.check.mjs` to verify decision normalization defaults, required-field failures, ID deduplication, and lightweight wrapper-API lifecycle behaviour (create/get/list/update) with explicit pass/fail output.
+- Run `node js/features/updates/update-record.check.mjs` to verify update normalization defaults, required-field failures, ID deduplication, and lightweight wrapper-API lifecycle behaviour (create/get/list/update) with explicit pass/fail output.
 
 ------------------------------------------------------------------------
 
