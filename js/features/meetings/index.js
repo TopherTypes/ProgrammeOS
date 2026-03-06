@@ -1,6 +1,9 @@
 import { renderPageFrame } from "../../layout.js";
+import { listActions } from "../actions/data.js";
+import { listDecisions } from "../decisions/data.js";
 import { listPeople } from "../people/data.js";
 import { listProjects } from "../projects/data.js";
+import { listUpdates } from "../updates/data.js";
 import { listMeetings } from "./data.js";
 import { openNewMeetingModal } from "./new-meeting-modal.js";
 
@@ -128,22 +131,43 @@ function renderMeetingDetail(
   meeting,
   attendeeNamesById,
   projectNamesById,
-  isMissingSelection
+  isMissingSelection,
+  reviewItems
 ) {
+  const selectedMeetingId = meeting?.id ?? "";
+  const actionsForMeeting = reviewItems.actions.filter((action) => action.meetingId === selectedMeetingId);
+  const decisionsForMeeting = reviewItems.decisions.filter(
+    (decision) => decision.meetingId === selectedMeetingId
+  );
+  const updatesForMeeting = reviewItems.updates.filter((update) => update.meetingId === selectedMeetingId);
+
+  const reviewHtml = renderMeetingReviewSectionGroup({
+    actionsForMeeting,
+    decisionsForMeeting,
+    updatesForMeeting,
+    isUnavailable: isMissingSelection || !meeting,
+  });
+
   if (isMissingSelection) {
     detailContainer.innerHTML = `
-      <p class="small-note" data-role="meeting-detail-missing">
-        Meeting detail view is unavailable because the selected meeting could not be found.
-      </p>
+      <article class="project-detail-card" data-role="meeting-detail-card">
+        <p class="small-note" data-role="meeting-detail-missing">
+          Meeting detail view is unavailable because the selected meeting could not be found.
+        </p>
+        ${reviewHtml}
+      </article>
     `;
     return;
   }
 
   if (!meeting) {
     detailContainer.innerHTML = `
-      <p class="small-note" data-role="meeting-detail-empty">
-        Select a meeting from the list to view details.
-      </p>
+      <article class="project-detail-card" data-role="meeting-detail-card">
+        <p class="small-note" data-role="meeting-detail-empty">
+          Select a meeting from the list to view details.
+        </p>
+        ${reviewHtml}
+      </article>
     `;
     return;
   }
@@ -183,7 +207,152 @@ function renderMeetingDetail(
       </section>
       <h4>Notes</h4>
       <p>${notes}</p>
+      ${reviewHtml}
     </article>
+  `;
+}
+
+/**
+ * Renders the grouped Meeting Review sections shown under meeting metadata.
+ *
+ * @param {object} config
+ * @param {Array<{id: string, description?: string, status?: string, ownerPersonId?: string, dueDate?: string}>} config.actionsForMeeting
+ * @param {Array<{id: string, description?: string, createdAt?: string}>} config.decisionsForMeeting
+ * @param {Array<{id: string, description?: string, createdAt?: string}>} config.updatesForMeeting
+ * @param {boolean} config.isUnavailable
+ * @returns {string}
+ */
+function renderMeetingReviewSectionGroup({
+  actionsForMeeting,
+  decisionsForMeeting,
+  updatesForMeeting,
+  isUnavailable,
+}) {
+  if (isUnavailable) {
+    return `
+      <section aria-label="Meeting review">
+        <h4>Meeting Review</h4>
+        <p class="small-note">Meeting review content appears when a meeting is selected.</p>
+      </section>
+    `;
+  }
+
+  return `
+    <section aria-label="Meeting review" data-role="meeting-review">
+      <h4>Meeting Review</h4>
+
+      ${renderMeetingReviewTableSection({
+        sectionLabel: "Actions",
+        emptyMessage: "No linked actions for this meeting.",
+        rowHeaders: ["Description", "Status", "Due", "Actions"],
+        rowData: actionsForMeeting,
+        rowHtmlBuilder: (action) => {
+          const description = escapeHtml(action.description?.trim() || "Untitled action");
+          const status = escapeHtml(action.status?.trim() || "Open");
+          const dueDate = escapeHtml(action.dueDate?.trim() || "No due date");
+
+          return `
+            <tr>
+              <td>${description}</td>
+              <td>${status}</td>
+              <td>${dueDate}</td>
+              <td>
+                <a class="people-button people-button-muted" href="#/actions">Open</a>
+              </td>
+            </tr>
+          `;
+        },
+      })}
+
+      ${renderMeetingReviewTableSection({
+        sectionLabel: "Decisions",
+        emptyMessage: "No linked decisions for this meeting.",
+        rowHeaders: ["Statement", "Created", "Actions"],
+        rowData: decisionsForMeeting,
+        rowHtmlBuilder: (decision) => {
+          const description = escapeHtml(decision.description?.trim() || "Untitled decision");
+          const createdAt = escapeHtml(decision.createdAt?.trim() || "Unknown");
+
+          return `
+            <tr>
+              <td>${description}</td>
+              <td>${createdAt}</td>
+              <td>
+                <a class="people-button people-button-muted" href="#/decisions">Open</a>
+              </td>
+            </tr>
+          `;
+        },
+      })}
+
+      ${renderMeetingReviewTableSection({
+        sectionLabel: "Updates",
+        emptyMessage: "No linked updates for this meeting.",
+        rowHeaders: ["Description", "Created", "Actions"],
+        rowData: updatesForMeeting,
+        rowHtmlBuilder: (update) => {
+          const description = escapeHtml(update.description?.trim() || "Untitled update");
+          const createdAt = escapeHtml(update.createdAt?.trim() || "Unknown");
+
+          return `
+            <tr>
+              <td>${description}</td>
+              <td>${createdAt}</td>
+              <td>
+                <a class="people-button people-button-muted" href="#/updates">Open</a>
+              </td>
+            </tr>
+          `;
+        },
+      })}
+    </section>
+  `;
+}
+
+/**
+ * Reusable dense inline table renderer for review sections.
+ *
+ * @param {object} config
+ * @param {string} config.sectionLabel
+ * @param {string} config.emptyMessage
+ * @param {string[]} config.rowHeaders
+ * @param {Array<object>} config.rowData
+ * @param {(row: object) => string} config.rowHtmlBuilder
+ * @returns {string}
+ */
+function renderMeetingReviewTableSection({
+  sectionLabel,
+  emptyMessage,
+  rowHeaders,
+  rowData,
+  rowHtmlBuilder,
+}) {
+  const safeSectionLabel = escapeHtml(sectionLabel);
+
+  if (rowData.length === 0) {
+    return `
+      <section aria-label="Meeting review ${safeSectionLabel}">
+        <h5>${safeSectionLabel} (0)</h5>
+        <p class="small-note">${escapeHtml(emptyMessage)}</p>
+      </section>
+    `;
+  }
+
+  return `
+    <section aria-label="Meeting review ${safeSectionLabel}">
+      <h5>${safeSectionLabel} (${rowData.length})</h5>
+      <table class="people-table meetings-table meetings-review-table">
+        <caption class="visually-hidden">${safeSectionLabel} linked to selected meeting</caption>
+        <thead>
+          <tr>
+            ${rowHeaders.map((header) => `<th scope="col">${escapeHtml(header)}</th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>
+          ${rowData.map((row) => rowHtmlBuilder(row)).join("")}
+        </tbody>
+      </table>
+    </section>
   `;
 }
 
@@ -219,15 +388,21 @@ function getSelectedMeetingIdFromEvent(event) {
  * @param {{ selectedMeetingId: string|null, meetings: Array<object> }} config.state
  */
 async function refreshMeetingsView({ listContainer, detailContainer, statusText, state }) {
-  const [meetings, people, projects] = await Promise.all([
+  const [meetings, people, projects, actions, decisions, updates] = await Promise.all([
     listMeetings(),
     listPeople(),
     listProjects(),
+    listActions(),
+    listDecisions(),
+    listUpdates(),
   ]);
 
   state.meetings = meetings;
   state.peopleById = new Map(people.map((person) => [person.id, person.name]));
   state.projectsById = new Map(projects.map((project) => [project.id, project.name]));
+  state.actions = actions;
+  state.decisions = decisions;
+  state.updates = updates;
 
   const selectedMeetingInList =
     meetings.find((meeting) => meeting.id === state.selectedMeetingId) ?? null;
@@ -255,7 +430,12 @@ async function refreshMeetingsView({ listContainer, detailContainer, statusText,
     selectedMeeting,
     state.peopleById,
     state.projectsById,
-    shouldShowMissingSelectionFallback
+    shouldShowMissingSelectionFallback,
+    {
+      actions: state.actions,
+      decisions: state.decisions,
+      updates: state.updates,
+    }
   );
 
   statusText.textContent =
@@ -293,11 +473,20 @@ export function renderMeetingsPage(outlets) {
     meetings: [],
     peopleById: new Map(),
     projectsById: new Map(),
+    actions: [],
+    decisions: [],
+    updates: [],
   };
 
-  refreshMeetingsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
-    statusText.textContent = `Unable to load meetings: ${error.message}`;
-  });
+  const refreshWithFeedback = async (failureLabel) => {
+    try {
+      await refreshMeetingsView({ listContainer, detailContainer, statusText, state });
+    } catch (error) {
+      statusText.textContent = `${failureLabel}: ${error.message}`;
+    }
+  };
+
+  refreshWithFeedback("Unable to load meetings");
 
   listContainer.addEventListener("click", (event) => {
     const selectedMeetingId = getSelectedMeetingIdFromEvent(event);
@@ -308,9 +497,7 @@ export function renderMeetingsPage(outlets) {
 
     state.selectedMeetingId = selectedMeetingId;
 
-    refreshMeetingsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
-      statusText.textContent = `Unable to load meeting details: ${error.message}`;
-    });
+    refreshWithFeedback("Unable to load meeting details");
   });
 
   // Keyboard behavior mirrors the Projects list: Arrow keys move focus row-to-row,
@@ -329,9 +516,7 @@ export function renderMeetingsPage(outlets) {
     if (event.key === "Enter" || event.key === " ") {
       state.selectedMeetingId = meetingId;
 
-      refreshMeetingsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
-        statusText.textContent = `Unable to load meeting details: ${error.message}`;
-      });
+      refreshWithFeedback("Unable to load meeting details");
 
       event.preventDefault();
       return;
@@ -369,4 +554,19 @@ export function renderMeetingsPage(outlets) {
       statusText.textContent = `Unable to open New Meeting modal: ${error.message}`;
     });
   });
+
+  // Keep Meeting Review sections current when linked entities mutate on other routes.
+  const linkedRecordRefreshEvents = [
+    "programmeos:actions-changed",
+    "programmeos:decisions-changed",
+    "programmeos:updates-changed",
+  ];
+
+  const handleLinkedRecordChange = () => {
+    refreshWithFeedback("Unable to refresh linked meeting review");
+  };
+
+  for (const eventName of linkedRecordRefreshEvents) {
+    window.addEventListener(eventName, handleLinkedRecordChange);
+  }
 }

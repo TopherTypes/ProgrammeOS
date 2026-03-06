@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.1.0**
+Current version: **0.2.0**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -17,6 +17,8 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 
 
 ## Recent fixes
+
+- v0.2.0: Extended Meetings detail with a linked Meeting Review area (Actions/Decisions/Updates grouped dense tables, per-section linked counts, explicit empty states, and automatic rehydration when linked records are created or updated).
 
 - v0.1.0: Marked Milestone 5 complete across planning/roadmap/readme/spec docs, consolidated delivered Actions/Decisions/Updates workflows and acceptance criteria, and aligned release metadata for milestone publication.
 

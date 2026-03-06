@@ -3,6 +3,21 @@ import { assertValidDecision, normalizeDecision } from "./decision-record.js";
 
 const DECISIONS_STORE = "decisions";
 
+function emitDecisionsChanged(decisionRecord) {
+  if (typeof window === "undefined" || typeof window.dispatchEvent !== "function") {
+    return;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("programmeos:decisions-changed", {
+      detail: {
+        decisionId: decisionRecord.id,
+        meetingId: decisionRecord.meetingId,
+      },
+    })
+  );
+}
+
 /**
  * Creates a new decision record with immutable identity and timestamp metadata.
  *
@@ -42,6 +57,8 @@ export async function createDecision(decisionInput) {
       cause: error,
     });
   }
+
+  emitDecisionsChanged(decisionRecord);
 
   return decisionRecord;
 }
@@ -167,6 +184,8 @@ export async function updateDecision(decisionId, patch) {
       normalizedDecisionId,
       updatedDecision
     );
+
+    emitDecisionsChanged(updatedDecision);
 
     return normalizeDecision(savedDecision);
   } catch (error) {

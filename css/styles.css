@@ -169,6 +169,11 @@ body {
   background: #eaf1ff;
 }
 
+.meetings-review-table th,
+.meetings-review-table td {
+  padding: 0.3rem 0.45rem;
+}
+
 .projects-list-item {
   width: 100%;
   text-align: left;

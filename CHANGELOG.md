@@ -20,6 +20,24 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.2.0] - 2026-03-06
+
+### Added
+- Added a new Meeting Review area to the meetings detail panel with grouped Actions/Decisions/Updates sections, per-section linked counts, dense inline tables, row-level Open actions, and explicit empty-state messaging.
+- Added linked-entity mutation events in action/decision/update data helpers so dependent meeting detail views can rehydrate as related records are created or updated.
+
+### Changed
+- Expanded meetings route hydration to load linked actions, decisions, and updates alongside meetings/people/projects so Meeting Review content stays synchronized during selection changes and stale-selection fallback rendering.
+- Bumped project version metadata to `0.2.0` across `VERSION`, `README.md`, and `ROADMAP.md`.
+
+### Fixed
+- Fixed stale Meeting Review behavior by rehydrating linked review sections whenever action/decision/update records change.
+
+### Removed
+- None.
+
+---
+
 
 ## [0.1.0] - 2026-03-06
 
