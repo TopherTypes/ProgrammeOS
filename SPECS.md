@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.26 milestone 4 completion alignment: Meetings behaviour is now a delivered baseline for MVP with canonical meeting model validation, route-frame/list/detail rendering, modal-driven creation flow, related people/project name resolution, keyboard-friendly row selection, and Node-runnable verification coverage (`node js/features/meetings/meeting-record.check.mjs`) maintained as the documented acceptance gate.
 - v0.0.25 meetings check script expansion: `js/features/meetings/meeting-record.check.mjs` must run directly in Node with explicit pass/fail output, covering normalization defaults/trimming, required-field validation failures (`title`, `date`), attendee/project id-array deduplication, and create/get/list/update sanity checks against IndexedDB-wrapper-style APIs.
 - v0.0.24 meetings detail/accessibility enhancement: extend `js/features/meetings/index.js` detail rendering to show `title`/`date`/`type`/`notes`, resolve attendee names from `listPeople()` and linked project names from `listProjects()`, provide safe stale-selection and unknown-link fallback messaging, and support Projects-consistent keyboard row interactions (Arrow Up/Down focus + Enter/Space selection).
 - v0.0.22 meetings route baseline: replace placeholder meetings page rendering with a deterministic frame (`renderMeetingsPageFrame`), async `refreshMeetingsView` hydration from `listMeetings()`, dense list table (`Title`, `Date`, `Type`, `Attendees`), safe HTML escaping for user-provided fields, row-selection highlighting, and explicit detail empty/missing-selection fallback states.
@@ -153,7 +154,17 @@ Meetings must support copying to create a future meeting shell. The new
 meeting should copy title, type, attendees, and project links but not
 actions, decisions, or updates.
 
-In the current MVP implementation baseline, Meetings include a route frame with toolbar/status/list/detail containers, async list hydration from IndexedDB (`listMeetings`) plus related people/project lookups for name resolution, dense table rendering, selected-row highlighting, click + keyboard selection (Arrow Up/Down focus and Enter/Space select), escaped user-provided text rendering, and explicit empty/missing detail fallbacks including safe unknown-linked-ID labels.
+Current implementation status: **Delivered in Milestone 4**.
+
+In the delivered MVP baseline, Meetings include a route frame with toolbar/status/list/detail containers, async list hydration from IndexedDB (`listMeetings`) plus related people/project lookups for name resolution, dense table rendering, selected-row highlighting, click + keyboard selection (Arrow Up/Down focus and Enter/Space select), escaped user-provided text rendering, modal-driven meeting creation with validation and predictable dismissal/focus restoration, and explicit empty/missing detail fallbacks including safe unknown-linked-ID labels.
+
+
+
+#### Meetings Baseline Verification (Milestone 4)
+
+- Run `node js/features/meetings/meeting-record.check.mjs` and confirm all checks pass (normalization defaults/trimming, required-field validation failures, id-array deduplication, and create/get/list/update sanity checks).
+- Open `#/meetings`, create a meeting via the modal with valid `title` + `date`, and confirm list/detail rehydrate without route reload.
+- Confirm keyboard row interaction (Arrow Up/Down focus movement, Enter/Space selection), attendee/project name resolution, and stale-link fallback labels in detail (`Unknown person`, `Unknown project`).
 
 ------------------------------------------------------------------------
 

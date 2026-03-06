@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.25**
+Current version: **0.0.26**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -162,6 +162,15 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 13. Cancel the delete confirmation once and confirm no data is deleted and cancellation is communicated.
 14. Remove a selected project from storage (or select a stale ID during testing) and confirm the detail panel shows the safe missing-project fallback message.
 
+## Implementation Status (Milestone Progress)
+
+- ✅ Milestone 0 — Application Foundation
+- ✅ Milestone 1 — Database Layer
+- ✅ Milestone 2 — People System
+- ✅ Milestone 3 — Projects System
+- ✅ Milestone 4 — Meetings System
+- ⚠️ Milestone 5+ — Pending
+
 ## Meetings Route Baseline (v0.0.24)
 
 - `#/meetings` now renders a deterministic route frame with:
@@ -196,10 +205,10 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 15. In the browser console, call `createMeeting(...)`, `getMeeting(id)`, `listMeetings()`, and `updateMeeting(id, patch)` from `js/features/meetings/data.js` and confirm immutable `id`/`createdAt` fields stay unchanged while `updatedAt` refreshes after updates.
 16. Run `node js/features/projects/project-record.check.mjs` and confirm normalization/validation plus lightweight project data lifecycle checks (create -> delete -> get/list expectations) pass.
 
-## Smoke Checklist Outcomes (v0.0.24)
+## Smoke Checklist Outcomes (v0.0.26)
 
 - ✅ Entity creation: **People pass; Projects pass including modal-based UI creation flow**.
-- ✅ Meeting logging: **New Meeting modal shipped with required validation, relationship linking, persistence, and post-save route rehydration**.
+- ✅ Meeting logging: **Pass — meetings model/data helpers, modal create flow, list/detail rendering, relationship name resolution, and keyboard interactions verified as delivered Milestone 4 baseline**.
 - ⚠️ Action/decision/update creation: **Pending milestone implementation**.
 - ⚠️ Communication tracking: **Pending milestone implementation**.
 - ⚠️ JSON export/import: **Pending milestone implementation**.

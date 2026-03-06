@@ -21,7 +21,7 @@ AI agents must follow the operational rules defined in **AGENTS.md** and respect
 - [x] Milestone 1 — Database Layer
 - [x] Milestone 2 — People System
 - [x] Milestone 3 — Projects System
-- [ ] Milestone 4 — Meetings System
+- [x] Milestone 4 — Meetings System
 - [ ] Milestone 5 — Actions, Decisions, Updates
 - [ ] Milestone 6 — Communication Tracking
 - [ ] Milestone 7 — Entity Linking UX
@@ -297,10 +297,11 @@ Verification
 
 # Milestone 4 — Meetings System
 Target Version: v0.0.5
+Status: **Completed (v0.0.26 documentation alignment)**
 
 Goal: Implement meeting logging.
 
-## Task 4.1 — Meeting Data Model
+## Task 4.1 — Meeting Data Model ✅
 
 Fields:
 
@@ -315,14 +316,16 @@ createdAt
 updatedAt
 
 Acceptance Criteria
-- Meeting records persist.
+- Meeting records persist with canonical shape (`id`, `title`, `date`, `type`, `attendeeIds`, `projectIds`, `notes`, `createdAt`, `updatedAt`).
+- Validation enforces non-empty `title` and `date` before persistence.
+- Linked attendee/project IDs are trimmed and deduplicated.
 
 Verification
 - Create meeting and reload page.
 
 ---
 
-## Task 4.2 — Meeting Creation Modal
+## Task 4.2 — Meeting Creation Modal ✅
 
 Features
 - Title
@@ -331,18 +334,23 @@ Features
 - Meeting type
 
 Acceptance Criteria
-- Meeting stored correctly.
+- Modal captures `title`, `date`, `type`, `attendeeIds`, `projectIds`, and `notes` and stores a meeting successfully.
+- Modal supports Escape/cancel/overlay dismissal, inline validation messaging, and trigger focus restoration.
+- Successful saves refresh meetings list/detail panes without full app reload.
 
 Verification
 - Create meeting with attendees.
 
 ---
 
-## Task 4.3 — Meeting Detail Page
+## Task 4.3 — Meeting Detail Page ✅
 
 Acceptance Criteria
 - Meeting information displayed.
 - Attendees listed.
+- Linked project names resolved and displayed.
+- Meetings list supports click + keyboard selection (Arrow Up/Down focus, Enter/Space select).
+- Empty/missing-selection and stale-link fallbacks render safely (`Unknown person`, `Unknown project`).
 
 Verification
 - Navigate to meeting detail page.
@@ -501,4 +509,4 @@ Potential milestones:
 - teams
 
 
-Update note (v0.0.17): Completed Projects modal creation flow wiring on `#/projects` with stakeholder multi-select and post-save route refresh.
+Update note (v0.0.26): Marked Milestone 4 complete after shipping meetings model/data helpers, modal create flow, list/detail rendering, keyboard interactions, linked-entity name resolution, and expanded Node verification coverage.

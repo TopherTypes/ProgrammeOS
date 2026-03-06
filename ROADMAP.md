@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.25**
+Current version: **0.0.26**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -10,11 +10,14 @@ This file mirrors milestone planning in `PLANS.md` and exists as a lightweight r
 - [x] Milestone 1 (v0.0.2): IndexedDB persistence layer.
 - [x] Milestone 2 (v0.0.3): People system (model, list, creation modal) — **complete**.
 - [x] Milestone 3 (v0.0.4): Projects system (project model persistence + Projects list/detail interaction baseline) — **complete**.
+- [x] Milestone 4 (v0.0.5): Meetings system (meeting model/data helpers, modal create flow, meetings list/detail baseline, and keyboard-friendly selection) — **complete**.
 
 For detailed tasks and acceptance criteria, see `PLANS.md`.
 
 
 ## Recent fixes
+
+- v0.0.26: Marked Milestone 4 complete across planning/spec/readme docs and published milestone release-note alignment for delivered Meetings baseline behaviour.
 
 - v0.0.6: Added IndexedDB initialisation with all MVP object stores and schema version metadata persistence.
 - v0.0.5: Removed a duplicate layout helper declaration that caused browser startup failure in the layout module.
