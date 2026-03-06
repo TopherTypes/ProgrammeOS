@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.27**
+Current version: **0.0.29**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -239,7 +239,7 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 
 - ✅ Entity creation: **People pass; Projects pass including modal-based UI creation flow**.
 - ✅ Meeting logging: **Pass — meetings model/data helpers, modal create flow, list/detail rendering, relationship name resolution, and keyboard interactions verified as delivered Milestone 4 baseline**.
-- ⚠️ Action/decision/update creation: **Partially delivered — Actions and Decisions create/update/list/detail baselines are now implemented; Updates remain pending.**
+- ✅ Action/decision/update creation: **Pass — Actions, Decisions, and Updates now have create/list/detail baselines with modal-driven creation and in-route hydration.**
 - ⚠️ Communication tracking: **Pending milestone implementation**.
 - ⚠️ JSON export/import: **Pending milestone implementation**.
 
@@ -254,6 +254,35 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 - Added lightweight verification script:
   - `node js/features/meetings/meeting-record.check.mjs` (normalization/validation + lightweight wrapper-API lifecycle sanity checks)
 
+
+
+## Updates Route Baseline (v0.0.29)
+
+- `#/updates` now renders a deterministic frame with:
+  - toolbar actions (`New Update` trigger + `aria-live="polite"` status text)
+  - updates list container rendered as a dense table or explicit empty state
+  - detail panel with empty and missing-selection fallback messaging
+- Added `js/features/updates/update-record.js` with `normalizeUpdate(...)` and `assertValidUpdate(...)`:
+  - required `description` validation
+  - optional normalization for `meetingId` and `projectIds`
+  - deduplicated/trimmed `projectIds`
+- Added `js/features/updates/data.js` create/read/list/update helpers backed by shared `js/db.js` wrappers.
+- `updateUpdate(...)` preserves immutable `id`/`createdAt` metadata while refreshing `updatedAt`.
+- Added `js/features/updates/new-update-modal.js` with required description validation, Escape/cancel/overlay dismissal, trigger focus restoration, and inline status/error messaging.
+- Update detail rendering resolves linked meeting/project names where records exist and safely falls back to unknown labels for stale links.
+- Added lightweight verification script: `node js/features/updates/update-record.check.mjs`.
+
+## Manual Verification (v0.0.29)
+
+1. Open `index.html` and navigate to `#/updates`.
+2. Confirm Updates toolbar renders with **New Update** and live status text.
+3. Confirm explicit empty-state messaging appears when no update records exist.
+4. Click **New Update** and submit empty description; verify inline required-field validation appears and modal remains open.
+5. Dismiss the modal via Escape, Cancel, and overlay click in separate attempts; confirm each path closes and restores focus to the trigger.
+6. Reopen modal, create an update with description, optional meeting, and optional linked projects; confirm list/detail rehydrate immediately without full reload.
+7. Select different rows and confirm detail panel updates; use a stale selected id during testing and confirm missing-selection fallback appears.
+8. Confirm linked meeting and project names are resolved in list/detail when those records exist, and stale IDs show fallback labels.
+9. Run `node js/features/updates/update-record.check.mjs` and confirm update normalization/validation checks pass.
 
 ## Decisions Route Baseline (v0.0.28)
 

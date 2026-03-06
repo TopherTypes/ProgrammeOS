@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.28**
+Current version: **0.0.29**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -16,6 +16,8 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 
 
 ## Recent fixes
+
+- v0.0.29: Added Updates baseline delivery (update record/data helpers, New Update modal, updates list/detail route frame, linked meeting/project name resolution, and stale-selection defensive fallback behavior), plus a lightweight update-record verification script and aligned docs/version metadata.
 
 - v0.0.28: Added Decisions baseline delivery (decision record/data helpers, New Decision modal, decisions list/detail route frame, linked meeting/project name resolution, and stale-selection defensive fallback behavior), and aligned docs/version metadata.
 
