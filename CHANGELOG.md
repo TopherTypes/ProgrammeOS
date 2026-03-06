@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.2.2] - 2026-03-06
+
+### Added
+- Added row-level edit mode in Meeting Review linked-record tables (`#/meetings` detail) with inline Save/Cancel controls for actions, decisions, and updates.
+
+### Changed
+- Wired Meeting Review inline persistence to existing helpers: `updateAction(...)`, `updateDecision(...)`, and `updateUpdate(...)`, with full table/count re-render after successful saves.
+- Added predictable focus restoration after save/cancel so keyboard interaction remains stable when rows exit edit mode.
+
+### Fixed
+- Added inline validation messaging for required linked-record descriptions to prevent empty saves from Meeting Review edit mode.
+
+### Removed
+- None.
+
+---
+
 All notable changes to this project will be documented in this file.
 
 The format is based on **Keep a Changelog**, and this project adheres to **Semantic Versioning**.
