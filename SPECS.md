@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.1.0 milestone 5 completion alignment: Actions, Decisions, and Updates are now a delivered MVP baseline with deterministic route frames (toolbar/list/detail), modal-driven create workflows, required-description validation, predictable Escape/cancel/overlay dismissal + focus restoration, linked meeting/project name resolution with safe stale-selection fallback messaging, and maintained Node-runnable record verification scripts for each entity.
 - v0.0.29 updates route + data baseline: add canonical update normalization/validation (`description` required, optional `meetingId`/`projectIds`) and updates CRUD data helpers (`createUpdate`, `getUpdate`, `listUpdates`, `updateUpdate`) with immutable `id`/`createdAt` preservation; replace `#/updates` placeholder with toolbar/list/detail rendering, modal-driven create flow (Escape/cancel/overlay dismissal, focus restoration, inline validation/status), linked meeting/project name resolution where available, and Projects/Meetings-consistent stale-selection fallback handling.
 - v0.0.28 decisions route + data baseline: add canonical decision normalization/validation (`description` required, optional `meetingId`/`projectIds`) and decisions CRUD data helpers (`createDecision`, `getDecision`, `listDecisions`, `updateDecision`) with immutable `id`/`createdAt` preservation; replace `#/decisions` placeholder with toolbar/list/detail rendering, modal-driven create flow (Escape/cancel/overlay dismissal, focus restoration, inline validation/status), linked meeting/project name resolution where available, and Projects/Meetings-consistent stale-selection fallback handling.
 - v0.0.27 actions route + data baseline: add canonical action normalization/validation (`description` required) and actions CRUD data helpers (`createAction`, `getAction`, `listActions`, `updateAction`) with immutable `id`/`createdAt` preservation; replace `#/actions` placeholder with toolbar/list/detail rendering, explicit empty+missing-selection fallbacks, modal-driven create flow (Escape/cancel/overlay dismissal, focus restoration, inline validation/status), and in-route create/update rehydration without full reload.
@@ -180,6 +181,11 @@ Actions must include: - description - owner (linked person) - status -
 due date (optional) - originating meeting (optional) - related
 project(s) (optional) - communication tracking
 
+Current implementation status: **Delivered in Milestone 5**.
+
+In the delivered MVP baseline, `#/actions` provides a deterministic route frame with toolbar/status/list/detail containers, explicit empty and missing-selection fallback states, and in-route hydration backed by the actions data helpers. Action creation is modal-driven with required-description validation, optional owner/status/due-date/meeting/project linking, and predictable Escape/cancel/overlay dismissal with trigger focus restoration. Successful create/update operations refresh list/detail content in place without full route reload.
+
+
 ------------------------------------------------------------------------
 
 ### 3.5 Decision Logging
@@ -187,6 +193,11 @@ project(s) (optional) - communication tracking
 Decisions must include: - decision statement - associated meeting
 (optional) - related project(s) (optional) - optional notes -
 communication tracking
+
+Current implementation status: **Delivered in Milestone 5**.
+
+In the delivered MVP baseline, `#/decisions` provides a deterministic route frame with toolbar/status/list/detail containers, modal-driven creation with required-description validation, and explicit empty/missing-selection fallback states. Decision detail rendering resolves linked meeting/project names when related records exist and uses safe fallback labels when links are stale or missing.
+
 
 ------------------------------------------------------------------------
 
@@ -199,6 +210,17 @@ related project(s) (optional) - optional notes - communication tracking
 
 Meetings must support generic updates as well as updates tied to
 specific discussions.
+
+Current implementation status: **Delivered in Milestone 5**.
+
+In the delivered MVP baseline, `#/updates` provides a deterministic route frame with toolbar/status/list/detail containers, modal-driven creation with required-description validation, and explicit empty/missing-selection fallback states. Update detail rendering resolves linked meeting/project names when available, with safe fallback labels for stale linked IDs.
+
+#### Milestone 5 Workflow Summary (Actions / Decisions / Updates)
+
+- Users open `#/actions`, `#/decisions`, or `#/updates` and create records via dedicated New-item modals.
+- Each modal enforces required description input, allows optional meeting/project linking, and supports Escape/cancel/overlay dismissal with focus returned to the launch trigger.
+- Successful submissions persist to IndexedDB via dedicated data helpers and rehydrate list/detail panes in place.
+- Baseline verification scripts run in Node: `action-record.check.mjs`, `decision-record.check.mjs`, and `update-record.check.mjs`.
 
 ------------------------------------------------------------------------
 

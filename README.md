@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.0.29**
+Current version: **0.1.0**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -169,7 +169,8 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 - ✅ Milestone 2 — People System
 - ✅ Milestone 3 — Projects System
 - ✅ Milestone 4 — Meetings System
-- ⚠️ Milestone 5+ — Pending
+- ✅ Milestone 5 — Actions, Decisions, Updates
+- ⚠️ Milestone 6+ — Pending
 
 ## Meetings Route Baseline (v0.0.24)
 

@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.0.29**
+Current version: **0.1.0**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -11,11 +11,14 @@ This file mirrors milestone planning in `PLANS.md` and exists as a lightweight r
 - [x] Milestone 2 (v0.0.3): People system (model, list, creation modal) — **complete**.
 - [x] Milestone 3 (v0.0.4): Projects system (project model persistence + Projects list/detail interaction baseline) — **complete**.
 - [x] Milestone 4 (v0.0.5): Meetings system (meeting model/data helpers, modal create flow, meetings list/detail baseline, and keyboard-friendly selection) — **complete**.
+- [x] Milestone 5 (v0.0.6): Actions, decisions, and updates baseline (modal create flows, list/detail routes, linked meeting/project resolution, and lightweight record verification) — **complete**.
 
 For detailed tasks and acceptance criteria, see `PLANS.md`.
 
 
 ## Recent fixes
+
+- v0.1.0: Marked Milestone 5 complete across planning/roadmap/readme/spec docs, consolidated delivered Actions/Decisions/Updates workflows and acceptance criteria, and aligned release metadata for milestone publication.
 
 - v0.0.29: Added Updates baseline delivery (update record/data helpers, New Update modal, updates list/detail route frame, linked meeting/project name resolution, and stale-selection defensive fallback behavior), plus a lightweight update-record verification script and aligned docs/version metadata.
 

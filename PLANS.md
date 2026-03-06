@@ -22,7 +22,7 @@ AI agents must follow the operational rules defined in **AGENTS.md** and respect
 - [x] Milestone 2 — People System
 - [x] Milestone 3 — Projects System
 - [x] Milestone 4 — Meetings System
-- [ ] Milestone 5 — Actions, Decisions, Updates
+- [x] Milestone 5 — Actions, Decisions, Updates
 - [ ] Milestone 6 — Communication Tracking
 - [ ] Milestone 7 — Entity Linking UX
 - [ ] Milestone 8 — Dashboard and Focus
@@ -359,10 +359,11 @@ Verification
 
 # Milestone 5 — Actions, Decisions, Updates
 Target Version: v0.0.6
+Status: **Completed (v0.1.0 milestone release alignment)**
 
 Goal: Capture outputs from meetings.
 
-## Task 5.1 — Action Model
+## Task 5.1 — Action Model ✅
 
 Fields:
 
@@ -376,14 +377,18 @@ projectIds
 requiresUpdateByPersonId
 
 Acceptance Criteria
-- Actions created and stored.
+- Actions route provides a deterministic toolbar/list/detail frame with explicit empty-state and missing-selection fallback messaging.
+- New Action modal captures required `description` and optional owner/status/due-date/meeting/project links.
+- Modal supports Escape/cancel/overlay dismissal, inline validation/status messaging, and trigger focus restoration.
+- Actions are created, listed, and detail-rendered with in-place refresh after create/update operations.
 
 Verification
-- Create action linked to meeting.
+- Navigate to `#/actions`, create an action, and confirm list/detail refresh without route reload.
+- Run `node js/features/actions/action-record.check.mjs` and confirm normalization/validation + lifecycle checks pass.
 
 ---
 
-## Task 5.2 — Decision Model
+## Task 5.2 — Decision Model ✅
 
 Fields:
 
@@ -393,11 +398,18 @@ meetingId
 projectIds
 
 Acceptance Criteria
-- Decisions stored and displayed.
+- Decisions route provides a deterministic toolbar/list/detail frame with explicit empty-state and missing-selection fallback messaging.
+- New Decision modal captures required `description` plus optional meeting/project links.
+- Modal supports Escape/cancel/overlay dismissal, inline validation/status messaging, and trigger focus restoration.
+- Decisions persist with linked meeting/project name resolution in detail rendering when related records exist.
+
+Verification
+- Navigate to `#/decisions`, create a decision, and confirm list/detail refresh with linked-name fallback behavior.
+- Run `node js/features/decisions/decision-record.check.mjs` and confirm normalization/validation + lifecycle checks pass.
 
 ---
 
-## Task 5.3 — Update Model
+## Task 5.3 — Update Model ✅
 
 Fields:
 
@@ -407,7 +419,14 @@ meetingId
 projectIds
 
 Acceptance Criteria
-- Updates stored and visible.
+- Updates route provides a deterministic toolbar/list/detail frame with explicit empty-state and missing-selection fallback messaging.
+- New Update modal captures required `description` plus optional meeting/project links.
+- Modal supports Escape/cancel/overlay dismissal, inline validation/status messaging, and trigger focus restoration.
+- Updates persist with linked meeting/project name resolution in detail rendering when related records exist.
+
+Verification
+- Navigate to `#/updates`, create an update, and confirm list/detail refresh with linked-name fallback behavior.
+- Run `node js/features/updates/update-record.check.mjs` and confirm normalization/validation + lifecycle checks pass.
 
 ---
 

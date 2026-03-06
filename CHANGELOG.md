@@ -21,6 +21,25 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ---
 
 
+## [0.1.0] - 2026-03-06
+
+### Added
+- Documented Milestone 5 completion in `PLANS.md` with delivered acceptance criteria and verification notes for Actions, Decisions, and Updates tasks.
+- Added milestone completion status entries in `ROADMAP.md` and `README.md` so Milestone 5 is tracked as complete.
+- Expanded `SPECS.md` Action/Decision/Update sections with shipped workflow behavior, route UX expectations, and baseline verification coverage.
+
+### Changed
+- Bumped project release version metadata to `0.1.0` for the Milestone 5 documentation release.
+- Updated roadmap/readme version references to keep published status blocks consistent with the new milestone release.
+
+### Fixed
+- Corrected stale milestone status messaging that still marked Milestone 5 as pending after Actions/Decisions/Updates delivery.
+
+### Removed
+- None.
+
+---
+
 ## [0.0.30] - 2026-03-06
 
 ### Added
