@@ -21,6 +21,27 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ---
 
 
+## [0.0.28] - 2026-03-06
+
+### Added
+- Added `js/features/decisions/decision-record.js` with canonical `normalizeDecision(...)` and `assertValidDecision(...)` helpers, including required `description` validation and optional `meetingId`/`projectIds` normalization.
+- Added `js/features/decisions/data.js` with `createDecision`, `getDecision`, `listDecisions`, and `updateDecision` wrappers around shared DB helpers.
+- Added `js/features/decisions/new-decision-modal.js` implementing New Decision modal lifecycle (required description validation, Escape/cancel/overlay close, focus restoration, and inline status/error messaging).
+- Added `js/features/decisions/decision-record.check.mjs` for lightweight Node-runnable decision normalization/validation verification.
+
+### Changed
+- Replaced `js/features/decisions/index.js` placeholder rendering with live Decisions route UI: toolbar, dense list table, explicit empty state, and detail pane with linked meeting/project name resolution where available.
+- Added Projects/Meetings-consistent stale-selection safeguards in decisions route hydration so missing selected records render deterministic fallback messaging.
+- Updated README, SPECS, ROADMAP, and VERSION metadata to reflect Decisions baseline delivery and verification guidance.
+
+### Fixed
+- Ensured decision updates preserve immutable `id`/`createdAt` fields and refresh `updatedAt` for each successful update write.
+
+### Removed
+- Removed static placeholder-only content from the Decisions route.
+
+---
+
 ## [0.0.27] - 2026-03-06
 
 ### Added

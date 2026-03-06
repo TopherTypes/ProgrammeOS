@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.0.28 decisions route + data baseline: add canonical decision normalization/validation (`description` required, optional `meetingId`/`projectIds`) and decisions CRUD data helpers (`createDecision`, `getDecision`, `listDecisions`, `updateDecision`) with immutable `id`/`createdAt` preservation; replace `#/decisions` placeholder with toolbar/list/detail rendering, modal-driven create flow (Escape/cancel/overlay dismissal, focus restoration, inline validation/status), linked meeting/project name resolution where available, and Projects/Meetings-consistent stale-selection fallback handling.
 - v0.0.27 actions route + data baseline: add canonical action normalization/validation (`description` required) and actions CRUD data helpers (`createAction`, `getAction`, `listActions`, `updateAction`) with immutable `id`/`createdAt` preservation; replace `#/actions` placeholder with toolbar/list/detail rendering, explicit empty+missing-selection fallbacks, modal-driven create flow (Escape/cancel/overlay dismissal, focus restoration, inline validation/status), and in-route create/update rehydration without full reload.
 - v0.0.26 milestone 4 completion alignment: Meetings behaviour is now a delivered baseline for MVP with canonical meeting model validation, route-frame/list/detail rendering, modal-driven creation flow, related people/project name resolution, keyboard-friendly row selection, and Node-runnable verification coverage (`node js/features/meetings/meeting-record.check.mjs`) maintained as the documented acceptance gate.
 - v0.0.25 meetings check script expansion: `js/features/meetings/meeting-record.check.mjs` must run directly in Node with explicit pass/fail output, covering normalization defaults/trimming, required-field validation failures (`title`, `date`), attendee/project id-array deduplication, and create/get/list/update sanity checks against IndexedDB-wrapper-style APIs.
@@ -34,6 +35,8 @@ Programme Work Management App
 ## 0.1 Verification Commands
 
 - Run `node js/features/meetings/meeting-record.check.mjs` to verify meeting record normalization, validation, deduplication, and lightweight wrapper-API lifecycle behaviour (create/get/list/update).
+- Run `node js/features/actions/action-record.check.mjs` to verify action normalization/validation behaviour.
+- Run `node js/features/decisions/decision-record.check.mjs` to verify decision normalization/validation behaviour.
 
 ------------------------------------------------------------------------
 
