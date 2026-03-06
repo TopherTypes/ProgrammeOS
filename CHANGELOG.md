@@ -20,6 +20,24 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.0.23] - 2026-03-06
+
+### Added
+- Added `js/features/meetings/new-meeting-modal.js` implementing a dedicated New Meeting modal with required `title` + `date`, optional/defaulted `type`, optional `notes`, and multi-select relationship fields for `attendeeIds` (from `listPeople()`) and `projectIds` (from `listProjects()`).
+- Added deterministic modal lifecycle handling for Meetings create flow: Escape/cancel/overlay dismissal, launch-trigger focus restoration, and inline validation/status messaging.
+
+### Changed
+- Wired the `#/meetings` toolbar `New Meeting` trigger to open the new modal, submit through `createMeeting`, and rehydrate meetings list/detail panes on successful save.
+- Updated README, SPECS, ROADMAP, and VERSION metadata for the new Meetings create-modal baseline.
+
+### Fixed
+- Removed the non-functional Meetings toolbar placeholder response so the route now provides a working create flow.
+
+### Removed
+- None.
+
+---
+
 ## [0.0.22] - 2026-03-06
 
 ### Added

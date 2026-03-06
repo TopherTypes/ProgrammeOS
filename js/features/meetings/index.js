@@ -1,5 +1,6 @@
 import { renderPageFrame } from "../../layout.js";
 import { listMeetings } from "./data.js";
+import { openNewMeetingModal } from "./new-meeting-modal.js";
 
 /**
  * Escapes user-controlled strings before insertion into template literals.
@@ -267,6 +268,12 @@ export function renderMeetingsPage(outlets) {
   });
 
   newMeetingTrigger.addEventListener("click", () => {
-    statusText.textContent = "New Meeting flow will be wired in a follow-up milestone.";
+    openNewMeetingModal({
+      onRehydrate: async () => {
+        await refreshMeetingsView({ listContainer, detailContainer, statusText, state });
+      },
+    }).catch((error) => {
+      statusText.textContent = `Unable to open New Meeting modal: ${error.message}`;
+    });
   });
 }
