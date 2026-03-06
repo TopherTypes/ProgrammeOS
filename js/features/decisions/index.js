@@ -31,6 +31,8 @@ function renderDecisionsPageFrame(outlets) {
       <section class="decisions-page" aria-label="Decisions management">
         <section class="people-toolbar" aria-label="Decision actions">
           <button class="people-button" type="button" data-role="new-decision-trigger">New Decision</button>
+          <label class="visually-hidden" for="decisions-meeting-filter">Filter decisions by meeting</label>
+          <select id="decisions-meeting-filter" class="people-input" data-role="decisions-meeting-filter"></select>
           <p class="small-note" data-role="decisions-status" aria-live="polite"></p>
         </section>
 
@@ -45,6 +47,48 @@ function renderDecisionsPageFrame(outlets) {
       </section>
     `,
   });
+}
+
+/**
+ * @param {HTMLSelectElement} filterSelect
+ * @param {Array<{id: string, title?: string}>} meetings
+ * @param {string} selectedMeetingFilter
+ */
+function renderMeetingFilterOptions(filterSelect, meetings, selectedMeetingFilter) {
+  const options = [
+    '<option value="">All meetings</option>',
+    ...meetings.map((meeting) => {
+      const title = escapeHtml(meeting.title?.trim() || "Untitled meeting");
+      return `<option value="${meeting.id}">${title}</option>`;
+    }),
+  ].join("");
+
+  filterSelect.innerHTML = options;
+  filterSelect.value = selectedMeetingFilter;
+
+  if (filterSelect.value !== selectedMeetingFilter) {
+    filterSelect.value = "";
+  }
+}
+
+/**
+ * @param {number} totalCount
+ * @param {number} filteredCount
+ * @param {boolean} isFilterActive
+ * @returns {string}
+ */
+function getDecisionsStatusText(totalCount, filteredCount, isFilterActive) {
+  const label = `${filteredCount} decision${filteredCount === 1 ? "" : "s"}`;
+
+  if (totalCount === 0) {
+    return "No decisions stored yet.";
+  }
+
+  if (!isFilterActive) {
+    return `${label} loaded.`;
+  }
+
+  return `${label} shown (filtered by meeting, ${totalCount} total).`;
 }
 
 /**
@@ -192,9 +236,16 @@ function getSelectedDecisionIdFromEvent(event) {
  * @param {HTMLElement} config.listContainer
  * @param {HTMLElement} config.detailContainer
  * @param {HTMLElement} config.statusText
- * @param {{selectedDecisionId: string|null, decisions: Array<object>, meetingsById: Map<string,string>, projectsById: Map<string,string>}} config.state
+ * @param {HTMLSelectElement} config.meetingFilterSelect
+ * @param {{selectedDecisionId: string|null, selectedMeetingFilter: string, decisions: Array<object>, meetingsById: Map<string,string>, projectsById: Map<string,string>}} config.state
  */
-async function refreshDecisionsView({ listContainer, detailContainer, statusText, state }) {
+async function refreshDecisionsView({
+  listContainer,
+  detailContainer,
+  statusText,
+  meetingFilterSelect,
+  state,
+}) {
   const [decisions, meetings, projects] = await Promise.all([
     listDecisions(),
     listMeetings(),
@@ -204,16 +255,22 @@ async function refreshDecisionsView({ listContainer, detailContainer, statusText
   state.decisions = decisions;
   state.meetingsById = new Map(meetings.map((meeting) => [meeting.id, meeting.title]));
   state.projectsById = new Map(projects.map((project) => [project.id, project.name]));
+  renderMeetingFilterOptions(meetingFilterSelect, meetings, state.selectedMeetingFilter);
+
+  const isFilterActive = Boolean(state.selectedMeetingFilter);
+  const visibleDecisions = isFilterActive
+    ? decisions.filter((decision) => decision.meetingId === state.selectedMeetingFilter)
+    : decisions;
 
   const selectedDecisionInList =
-    decisions.find((decision) => decision.id === state.selectedDecisionId) ?? null;
+    visibleDecisions.find((decision) => decision.id === state.selectedDecisionId) ?? null;
   const hadExplicitSelection = Boolean(state.selectedDecisionId);
   let shouldShowMissingSelectionFallback = false;
 
   // Mirror Projects/Meetings defensive behavior: auto-select only on first load,
   // but show missing-selection feedback if an explicit selection goes stale.
-  if (!selectedDecisionInList && decisions.length > 0 && !hadExplicitSelection) {
-    state.selectedDecisionId = decisions[0].id;
+  if (!selectedDecisionInList && visibleDecisions.length > 0 && !hadExplicitSelection) {
+    state.selectedDecisionId = visibleDecisions[0].id;
   }
 
   if (!selectedDecisionInList && hadExplicitSelection) {
@@ -222,10 +279,10 @@ async function refreshDecisionsView({ listContainer, detailContainer, statusText
   }
 
   const selectedDecision = state.selectedDecisionId
-    ? decisions.find((decision) => decision.id === state.selectedDecisionId) ?? null
+    ? visibleDecisions.find((decision) => decision.id === state.selectedDecisionId) ?? null
     : null;
 
-  renderDecisionsList(listContainer, decisions, state.meetingsById, state.selectedDecisionId);
+  renderDecisionsList(listContainer, visibleDecisions, state.meetingsById, state.selectedDecisionId);
   renderDecisionDetail(
     detailContainer,
     selectedDecision,
@@ -234,10 +291,11 @@ async function refreshDecisionsView({ listContainer, detailContainer, statusText
     shouldShowMissingSelectionFallback
   );
 
-  statusText.textContent =
-    decisions.length === 0
-      ? "No decisions stored yet."
-      : `${decisions.length} decision${decisions.length === 1 ? "" : "s"} loaded.`;
+  statusText.textContent = getDecisionsStatusText(
+    decisions.length,
+    visibleDecisions.length,
+    isFilterActive
+  );
 }
 
 /**
@@ -250,6 +308,7 @@ export function renderDecisionsPage(outlets) {
 
   const listContainer = outlets.mainOutlet.querySelector('[data-role="decisions-list"]');
   const statusText = outlets.mainOutlet.querySelector('[data-role="decisions-status"]');
+  const meetingFilterSelect = outlets.mainOutlet.querySelector('[data-role="decisions-meeting-filter"]');
   const newDecisionTrigger = outlets.mainOutlet.querySelector('[data-role="new-decision-trigger"]');
   const detailContainer = outlets.detailOutlet.querySelector('[data-role="decision-detail"]');
 
@@ -257,6 +316,7 @@ export function renderDecisionsPage(outlets) {
     !listContainer ||
     !statusText ||
     !detailContainer ||
+    !(meetingFilterSelect instanceof HTMLSelectElement) ||
     !(newDecisionTrigger instanceof HTMLButtonElement)
   ) {
     throw new Error("Decisions page failed to mount required containers.");
@@ -264,13 +324,24 @@ export function renderDecisionsPage(outlets) {
 
   const state = {
     selectedDecisionId: null,
+    selectedMeetingFilter: "",
     decisions: [],
     meetingsById: new Map(),
     projectsById: new Map(),
   };
 
-  refreshDecisionsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
+  refreshDecisionsView({ listContainer, detailContainer, statusText, meetingFilterSelect, state }).catch((error) => {
     statusText.textContent = `Unable to load decisions: ${error.message}`;
+  });
+
+  meetingFilterSelect.addEventListener("change", () => {
+    state.selectedMeetingFilter = meetingFilterSelect.value;
+
+    refreshDecisionsView({ listContainer, detailContainer, statusText, meetingFilterSelect, state }).catch(
+      (error) => {
+        statusText.textContent = `Unable to apply decisions meeting filter: ${error.message}`;
+      }
+    );
   });
 
   listContainer.addEventListener("click", (event) => {
@@ -282,7 +353,7 @@ export function renderDecisionsPage(outlets) {
 
     state.selectedDecisionId = selectedDecisionId;
 
-    refreshDecisionsView({ listContainer, detailContainer, statusText, state }).catch((error) => {
+    refreshDecisionsView({ listContainer, detailContainer, statusText, meetingFilterSelect, state }).catch((error) => {
       statusText.textContent = `Unable to load decision details: ${error.message}`;
     });
   });
@@ -291,7 +362,7 @@ export function renderDecisionsPage(outlets) {
     openNewDecisionModal({
       onRehydrate: async (createdDecision) => {
         state.selectedDecisionId = createdDecision.id;
-        await refreshDecisionsView({ listContainer, detailContainer, statusText, state });
+        await refreshDecisionsView({ listContainer, detailContainer, statusText, meetingFilterSelect, state });
         statusText.textContent = "Decision created successfully.";
       },
     }).catch((error) => {

@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.3.0] - 2026-03-06
+
+### Added
+- Added a `Filter by meeting` select to the Actions, Decisions, and Updates page toolbars with a default `All meetings` option and meeting-title options sourced from `listMeetings()`.
+
+### Changed
+- Updated actions/decisions/updates route hydration so filtered meeting selection now drives list rendering, selected-row reconciliation, and detail rendering using the same missing-selection fallback messaging when an explicit selection is filtered out.
+- Updated status text on actions/decisions/updates pages so counts are based on filtered totals and clearly indicate when a meeting filter is active.
+
+### Fixed
+- Fixed inconsistent selection behavior across actions/decisions/updates routes by aligning stale-selection handling for both removed and filter-hidden records.
+
+### Removed
+- None.
+
+---
+
 ## [0.2.2] - 2026-03-06
 
 ### Added

@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.2.1**
+Current version: **0.3.0**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -17,6 +17,8 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 
 
 ## Recent fixes
+
+- v0.3.0: Added meeting-based filters to Actions, Decisions, and Updates pages with `All meetings` defaults, live meeting-title options, filtered list/detail selection reconciliation, and filter-aware status totals.
 
 - v0.2.1: Extended New Action, New Decision, and New Update modal APIs with optional locked meeting config (`lockedMeetingId`, `lockedMeetingLabel`) so meeting-scoped launches prefill and lock meeting context while standalone routes keep meeting linkage optional/editable.
 
