@@ -137,6 +137,7 @@ function createUpdateDataHelpers(db) {
         description: normalizedInput.description,
         meetingId: normalizedInput.meetingId,
         projectIds: normalizedInput.projectIds,
+        requiresUpdateByPersonId: normalizedInput.requiresUpdateByPersonId,
         createdAt: nowIso,
         updatedAt: nowIso,
       };
@@ -183,12 +184,17 @@ function createUpdateDataHelpers(db) {
         !!patch && Object.prototype.hasOwnProperty.call(patch, "meetingId");
       const hasProjectIdsUpdate =
         !!patch && Object.prototype.hasOwnProperty.call(patch, "projectIds");
+      const hasRequiresUpdateByPersonIdUpdate =
+        !!patch && Object.prototype.hasOwnProperty.call(patch, "requiresUpdateByPersonId");
 
       const updatedUpdate = {
         id: existingUpdate.id,
         description: hasDescriptionUpdate ? incomingPatch.description : existingUpdate.description,
         meetingId: hasMeetingIdUpdate ? incomingPatch.meetingId : existingUpdate.meetingId,
         projectIds: hasProjectIdsUpdate ? incomingPatch.projectIds : existingUpdate.projectIds,
+        requiresUpdateByPersonId: hasRequiresUpdateByPersonIdUpdate
+          ? incomingPatch.requiresUpdateByPersonId
+          : existingUpdate.requiresUpdateByPersonId,
         createdAt: existingUpdate.createdAt,
         updatedAt: new Date().toISOString(),
       };
@@ -236,6 +242,44 @@ async function runChecks() {
       assert(descriptionRejected, "Expected blank description to fail validation.");
     }),
 
+    runCheck("normalizeUpdate normalizes requiresUpdateByPersonId entries", () => {
+      const normalized = normalizeUpdate({
+        description: "Shared update note",
+        requiresUpdateByPersonId: {
+          " person-a ": { required: 0, informedAt: " 2026-03-07T12:00:00.000Z " },
+          "": { required: true, informedAt: "2026-03-07T13:00:00.000Z" },
+          " person-b ": { required: false, informedAt: "   " },
+          " person-c ": null,
+        },
+      });
+
+      assert(
+        Object.keys(normalized.requiresUpdateByPersonId).length === 3,
+        "Expected blank person ids to be dropped from requiresUpdateByPersonId."
+      );
+      assert(
+        normalized.requiresUpdateByPersonId["person-a"].required === true,
+        "Expected required to default to true unless explicitly false."
+      );
+      assert(
+        normalized.requiresUpdateByPersonId["person-a"].informedAt === "2026-03-07T12:00:00.000Z",
+        "Expected informedAt to be trimmed when provided."
+      );
+      assert(
+        normalized.requiresUpdateByPersonId["person-b"].required === false,
+        "Expected explicit false required values to be preserved."
+      );
+      assert(
+        normalized.requiresUpdateByPersonId["person-b"].informedAt === null,
+        "Expected blank informedAt values to normalize to null."
+      );
+      assert(
+        normalized.requiresUpdateByPersonId["person-c"].required === true &&
+          normalized.requiresUpdateByPersonId["person-c"].informedAt === null,
+        "Expected invalid requiresUpdate entries to normalize with defaults."
+      );
+    }),
+
     runCheck("normalizeUpdate deduplicates project id arrays", () => {
       const normalized = normalizeUpdate({
         description: "Shared update note",
@@ -260,6 +304,10 @@ async function runChecks() {
           description: "  Shared update note  ",
           meetingId: " meeting-x ",
           projectIds: [" project-1 ", "project-1", "project-2"],
+          requiresUpdateByPersonId: {
+            " person-1 ": { required: true, informedAt: " 2026-03-07T09:00:00.000Z " },
+            "   ": { required: true, informedAt: "ignored" },
+          },
         });
 
         assert(!!created.id, "Expected created update to include an id.");
@@ -271,6 +319,11 @@ async function runChecks() {
         const loaded = await updateData.getUpdate(created.id);
         assert(loaded !== null, "Expected created update to be retrievable via getUpdate.");
         assert(loaded?.projectIds.length === 2, "Expected projectIds dedupe to persist on create.");
+        assert(
+          Object.keys(loaded?.requiresUpdateByPersonId ?? {}).length === 1 &&
+            loaded?.requiresUpdateByPersonId["person-1"].informedAt === "2026-03-07T09:00:00.000Z",
+          "Expected requiresUpdateByPersonId normalization to persist on create/get."
+        );
 
         const listed = await updateData.listUpdates();
         assert(listed.length === 1, "Expected one update to be returned by listUpdates.");
@@ -278,6 +331,10 @@ async function runChecks() {
         const updated = await updateData.updateUpdate(created.id, {
           description: "  Shared update note (Updated)  ",
           projectIds: [" project-2 ", "project-3", "project-2"],
+          requiresUpdateByPersonId: {
+            " person-2 ": { required: false, informedAt: "   " },
+            " person-3 ": { required: true, informedAt: " 2026-03-08T10:00:00.000Z " },
+          },
           id: "attempted-overwrite",
           createdAt: "attempted-overwrite",
         });
@@ -300,6 +357,14 @@ async function runChecks() {
             updated.projectIds[0] === "project-2" &&
             updated.projectIds[1] === "project-3",
           "Expected updated projectIds to remain normalized and deduplicated."
+        );
+        assert(
+          updated.requiresUpdateByPersonId["person-2"].required === false &&
+            updated.requiresUpdateByPersonId["person-2"].informedAt === null &&
+            updated.requiresUpdateByPersonId["person-3"].required === true &&
+            updated.requiresUpdateByPersonId["person-3"].informedAt ===
+              "2026-03-08T10:00:00.000Z",
+          "Expected updateUpdate to round-trip normalized requiresUpdateByPersonId values."
         );
       }
     ),

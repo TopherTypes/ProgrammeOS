@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.5.1] - 2026-03-07
+
+### Added
+- Extended decision and update record verification scripts to assert `requiresUpdateByPersonId` normalization semantics and create/get/update lifecycle round-tripping.
+
+### Changed
+- Updated decisions and updates data helpers so `requiresUpdateByPersonId` persists through create/update flows and remains backward-compatible for legacy records missing the field.
+- Bumped project version metadata to `0.5.1` in `VERSION` and `README.md`.
+
+### Fixed
+- Aligned decision/update record normalization with action semantics for `requiresUpdateByPersonId`, including trimming person ids, dropping blank keys, defaulting `required` to `true`, and normalizing blank `informedAt` values to `null`.
+
+### Removed
+- None.
+
+---
+
 ## [0.5.0] - 2026-03-07
 
 ### Added

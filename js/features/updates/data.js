@@ -25,12 +25,14 @@ function emitUpdatesChanged(updateRecord) {
  *   description: string,
  *   meetingId?: string,
  *   projectIds?: string[],
+ *   requiresUpdateByPersonId?: Record<string, { required: boolean, informedAt: string|null }>,
  * }} updateInput
  * @returns {Promise<{
  *   id: string,
  *   description: string,
  *   meetingId: string,
  *   projectIds: string[],
+ *   requiresUpdateByPersonId: Record<string, { required: boolean, informedAt: string|null }>,
  *   createdAt: string,
  *   updatedAt: string,
  * }>}
@@ -46,6 +48,7 @@ export async function createUpdate(updateInput) {
     description: normalizedInput.description,
     meetingId: normalizedInput.meetingId,
     projectIds: normalizedInput.projectIds,
+    requiresUpdateByPersonId: normalizedInput.requiresUpdateByPersonId,
     createdAt: nowIso,
     updatedAt: nowIso,
   };
@@ -72,6 +75,7 @@ export async function createUpdate(updateInput) {
  *   description: string,
  *   meetingId: string,
  *   projectIds: string[],
+ *   requiresUpdateByPersonId: Record<string, { required: boolean, informedAt: string|null }>,
  *   createdAt: string,
  *   updatedAt: string,
  * }|null>}
@@ -101,6 +105,7 @@ export async function getUpdate(updateId) {
  *   description: string,
  *   meetingId: string,
  *   projectIds: string[],
+ *   requiresUpdateByPersonId: Record<string, { required: boolean, informedAt: string|null }>,
  *   createdAt: string,
  *   updatedAt: string,
  * }>>}
@@ -124,6 +129,7 @@ export async function listUpdates() {
  *   description?: string,
  *   meetingId?: string,
  *   projectIds?: string[],
+ *   requiresUpdateByPersonId?: Record<string, { required: boolean, informedAt: string|null }>,
  *   id?: string,
  *   createdAt?: string,
  * }} patch
@@ -132,6 +138,7 @@ export async function listUpdates() {
  *   description: string,
  *   meetingId: string,
  *   projectIds: string[],
+ *   requiresUpdateByPersonId: Record<string, { required: boolean, informedAt: string|null }>,
  *   createdAt: string,
  *   updatedAt: string,
  * }>}
@@ -163,12 +170,17 @@ export async function updateUpdate(updateId, patch) {
   const hasDescriptionUpdate = !!patch && Object.prototype.hasOwnProperty.call(patch, "description");
   const hasMeetingIdUpdate = !!patch && Object.prototype.hasOwnProperty.call(patch, "meetingId");
   const hasProjectIdsUpdate = !!patch && Object.prototype.hasOwnProperty.call(patch, "projectIds");
+  const hasRequiresUpdateByPersonIdUpdate =
+    !!patch && Object.prototype.hasOwnProperty.call(patch, "requiresUpdateByPersonId");
 
   const updatedUpdate = {
     id: existingUpdate.id,
     description: hasDescriptionUpdate ? incomingPatch.description : existingUpdate.description,
     meetingId: hasMeetingIdUpdate ? incomingPatch.meetingId : existingUpdate.meetingId,
     projectIds: hasProjectIdsUpdate ? incomingPatch.projectIds : existingUpdate.projectIds,
+    requiresUpdateByPersonId: hasRequiresUpdateByPersonIdUpdate
+      ? incomingPatch.requiresUpdateByPersonId
+      : existingUpdate.requiresUpdateByPersonId,
     createdAt: existingUpdate.createdAt,
     updatedAt: new Date().toISOString(),
   };

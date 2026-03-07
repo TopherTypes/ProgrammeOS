@@ -31,6 +31,42 @@ function asNormalizedIdArray(value) {
 }
 
 /**
+ * Normalizes the per-person communication tracking map.
+ *
+ * Accepts a map-like object and returns a canonical object where keys are
+ * trimmed person ids and each value follows `{ required, informedAt }`.
+ *
+ * @param {unknown} value
+ * @returns {Record<string, { required: boolean, informedAt: string|null }>}
+ */
+function asNormalizedRequiresUpdateMap(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+
+  /** @type {Record<string, { required: boolean, informedAt: string|null }>} */
+  const normalizedMap = {};
+
+  for (const [rawPersonId, rawEntry] of Object.entries(value)) {
+    const personId = asTrimmedString(rawPersonId);
+
+    if (!personId) {
+      continue;
+    }
+
+    const entry = rawEntry && typeof rawEntry === "object" ? rawEntry : {};
+    const informedAtRaw = asTrimmedString(entry.informedAt);
+
+    normalizedMap[personId] = {
+      required: entry.required !== false,
+      informedAt: informedAtRaw || null,
+    };
+  }
+
+  return normalizedMap;
+}
+
+/**
  * Normalises a decision-like object into the canonical decision shape.
  *
  * @param {Record<string, unknown>|undefined|null} decision
@@ -39,6 +75,7 @@ function asNormalizedIdArray(value) {
  *   description: string,
  *   meetingId: string,
  *   projectIds: string[],
+ *   requiresUpdateByPersonId: Record<string, { required: boolean, informedAt: string|null }>,
  *   createdAt: string,
  *   updatedAt: string,
  * }}
@@ -49,6 +86,7 @@ export function normalizeDecision(decision) {
     description: asTrimmedString(decision?.description),
     meetingId: asTrimmedString(decision?.meetingId),
     projectIds: asNormalizedIdArray(decision?.projectIds),
+    requiresUpdateByPersonId: asNormalizedRequiresUpdateMap(decision?.requiresUpdateByPersonId),
     createdAt: asTrimmedString(decision?.createdAt),
     updatedAt: asTrimmedString(decision?.updatedAt),
   };
