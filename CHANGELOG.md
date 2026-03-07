@@ -105,26 +105,6 @@
 
 ---
 
-All notable changes to this project will be documented in this file.
-
-The format is based on **Keep a Changelog**, and this project adheres to **Semantic Versioning**.
-
-## [Unreleased]
-
-### Added
-- None.
-
-### Changed
-- None.
-
-### Fixed
-- None.
-
-### Removed
-- None.
-
----
-
 ## [0.2.1] - 2026-03-06
 
 ### Added
@@ -368,6 +348,22 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [0.0.20] - 2026-03-06
+
+### Added
+- Added `js/features/meetings/meeting-record.js` with canonical `normalizeMeeting(...)` and `assertValidMeeting(...)` helpers, including required `title`/`date` validation and normalized `attendeeIds`/`projectIds` arrays.
+- Added `js/features/meetings/meeting-record.check.mjs` to provide lightweight Node-runnable sanity checks for meeting normalization and validation behavior.
+
+### Changed
+- Updated README, SPECS, ROADMAP, and VERSION metadata to reflect the meetings record-model baseline and validation coverage.
+
+### Fixed
+- Ensured meeting id-link arrays are deduplicated during normalization so persisted meeting relationships remain consistent.
+
+### Removed
+- None.
+
+---
 
 ## [0.0.19] - 2026-03-05
 
