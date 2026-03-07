@@ -124,12 +124,26 @@ Rationale:
   - `actionsReviewed`
   - `decisionsReviewed`
   - `updatesReviewed`
+- The checklist is persisted on the meeting entity itself (not derived from linked rows), so completion state is explicitly stored per meeting.
 - Missing checklist data must normalize to all `false` values for backward compatibility with older stored meetings.
 - Checklist updates should flow through the existing meeting update path so persistence semantics (including immutable fields and timestamp updates) remain consistent.
 
 Rationale:
 - Captures lightweight meeting-closeout progress directly on the meeting record.
+- Keeps checklist persistence local-first and export/import-safe without introducing cross-entity migration risk.
 - Avoids schema-breaking migrations by applying normalization defaults during read/update.
+
+### 4.4 Meeting-linked filtering and sorting conventions
+- Actions/Decisions/Updates support `Filter by meeting` using meeting IDs from `listMeetings()`.
+- Filtering semantics: when a meeting is selected, list views include only records linked by `meetingId`; "All meetings" shows the unfiltered route list.
+- Sorting conventions are shared between route lists and Meeting Review linked tables:
+  - Actions: status bucket order (`open` → `in-progress` → `blocked` → `done` → `unknown`), then oldest-first `createdAt`, then stable tie-breakers.
+  - Decisions and Updates: oldest-first `createdAt`, then stable tie-breakers.
+- Meeting Review tables follow the same sorting conventions so users see consistent ordering between meeting detail and filtered routes.
+
+Rationale:
+- Makes `filter by meeting` behavior predictable across list and detail contexts.
+- Prevents order drift between Meeting Review and the standalone Actions/Decisions/Updates pages.
 
 ---
 
