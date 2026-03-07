@@ -119,6 +119,18 @@ Rationale:
 - Every entity must be creatable without links.
 - Linking is additive and can happen later without special workflows.
 
+### 4.3 Meeting review checklist state
+- Meetings persist a `reviewChecklist` object with boolean flags:
+  - `actionsReviewed`
+  - `decisionsReviewed`
+  - `updatesReviewed`
+- Missing checklist data must normalize to all `false` values for backward compatibility with older stored meetings.
+- Checklist updates should flow through the existing meeting update path so persistence semantics (including immutable fields and timestamp updates) remain consistent.
+
+Rationale:
+- Captures lightweight meeting-closeout progress directly on the meeting record.
+- Avoids schema-breaking migrations by applying normalization defaults during read/update.
+
 ---
 
 ## 5. Communication Tracking Model (“Requires update”)
@@ -277,4 +289,3 @@ Rationale:
 Rationale:
 - Keeps `db.js` generic and reusable while keeping business rules close to each domain.
 - Improves consistency for future UI rendering by enforcing a normalized entity shape.
-

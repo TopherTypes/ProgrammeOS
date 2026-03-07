@@ -1,4 +1,9 @@
-import { assertValidMeeting, normalizeMeeting } from "./meeting-record.js";
+import {
+  assertValidMeeting,
+  DEFAULT_REVIEW_CHECKLIST,
+  normalizeMeeting,
+  normalizeReviewChecklist,
+} from "./meeting-record.js";
 
 /**
  * Minimal assertion helper for deterministic test failures.
@@ -140,6 +145,7 @@ function createMeetingDataHelpers(db) {
         attendeeIds: normalizedInput.attendeeIds,
         projectIds: normalizedInput.projectIds,
         notes: normalizedInput.notes,
+        reviewChecklist: normalizedInput.reviewChecklist,
         createdAt: nowIso,
         updatedAt: nowIso,
       };
@@ -197,6 +203,12 @@ function createMeetingDataHelpers(db) {
         !!patch && Object.prototype.hasOwnProperty.call(patch, "projectIds");
       const hasNotesUpdate =
         !!patch && Object.prototype.hasOwnProperty.call(patch, "notes");
+      const hasReviewChecklistUpdate =
+        !!patch && Object.prototype.hasOwnProperty.call(patch, "reviewChecklist");
+
+      const reviewChecklist = hasReviewChecklistUpdate
+        ? normalizeReviewChecklist(patch?.reviewChecklist, existingMeeting.reviewChecklist)
+        : normalizeReviewChecklist(existingMeeting.reviewChecklist, DEFAULT_REVIEW_CHECKLIST);
 
       const updatedMeeting = {
         id: existingMeeting.id,
@@ -210,6 +222,7 @@ function createMeetingDataHelpers(db) {
           ? incomingPatch.projectIds
           : existingMeeting.projectIds,
         notes: hasNotesUpdate ? incomingPatch.notes : existingMeeting.notes,
+        reviewChecklist,
         createdAt: existingMeeting.createdAt,
         updatedAt: new Date().toISOString(),
       };
@@ -253,6 +266,31 @@ async function runChecks() {
         "Expected missing projectIds to default to an empty array."
       );
       assert(normalized.notes === "", "Expected missing notes to default to empty string.");
+      assert(
+        normalized.reviewChecklist.actionsReviewed === false &&
+          normalized.reviewChecklist.decisionsReviewed === false &&
+          normalized.reviewChecklist.updatesReviewed === false,
+        "Expected missing reviewChecklist to default all values to false."
+      );
+    }),
+
+    runCheck("normalizeMeeting normalizes reviewChecklist booleans", () => {
+      const normalized = normalizeMeeting({
+        title: "Weekly Update",
+        date: "2026-03-06",
+        reviewChecklist: {
+          actionsReviewed: true,
+          decisionsReviewed: "yes",
+          updatesReviewed: true,
+        },
+      });
+
+      assert(normalized.reviewChecklist.actionsReviewed === true, "Expected true value to persist.");
+      assert(
+        normalized.reviewChecklist.decisionsReviewed === false,
+        "Expected non-boolean checklist values to normalize to false."
+      );
+      assert(normalized.reviewChecklist.updatesReviewed === true, "Expected true value to persist.");
     }),
 
     runCheck("assertValidMeeting rejects missing title/date", () => {
@@ -315,6 +353,12 @@ async function runChecks() {
 
         assert(!!created.id, "Expected created meeting to include an id.");
         assert(created.title === "Planning Sync", "Expected created meeting title to be normalized.");
+        assert(
+          created.reviewChecklist.actionsReviewed === false &&
+            created.reviewChecklist.decisionsReviewed === false &&
+            created.reviewChecklist.updatesReviewed === false,
+          "Expected created meeting checklist defaults to be persisted."
+        );
 
         const loaded = await meetingData.getMeeting(created.id);
         assert(loaded !== null, "Expected created meeting to be retrievable via getMeeting.");
@@ -326,6 +370,10 @@ async function runChecks() {
         const updated = await meetingData.updateMeeting(created.id, {
           title: "  Planning Sync (Updated)  ",
           attendeeIds: [" person-b ", "person-c", "person-b"],
+          reviewChecklist: {
+            actionsReviewed: true,
+            decisionsReviewed: true,
+          },
           id: "attempted-overwrite",
           createdAt: "attempted-overwrite",
         });
@@ -348,6 +396,12 @@ async function runChecks() {
             updated.attendeeIds[0] === "person-b" &&
             updated.attendeeIds[1] === "person-c",
           "Expected updated attendeeIds to remain normalized and deduplicated."
+        );
+        assert(
+          updated.reviewChecklist.actionsReviewed === true &&
+            updated.reviewChecklist.decisionsReviewed === true &&
+            updated.reviewChecklist.updatesReviewed === false,
+          "Expected updateMeeting checklist patch to merge with existing defaults."
         );
       }
     ),

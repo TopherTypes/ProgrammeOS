@@ -34,6 +34,53 @@ function asNormalizedIdArray(value) {
 }
 
 /**
+ * Canonical checklist keys used for meeting review completion tracking.
+ */
+export const REVIEW_CHECKLIST_KEYS = [
+  "actionsReviewed",
+  "decisionsReviewed",
+  "updatesReviewed",
+];
+
+/**
+ * Canonical default checklist state for every meeting record.
+ */
+export const DEFAULT_REVIEW_CHECKLIST = Object.freeze({
+  actionsReviewed: false,
+  decisionsReviewed: false,
+  updatesReviewed: false,
+});
+
+/**
+ * Normalizes unknown checklist input into a safe canonical boolean map.
+ *
+ * The optional fallback allows partial updates to inherit existing values,
+ * preserving backward compatibility for previously persisted meetings.
+ *
+ * @param {unknown} value
+ * @param {{actionsReviewed?: boolean, decisionsReviewed?: boolean, updatesReviewed?: boolean}} [fallback]
+ * @returns {{actionsReviewed: boolean, decisionsReviewed: boolean, updatesReviewed: boolean}}
+ */
+export function normalizeReviewChecklist(value, fallback = DEFAULT_REVIEW_CHECKLIST) {
+  const source = value && typeof value === "object" ? value : null;
+
+  return {
+    actionsReviewed:
+      source && source.actionsReviewed === true
+        ? true
+        : Boolean(fallback.actionsReviewed),
+    decisionsReviewed:
+      source && source.decisionsReviewed === true
+        ? true
+        : Boolean(fallback.decisionsReviewed),
+    updatesReviewed:
+      source && source.updatesReviewed === true
+        ? true
+        : Boolean(fallback.updatesReviewed),
+  };
+}
+
+/**
  * Normalises a meeting-like object into the canonical meeting shape.
  *
  * @param {Record<string, unknown>|undefined|null} meeting
@@ -45,6 +92,11 @@ function asNormalizedIdArray(value) {
  *   attendeeIds: string[],
  *   projectIds: string[],
  *   notes: string,
+ *   reviewChecklist: {
+ *     actionsReviewed: boolean,
+ *     decisionsReviewed: boolean,
+ *     updatesReviewed: boolean,
+ *   },
  *   createdAt: string,
  *   updatedAt: string,
  * }}
@@ -58,6 +110,7 @@ export function normalizeMeeting(meeting) {
     attendeeIds: asNormalizedIdArray(meeting?.attendeeIds),
     projectIds: asNormalizedIdArray(meeting?.projectIds),
     notes: asTrimmedString(meeting?.notes),
+    reviewChecklist: normalizeReviewChecklist(meeting?.reviewChecklist),
     createdAt: asTrimmedString(meeting?.createdAt),
     updatedAt: asTrimmedString(meeting?.updatedAt),
   };
