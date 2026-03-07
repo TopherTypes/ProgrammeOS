@@ -197,7 +197,7 @@ project(s) (optional) - communication tracking
 
 Current implementation status: **Delivered in Milestone 5**.
 
-In the delivered MVP baseline, `#/actions` provides a deterministic route frame with toolbar/status/list/detail containers, explicit empty and missing-selection fallback states, and in-route hydration backed by the actions data helpers. Action creation is modal-driven with required-description validation, optional owner/status/due-date/meeting/project linking, and predictable Escape/cancel/overlay dismissal with trigger focus restoration. Successful create/update operations refresh list/detail content in place without full route reload.
+In the delivered MVP baseline, `#/actions` provides a deterministic route frame with toolbar/status/list/detail containers, explicit empty and missing-selection fallback states, and in-route hydration backed by the actions data helpers. Action creation is modal-driven with required-description validation, optional owner/status/due-date/meeting/project linking, and predictable Escape/cancel/overlay dismissal with trigger focus restoration. Action detail now includes a communication summary (total required, informed count, outstanding count) resolved via People name lookup with `Unknown person` fallback for stale IDs. Successful create/update/toggle operations refresh list/detail content in place without full route reload.
 
 `#/actions` also provides `Filter by meeting` behavior using meeting records from `listMeetings()`. Filtered views include only records linked by `meetingId`, with deterministic sorting aligned to Meeting Review ordering (status bucket then oldest-first `createdAt`, stable tie-breakers).
 
@@ -212,7 +212,7 @@ communication tracking
 
 Current implementation status: **Delivered in Milestone 5**.
 
-In the delivered MVP baseline, `#/decisions` provides a deterministic route frame with toolbar/status/list/detail containers, modal-driven creation with required-description validation, and explicit empty/missing-selection fallback states. Decision detail rendering resolves linked meeting/project names when related records exist and uses safe fallback labels when links are stale or missing.
+In the delivered MVP baseline, `#/decisions` provides a deterministic route frame with toolbar/status/list/detail containers, modal-driven creation with required-description validation, and explicit empty/missing-selection fallback states. Decision detail rendering resolves linked meeting/project names when related records exist, includes communication summary counts (total required/informed/outstanding) with per-person People lookup, and uses safe fallback labels when links are stale or missing (`Unknown meeting`, `Unknown project`, `Unknown person`).
 
 `#/decisions` also provides `Filter by meeting` behavior using meeting records from `listMeetings()`. Filtered views include only records linked by `meetingId`, sorted oldest-first by `createdAt` with stable tie-breakers (matching Meeting Review ordering).
 
@@ -231,7 +231,7 @@ specific discussions.
 
 Current implementation status: **Delivered in Milestone 5**.
 
-In the delivered MVP baseline, `#/updates` provides a deterministic route frame with toolbar/status/list/detail containers, modal-driven creation with required-description validation, and explicit empty/missing-selection fallback states. Update detail rendering resolves linked meeting/project names when available, with safe fallback labels for stale linked IDs.
+In the delivered MVP baseline, `#/updates` provides a deterministic route frame with toolbar/status/list/detail containers, modal-driven creation with required-description validation, and explicit empty/missing-selection fallback states. Update detail rendering resolves linked meeting/project names when available, includes communication summary counts (total required/informed/outstanding) with per-person People lookup, and keeps safe fallback labels for stale linked IDs (including `Unknown person`).
 
 `#/updates` also provides `Filter by meeting` behavior using meeting records from `listMeetings()`. Filtered views include only records linked by `meetingId`, sorted oldest-first by `createdAt` with stable tie-breakers (matching Meeting Review ordering).
 

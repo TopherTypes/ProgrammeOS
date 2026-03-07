@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.5.1**
+Current version: **0.5.2**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 

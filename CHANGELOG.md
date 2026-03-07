@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.5.2] - 2026-03-07
+
+### Added
+- Added communication summary sections to Action, Decision, and Update detail panels showing total required, informed count, and outstanding count plus informed/outstanding recipient lists.
+
+### Changed
+- Updated decision/update route hydration to include People lookup maps so communication recipients resolve to person names in detail views.
+- Added route-level entity-change listeners for actions/decisions/updates so detail/list panes re-render immediately after create/update/toggle events without route reload.
+- Bumped project version metadata to `0.5.2` in `VERSION`, `README.md`, and `ROADMAP.md`.
+
+### Fixed
+- Fixed communication recipient rendering fallbacks so missing linked people consistently display `Unknown person` across actions/decisions/updates detail views.
+
+### Removed
+- None.
+
+---
+
 ## [0.5.1] - 2026-03-07
 
 ### Added

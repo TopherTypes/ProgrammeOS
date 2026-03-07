@@ -196,10 +196,27 @@ function renderActionDetail(detailContainer, action, peopleById, projectsById, i
   const linkedProjects = (action.projectIds ?? [])
     .map((projectId) => projectsById.get(projectId) || "Unknown project")
     .map((projectName) => escapeHtml(projectName));
+  const communicationEntries = Object.entries(action.requiresUpdateByPersonId ?? {}).filter(
+    ([, entry]) => entry?.required !== false
+  );
+  const informedPeople = communicationEntries
+    .filter(([, entry]) => typeof entry?.informedAt === "string" && entry.informedAt.trim().length > 0)
+    .map(([personId]) => escapeHtml(peopleById.get(personId) || "Unknown person"));
+  const outstandingPeople = communicationEntries
+    .filter(([, entry]) => !(typeof entry?.informedAt === "string" && entry.informedAt.trim().length > 0))
+    .map(([personId]) => escapeHtml(peopleById.get(personId) || "Unknown person"));
   const projectsHtml =
     linkedProjects.length === 0
       ? `<p class="small-note">No linked projects yet.</p>`
       : `<ul>${linkedProjects.map((projectName) => `<li>${projectName}</li>`).join("")}</ul>`;
+  const informedPeopleHtml =
+    informedPeople.length === 0
+      ? `<p class="small-note">No required recipients informed yet.</p>`
+      : `<ul>${informedPeople.map((personName) => `<li>${personName}</li>`).join("")}</ul>`;
+  const outstandingPeopleHtml =
+    outstandingPeople.length === 0
+      ? `<p class="small-note">No outstanding recipients.</p>`
+      : `<ul>${outstandingPeople.map((personName) => `<li>${personName}</li>`).join("")}</ul>`;
 
   detailContainer.innerHTML = `
     <article class="project-detail-card" data-role="action-detail-card">
@@ -218,6 +235,20 @@ function renderActionDetail(detailContainer, action, peopleById, projectsById, i
       <p><strong>Due date:</strong> ${dueDate}</p>
       <p><strong>Owner:</strong> ${ownerName}</p>
       <p><strong>Meeting link:</strong> ${meetingLabel}</p>
+      <section aria-label="Action communication summary">
+        <h4>Communication summary</h4>
+        <p><strong>Total required:</strong> ${communicationEntries.length}</p>
+        <p><strong>Informed count:</strong> ${informedPeople.length}</p>
+        <p><strong>Outstanding count:</strong> ${outstandingPeople.length}</p>
+        <div>
+          <h5>Informed</h5>
+          ${informedPeopleHtml}
+        </div>
+        <div>
+          <h5>Outstanding</h5>
+          ${outstandingPeopleHtml}
+        </div>
+      </section>
       <section aria-label="Action linked projects">
         <h4>Linked projects (${linkedProjects.length})</h4>
         ${projectsHtml}
@@ -405,6 +436,15 @@ export function renderActionsPage(outlets) {
       .catch((error) => {
         statusText.textContent = `Unable to update action: ${error.message}`;
       });
+  });
+
+
+  window.addEventListener("programmeos:actions-changed", () => {
+    refreshActionsView({ listContainer, detailContainer, statusText, meetingFilterSelect, state }).catch(
+      (error) => {
+        statusText.textContent = `Unable to refresh actions after update: ${error.message}`;
+      }
+    );
   });
 
   newActionTrigger.addEventListener("click", () => {

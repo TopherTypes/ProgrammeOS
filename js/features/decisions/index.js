@@ -1,5 +1,6 @@
 import { renderPageFrame } from "../../layout.js";
 import { listMeetings } from "../meetings/data.js";
+import { listPeople } from "../people/data.js";
 import { listProjects } from "../projects/data.js";
 import { listDecisions } from "./data.js";
 import { openNewDecisionModal } from "./new-decision-modal.js";
@@ -158,6 +159,7 @@ function renderDecisionsList(listContainer, decisions, meetingsById, selectedDec
  * @param {HTMLElement} detailContainer
  * @param {{id: string, description?: string, meetingId?: string, projectIds?: string[]}|null} decision
  * @param {Map<string, string>} meetingsById
+ * @param {Map<string, string>} peopleById
  * @param {Map<string, string>} projectsById
  * @param {boolean} isMissingSelection
  */
@@ -165,6 +167,7 @@ function renderDecisionDetail(
   detailContainer,
   decision,
   meetingsById,
+  peopleById,
   projectsById,
   isMissingSelection
 ) {
@@ -193,15 +196,46 @@ function renderDecisionDetail(
   const linkedProjects = (decision.projectIds ?? [])
     .map((projectId) => projectsById.get(projectId) || "Unknown project")
     .map((projectName) => escapeHtml(projectName));
+  const communicationEntries = Object.entries(decision.requiresUpdateByPersonId ?? {}).filter(
+    ([, entry]) => entry?.required !== false
+  );
+  const informedPeople = communicationEntries
+    .filter(([, entry]) => typeof entry?.informedAt === "string" && entry.informedAt.trim().length > 0)
+    .map(([personId]) => escapeHtml(peopleById.get(personId) || "Unknown person"));
+  const outstandingPeople = communicationEntries
+    .filter(([, entry]) => !(typeof entry?.informedAt === "string" && entry.informedAt.trim().length > 0))
+    .map(([personId]) => escapeHtml(peopleById.get(personId) || "Unknown person"));
   const projectsHtml =
     linkedProjects.length === 0
       ? `<p class="small-note">No linked projects yet.</p>`
       : `<ul>${linkedProjects.map((projectName) => `<li>${projectName}</li>`).join("")}</ul>`;
+  const informedPeopleHtml =
+    informedPeople.length === 0
+      ? `<p class="small-note">No required recipients informed yet.</p>`
+      : `<ul>${informedPeople.map((personName) => `<li>${personName}</li>`).join("")}</ul>`;
+  const outstandingPeopleHtml =
+    outstandingPeople.length === 0
+      ? `<p class="small-note">No outstanding recipients.</p>`
+      : `<ul>${outstandingPeople.map((personName) => `<li>${personName}</li>`).join("")}</ul>`;
 
   detailContainer.innerHTML = `
     <article class="project-detail-card" data-role="decision-detail-card">
       <h3>${description}</h3>
       <p><strong>Meeting link:</strong> ${meetingLabel}</p>
+      <section aria-label="Decision communication summary">
+        <h4>Communication summary</h4>
+        <p><strong>Total required:</strong> ${communicationEntries.length}</p>
+        <p><strong>Informed count:</strong> ${informedPeople.length}</p>
+        <p><strong>Outstanding count:</strong> ${outstandingPeople.length}</p>
+        <div>
+          <h5>Informed</h5>
+          ${informedPeopleHtml}
+        </div>
+        <div>
+          <h5>Outstanding</h5>
+          ${outstandingPeopleHtml}
+        </div>
+      </section>
       <section aria-label="Decision linked projects">
         <h4>Linked projects (${linkedProjects.length})</h4>
         ${projectsHtml}
@@ -238,7 +272,7 @@ function getSelectedDecisionIdFromEvent(event) {
  * @param {HTMLElement} config.detailContainer
  * @param {HTMLElement} config.statusText
  * @param {HTMLSelectElement} config.meetingFilterSelect
- * @param {{selectedDecisionId: string|null, selectedMeetingFilter: string, decisions: Array<object>, meetingsById: Map<string,string>, projectsById: Map<string,string>}} config.state
+ * @param {{selectedDecisionId: string|null, selectedMeetingFilter: string, decisions: Array<object>, meetingsById: Map<string,string>, peopleById: Map<string,string>, projectsById: Map<string,string>}} config.state
  */
 async function refreshDecisionsView({
   listContainer,
@@ -247,14 +281,16 @@ async function refreshDecisionsView({
   meetingFilterSelect,
   state,
 }) {
-  const [decisions, meetings, projects] = await Promise.all([
+  const [decisions, meetings, people, projects] = await Promise.all([
     listDecisions(),
     listMeetings(),
+    listPeople(),
     listProjects(),
   ]);
 
   state.decisions = decisions;
   state.meetingsById = new Map(meetings.map((meeting) => [meeting.id, meeting.title]));
+  state.peopleById = new Map(people.map((person) => [person.id, person.name]));
   state.projectsById = new Map(projects.map((project) => [project.id, project.name]));
   renderMeetingFilterOptions(meetingFilterSelect, meetings, state.selectedMeetingFilter);
 
@@ -289,6 +325,7 @@ async function refreshDecisionsView({
     detailContainer,
     selectedDecision,
     state.meetingsById,
+    state.peopleById,
     state.projectsById,
     shouldShowMissingSelectionFallback
   );
@@ -329,6 +366,7 @@ export function renderDecisionsPage(outlets) {
     selectedMeetingFilter: "",
     decisions: [],
     meetingsById: new Map(),
+    peopleById: new Map(),
     projectsById: new Map(),
   };
 
@@ -358,6 +396,15 @@ export function renderDecisionsPage(outlets) {
     refreshDecisionsView({ listContainer, detailContainer, statusText, meetingFilterSelect, state }).catch((error) => {
       statusText.textContent = `Unable to load decision details: ${error.message}`;
     });
+  });
+
+
+  window.addEventListener("programmeos:decisions-changed", () => {
+    refreshDecisionsView({ listContainer, detailContainer, statusText, meetingFilterSelect, state }).catch(
+      (error) => {
+        statusText.textContent = `Unable to refresh decisions after update: ${error.message}`;
+      }
+    );
   });
 
   newDecisionTrigger.addEventListener("click", () => {
