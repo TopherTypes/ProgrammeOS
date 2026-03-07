@@ -3,6 +3,7 @@ import { listMeetings } from "../meetings/data.js";
 import { listProjects } from "../projects/data.js";
 import { listUpdates } from "./data.js";
 import { openNewUpdateModal } from "./new-update-modal.js";
+import { sortRecordsOldestFirst } from "../review-sort.js";
 
 /**
  * Escapes user-controlled strings before insertion into template literals.
@@ -257,10 +258,11 @@ async function refreshUpdatesView({
   state.projectsById = new Map(projects.map((project) => [project.id, project.name]));
   renderMeetingFilterOptions(meetingFilterSelect, meetings, state.selectedMeetingFilter);
 
+  const sortedUpdates = sortRecordsOldestFirst(updates);
   const isFilterActive = Boolean(state.selectedMeetingFilter);
   const visibleUpdates = isFilterActive
-    ? updates.filter((update) => update.meetingId === state.selectedMeetingFilter)
-    : updates;
+    ? sortedUpdates.filter((update) => update.meetingId === state.selectedMeetingFilter)
+    : sortedUpdates;
 
   const selectedUpdateInList =
     visibleUpdates.find((update) => update.id === state.selectedUpdateId) ?? null;

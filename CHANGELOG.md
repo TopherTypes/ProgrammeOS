@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.3.1] - 2026-03-07
+
+### Added
+- Added centralized deterministic sort helpers in `js/features/review-sort.js` so meeting-linked list ordering is defined in one place and reused across routes.
+
+### Changed
+- Updated Meeting Review table ordering: Actions now sort by explicit status buckets (`open`, `in-progress`, `blocked`, `done`, fallback `unknown`) before oldest-first `createdAt`; Decisions and Updates sort oldest-first by `createdAt` with stable fallback tie-breakers.
+- Updated Actions, Decisions, and Updates route hydration to apply the same deterministic sorting when rendering meeting-filtered lists, preventing order drift between filtered routes and Meeting Review tables.
+
+### Fixed
+- Fixed non-deterministic rendering order for meeting-linked records when timestamps/status values were missing or tied by applying consistent stable fallback comparison rules.
+
+### Removed
+- None.
+
+---
+
 ## [0.3.0] - 2026-03-06
 
 ### Added

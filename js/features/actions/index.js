@@ -4,6 +4,7 @@ import { listPeople } from "../people/data.js";
 import { listProjects } from "../projects/data.js";
 import { listActions, updateAction } from "./data.js";
 import { openNewActionModal } from "./new-action-modal.js";
+import { sortActionsForDisplay } from "../review-sort.js";
 
 /**
  * Escapes user-controlled strings before insertion into template literals.
@@ -274,10 +275,11 @@ async function refreshActionsView({
   state.projectsById = new Map(projects.map((project) => [project.id, project.name]));
   renderMeetingFilterOptions(meetingFilterSelect, meetings, state.selectedMeetingFilter);
 
+  const sortedActions = sortActionsForDisplay(actions);
   const isFilterActive = Boolean(state.selectedMeetingFilter);
   const visibleActions = isFilterActive
-    ? actions.filter((action) => action.meetingId === state.selectedMeetingFilter)
-    : actions;
+    ? sortedActions.filter((action) => action.meetingId === state.selectedMeetingFilter)
+    : sortedActions;
 
   const selectedActionInList =
     visibleActions.find((action) => action.id === state.selectedActionId) ?? null;

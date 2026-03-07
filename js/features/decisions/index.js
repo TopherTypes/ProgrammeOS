@@ -3,6 +3,7 @@ import { listMeetings } from "../meetings/data.js";
 import { listProjects } from "../projects/data.js";
 import { listDecisions } from "./data.js";
 import { openNewDecisionModal } from "./new-decision-modal.js";
+import { sortRecordsOldestFirst } from "../review-sort.js";
 
 /**
  * Escapes user-controlled strings before insertion into template literals.
@@ -257,10 +258,11 @@ async function refreshDecisionsView({
   state.projectsById = new Map(projects.map((project) => [project.id, project.name]));
   renderMeetingFilterOptions(meetingFilterSelect, meetings, state.selectedMeetingFilter);
 
+  const sortedDecisions = sortRecordsOldestFirst(decisions);
   const isFilterActive = Boolean(state.selectedMeetingFilter);
   const visibleDecisions = isFilterActive
-    ? decisions.filter((decision) => decision.meetingId === state.selectedMeetingFilter)
-    : decisions;
+    ? sortedDecisions.filter((decision) => decision.meetingId === state.selectedMeetingFilter)
+    : sortedDecisions;
 
   const selectedDecisionInList =
     visibleDecisions.find((decision) => decision.id === state.selectedDecisionId) ?? null;
