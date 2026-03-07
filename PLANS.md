@@ -23,10 +23,10 @@ AI agents must follow the operational rules defined in **AGENTS.md** and respect
 - [x] Milestone 3 — Projects System
 - [x] Milestone 4 — Meetings System
 - [x] Milestone 5 — Actions, Decisions, Updates
-- [ ] Milestone 6 — Communication Tracking
+- [~] Milestone 6 — Communication Tracking (in progress: record-level tracking + detail summaries shipped)
 - [ ] Milestone 7 — Entity Linking UX
 - [ ] Milestone 8 — Dashboard and Focus
-- [ ] Milestone 9 — Import / Export
+- [ ] Milestone 9 — Import / Export (planned; included in release smoke checklist)
 
 ---
 

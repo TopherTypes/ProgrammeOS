@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.5.2**
+Current version: **0.5.3**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -12,11 +12,15 @@ This file mirrors milestone planning in `PLANS.md` and exists as a lightweight r
 - [x] Milestone 3 (v0.0.4): Projects system (project model persistence + Projects list/detail interaction baseline) — **complete**.
 - [x] Milestone 4 (v0.0.5): Meetings system (meeting model/data helpers, modal create flow, meetings list/detail baseline, and keyboard-friendly selection) — **complete**.
 - [x] Milestone 5 (v0.0.6): Actions, decisions, and updates baseline (modal create flows, list/detail routes, linked meeting/project resolution, and lightweight record verification) — **complete**.
+- [~] Milestone 6 (v0.0.7): Communication tracking — **in progress** (record normalization + detail summaries shipped; full smoke workflow tracked in README checklist).
+- [ ] Milestone 9 (v0.1.1): JSON import/export — **planned** (covered in release smoke checklist).
 
 For detailed tasks and acceptance criteria, see `PLANS.md`.
 
 
 ## Recent fixes
+
+- v0.5.3: Refreshed release smoke checklist documentation and recorded lightweight record/schema check outcomes for delivery verification.
 
 - v0.3.1: Added centralized deterministic sort helpers for Meeting Review and meeting-filtered Actions/Decisions/Updates lists (action status bucket order + oldest-first createdAt tie-breaks; decisions/updates oldest-first only).
 
