@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.5.0**
+Current version: **0.5.1**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -220,16 +220,21 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 - Meeting detail now renders resolved attendee names (from `listPeople()`) and linked project names (from `listProjects()`), with explicit unknown-ID labels (`Unknown person`, `Unknown project`).
 - Meetings list keyboard interactions now support Arrow Up/Down focus movement plus Enter/Space selection to match the Projects accessibility interaction pattern.
 
-## Manual Verification (v0.5.0)
+## Manual Verification (v0.5.1)
 
 1. Open `index.html`, navigate to `#/meetings`, and select an existing meeting (or create one).
 2. In **Meeting Review**, confirm Actions/Decisions/Updates groups render with counts based on records linked by `meetingId`.
-3. Use a Meeting Review create action (for example **New Action**) and verify the modal opens with meeting linkage locked to the selected meeting.
-4. Save the new record and verify it appears in Meeting Review immediately and remains linked after reload.
-5. Click **Edit** on a Meeting Review row, update content, save, and confirm inline validation blocks empty description values.
-6. Toggle each meeting checklist item and confirm completion summary text updates and persists after page reload.
-7. Navigate to `#/actions`, `#/decisions`, and `#/updates`; for each route, apply **Filter by meeting** and verify only records linked by `meetingId` are shown.
-8. Return each route filter to **All meetings** and confirm full list restoration plus stable ordering.
+3. From each Meeting Review section (**New Action**, **New Decision**, **New Update**), open the modal and verify meeting linkage is locked to the selected meeting (read-only meeting context with no ability to relink before save).
+4. Save each new record and verify it appears immediately in Meeting Review and remains linked to the same meeting after refresh.
+5. Click **Edit** on a Meeting Review row, change a value, click **Cancel**, and verify original content is restored with no persisted change.
+6. Re-enter edit mode on the same row, save a valid change, and verify the row exits edit mode with persisted values.
+7. While editing, clear description and click **Save** to confirm inline validation blocks empty descriptions and keeps the row in edit mode.
+8. Toggle each meeting checklist item and confirm completion summary text updates and persists after page refresh.
+9. Export JSON snapshot, reload the app, then import the snapshot and confirm checklist toggle state remains intact for the same meeting.
+10. Navigate to `#/actions`, `#/decisions`, and `#/updates`; on each route select a meeting in **Filter by meeting** and verify only records with matching `meetingId` are visible.
+11. On each route, switch filter back to **All meetings** and verify full list restoration with deterministic ordering.
+12. Run `node js/features/review-sort-and-filter.check.mjs` and confirm meeting-filter semantics and deterministic sort checks pass.
+13. Run `node js/features/meetings/meeting-record.check.mjs` and confirm checklist normalization defaults and update round-trip checks pass.
 
 ## Manual Verification (v0.0.24)
 

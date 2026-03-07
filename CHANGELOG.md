@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.5.1] - 2026-03-07
+
+### Added
+- Added lightweight Node verification script `js/features/review-sort-and-filter.check.mjs` covering meeting-linked filter semantics and deterministic sorting behavior shared by Meeting Review and filtered entity list routes.
+
+### Changed
+- Expanded `README.md` manual smoke steps to explicitly verify meeting-locked creation from Meeting Review, inline edit save/cancel behavior, per-route meeting filtering, and checklist persistence through refresh plus JSON export/import.
+- Bumped project version metadata to `0.5.1` in `VERSION` and `README.md`.
+
+### Fixed
+- None.
+
+### Removed
+- None.
+
+---
+
 ## [0.5.0] - 2026-03-07
 
 ### Added
