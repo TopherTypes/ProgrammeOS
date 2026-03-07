@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.4.0**
+Current version: **0.5.0**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -128,6 +128,20 @@ The app now renders all routes inside a shared layout shell:
 - Save uses existing data helpers and refreshes Meeting Review tables/counts after successful persistence.
 - Inline validation now blocks empty descriptions and shows row-level error/status feedback with predictable focus after save/cancel.
 
+## Meeting Review Workflow (v0.5.0)
+
+- `#/meetings` detail includes a **Meeting Review** section with grouped Actions, Decisions, and Updates linked by `meetingId`.
+- Each group provides quick create actions that open the existing New Action/New Decision/New Update modals in meeting-locked mode.
+- In meeting-locked mode, the modal meeting field is read-only and always persists the provided `lockedMeetingId`.
+- Meeting Review rows support inline editing for fast correction without leaving the meeting context.
+- The meeting checklist (`actionsReviewed`, `decisionsReviewed`, `updatesReviewed`) persists directly on the meeting record and drives completion summary text.
+
+## Meeting Filters Usage (v0.5.0)
+
+- Actions, Decisions, and Updates pages expose a **Filter by meeting** control.
+- Selecting a meeting shows only records linked by `meetingId`; **All meetings** restores unfiltered lists.
+- Filtered lists use the same deterministic sort conventions as Meeting Review tables so ordering stays consistent across contexts.
+
 ## Delivered People Directory Capabilities (Milestone 2 Complete)
 
 The delivered People feature set now includes:
@@ -205,6 +219,17 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 - Row selection state is preserved in-memory, selected rows are visually highlighted, and detail content updates with selection changes.
 - Meeting detail now renders resolved attendee names (from `listPeople()`) and linked project names (from `listProjects()`), with explicit unknown-ID labels (`Unknown person`, `Unknown project`).
 - Meetings list keyboard interactions now support Arrow Up/Down focus movement plus Enter/Space selection to match the Projects accessibility interaction pattern.
+
+## Manual Verification (v0.5.0)
+
+1. Open `index.html`, navigate to `#/meetings`, and select an existing meeting (or create one).
+2. In **Meeting Review**, confirm Actions/Decisions/Updates groups render with counts based on records linked by `meetingId`.
+3. Use a Meeting Review create action (for example **New Action**) and verify the modal opens with meeting linkage locked to the selected meeting.
+4. Save the new record and verify it appears in Meeting Review immediately and remains linked after reload.
+5. Click **Edit** on a Meeting Review row, update content, save, and confirm inline validation blocks empty description values.
+6. Toggle each meeting checklist item and confirm completion summary text updates and persists after page reload.
+7. Navigate to `#/actions`, `#/decisions`, and `#/updates`; for each route, apply **Filter by meeting** and verify only records linked by `meetingId` are shown.
+8. Return each route filter to **All meetings** and confirm full list restoration plus stable ordering.
 
 ## Manual Verification (v0.0.24)
 

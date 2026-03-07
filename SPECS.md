@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.5.0 meeting review workflow documentation alignment: codify Meeting Review workflow semantics, including meeting-locked creation behavior (`lockedMeetingId`/`lockedMeetingLabel`), inline edit save/cancel expectations, persisted checklist semantics, and consistent "filter by meeting" behavior for records linked by `meetingId` across Actions/Decisions/Updates.
 - v0.4.0 meeting review checklist extension: extend canonical meeting normalization/data helpers with a persisted `reviewChecklist` object (`actionsReviewed`, `decisionsReviewed`, `updatesReviewed`) using backward-compatible defaults for pre-existing records; render checklist toggles + completion summary in `#/meetings` detail and persist toggle changes through `updateMeeting(...)` so checklist state survives reload and JSON export/import.
 - v0.3.1 deterministic review/list ordering refinement: Meeting Review tables and meeting-filtered Actions/Decisions/Updates lists must apply centralized deterministic sort helpers. Actions sort by explicit status buckets (`open`, `in-progress`, `blocked`, `done`, fallback `unknown`) and then oldest `createdAt` first with stable tie-breakers; decisions and updates have no status buckets and therefore use oldest-first `createdAt` ordering with stable tie-breakers only.
 - v0.3.0 meeting-scoped list filtering extension: add a `Filter by meeting` select to the Actions/Decisions/Updates route toolbars with a default `All meetings` option and options populated from `listMeetings()` titles; route hydration must apply the selected meeting filter to rendered rows, selection reconciliation, and detail rendering so stale explicit selections surface existing missing-selection fallback messaging when filtered out; status text must report filtered totals and indicate active filter state.
@@ -170,6 +171,14 @@ Current implementation status: **Delivered in Milestone 4**.
 
 In the delivered MVP baseline, Meetings include a route frame with toolbar/status/list/detail containers, async list hydration from IndexedDB (`listMeetings`) plus related people/project lookups for name resolution, dense table rendering, selected-row highlighting, click + keyboard selection (Arrow Up/Down focus and Enter/Space select), escaped user-provided text rendering, modal-driven meeting creation with validation and predictable dismissal/focus restoration, and explicit empty/missing detail fallbacks including safe unknown-linked-ID labels. Meeting review linked rows now support inline edit/save/cancel with required-description validation and in-place persistence for actions, decisions, and updates. Meetings now also persist a per-meeting review checklist (`actionsReviewed`, `decisionsReviewed`, `updatesReviewed`) with checklist toggles and a completion summary rendered in the detail panel.
 
+Meeting Review workflow semantics:
+
+- The Meeting Review area is rendered in selected meeting detail and groups linked records by type (Actions, Decisions, Updates), each linked by `meetingId`.
+- Meeting Review section counts and rows refresh whenever meeting selection changes or linked records mutate.
+- Row-level inline editing is available directly in Meeting Review tables for quick correction/cleanup; Save persists through existing entity update helpers and Cancel restores read-only mode without writes.
+- Meeting Review "Create" triggers launch the standard create modals in meeting-locked mode; when a modal receives `lockedMeetingId` + `lockedMeetingLabel`, meeting linkage is displayed read-only and persisted automatically.
+- Checklist semantics are meeting-scoped: each checklist toggle persists to `meeting.reviewChecklist`, defaults to `false` when absent, and contributes to completion summary text that reports checklist progress.
+
 
 
 #### Meetings Baseline Verification (Milestone 4)
@@ -190,6 +199,8 @@ Current implementation status: **Delivered in Milestone 5**.
 
 In the delivered MVP baseline, `#/actions` provides a deterministic route frame with toolbar/status/list/detail containers, explicit empty and missing-selection fallback states, and in-route hydration backed by the actions data helpers. Action creation is modal-driven with required-description validation, optional owner/status/due-date/meeting/project linking, and predictable Escape/cancel/overlay dismissal with trigger focus restoration. Successful create/update operations refresh list/detail content in place without full route reload.
 
+`#/actions` also provides `Filter by meeting` behavior using meeting records from `listMeetings()`. Filtered views include only records linked by `meetingId`, with deterministic sorting aligned to Meeting Review ordering (status bucket then oldest-first `createdAt`, stable tie-breakers).
+
 
 ------------------------------------------------------------------------
 
@@ -202,6 +213,8 @@ communication tracking
 Current implementation status: **Delivered in Milestone 5**.
 
 In the delivered MVP baseline, `#/decisions` provides a deterministic route frame with toolbar/status/list/detail containers, modal-driven creation with required-description validation, and explicit empty/missing-selection fallback states. Decision detail rendering resolves linked meeting/project names when related records exist and uses safe fallback labels when links are stale or missing.
+
+`#/decisions` also provides `Filter by meeting` behavior using meeting records from `listMeetings()`. Filtered views include only records linked by `meetingId`, sorted oldest-first by `createdAt` with stable tie-breakers (matching Meeting Review ordering).
 
 
 ------------------------------------------------------------------------
@@ -219,6 +232,8 @@ specific discussions.
 Current implementation status: **Delivered in Milestone 5**.
 
 In the delivered MVP baseline, `#/updates` provides a deterministic route frame with toolbar/status/list/detail containers, modal-driven creation with required-description validation, and explicit empty/missing-selection fallback states. Update detail rendering resolves linked meeting/project names when available, with safe fallback labels for stale linked IDs.
+
+`#/updates` also provides `Filter by meeting` behavior using meeting records from `listMeetings()`. Filtered views include only records linked by `meetingId`, sorted oldest-first by `createdAt` with stable tie-breakers (matching Meeting Review ordering).
 
 #### Milestone 5 Workflow Summary (Actions / Decisions / Updates)
 

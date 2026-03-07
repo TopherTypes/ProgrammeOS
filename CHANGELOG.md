@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.5.0] - 2026-03-07
+
+### Added
+- Documented Meeting Review workflow usage in `README.md`, including meeting-locked create flow, inline editing workflow, and checklist completion behavior.
+- Added manual verification steps in `README.md` for Meeting Review interactions and `filter by meeting` behavior across Actions/Decisions/Updates.
+
+### Changed
+- Updated `SPECS.md` to explicitly define Meeting Review semantics for records linked by `meetingId`, meeting-locked modal behavior, inline edit expectations, and checklist persistence semantics.
+- Updated `DECISIONS.md` to record checklist persistence choice on meeting records and shared filtering/sorting conventions for `filter by meeting` and Meeting Review ordering.
+- Bumped project version metadata to `0.5.0` in `VERSION` and `README.md`.
+
+### Fixed
+- None.
+
+### Removed
+- None.
+
+---
+
 ## [0.4.0] - 2026-03-07
 
 ### Added
