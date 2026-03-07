@@ -25,12 +25,14 @@ function emitDecisionsChanged(decisionRecord) {
  *   description: string,
  *   meetingId?: string,
  *   projectIds?: string[],
+ *   requiresUpdateByPersonId?: Record<string, { required: boolean, informedAt: string|null }>,
  * }} decisionInput
  * @returns {Promise<{
  *   id: string,
  *   description: string,
  *   meetingId: string,
  *   projectIds: string[],
+ *   requiresUpdateByPersonId: Record<string, { required: boolean, informedAt: string|null }>,
  *   createdAt: string,
  *   updatedAt: string,
  * }>}
@@ -46,6 +48,7 @@ export async function createDecision(decisionInput) {
     description: normalizedInput.description,
     meetingId: normalizedInput.meetingId,
     projectIds: normalizedInput.projectIds,
+    requiresUpdateByPersonId: normalizedInput.requiresUpdateByPersonId,
     createdAt: nowIso,
     updatedAt: nowIso,
   };
@@ -72,6 +75,7 @@ export async function createDecision(decisionInput) {
  *   description: string,
  *   meetingId: string,
  *   projectIds: string[],
+ *   requiresUpdateByPersonId: Record<string, { required: boolean, informedAt: string|null }>,
  *   createdAt: string,
  *   updatedAt: string,
  * }|null>}
@@ -101,6 +105,7 @@ export async function getDecision(decisionId) {
  *   description: string,
  *   meetingId: string,
  *   projectIds: string[],
+ *   requiresUpdateByPersonId: Record<string, { required: boolean, informedAt: string|null }>,
  *   createdAt: string,
  *   updatedAt: string,
  * }>>}
@@ -124,6 +129,7 @@ export async function listDecisions() {
  *   description?: string,
  *   meetingId?: string,
  *   projectIds?: string[],
+ *   requiresUpdateByPersonId?: Record<string, { required: boolean, informedAt: string|null }>,
  *   id?: string,
  *   createdAt?: string,
  * }} patch
@@ -132,6 +138,7 @@ export async function listDecisions() {
  *   description: string,
  *   meetingId: string,
  *   projectIds: string[],
+ *   requiresUpdateByPersonId: Record<string, { required: boolean, informedAt: string|null }>,
  *   createdAt: string,
  *   updatedAt: string,
  * }>}
@@ -166,12 +173,17 @@ export async function updateDecision(decisionId, patch) {
   const hasDescriptionUpdate = !!patch && Object.prototype.hasOwnProperty.call(patch, "description");
   const hasMeetingIdUpdate = !!patch && Object.prototype.hasOwnProperty.call(patch, "meetingId");
   const hasProjectIdsUpdate = !!patch && Object.prototype.hasOwnProperty.call(patch, "projectIds");
+  const hasRequiresUpdateByPersonIdUpdate =
+    !!patch && Object.prototype.hasOwnProperty.call(patch, "requiresUpdateByPersonId");
 
   const updatedDecision = {
     id: existingDecision.id,
     description: hasDescriptionUpdate ? incomingPatch.description : existingDecision.description,
     meetingId: hasMeetingIdUpdate ? incomingPatch.meetingId : existingDecision.meetingId,
     projectIds: hasProjectIdsUpdate ? incomingPatch.projectIds : existingDecision.projectIds,
+    requiresUpdateByPersonId: hasRequiresUpdateByPersonIdUpdate
+      ? incomingPatch.requiresUpdateByPersonId
+      : existingDecision.requiresUpdateByPersonId,
     createdAt: existingDecision.createdAt,
     updatedAt: new Date().toISOString(),
   };
