@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.0] - 2026-03-07
+
+### Added
+- Added persisted meeting review checklist state (`reviewChecklist`) with default items for Actions reviewed, Decisions reviewed, and Updates reviewed.
+- Added checklist controls in `#/meetings` detail with immediate toggle persistence and completion summary text.
+
+### Changed
+- Extended canonical meeting normalization + data helper update logic so checklist data is backward-compatible for existing stored meetings and safe for export/import snapshots without schema-breaking migrations.
+- Bumped project version metadata to `0.4.0` across `VERSION`, `README.md`, and `ROADMAP.md`.
+
+### Fixed
+- Fixed meeting update patch behavior to preserve existing checklist keys when only a subset of checklist toggles are updated.
+
+### Removed
+- None.
+
+---
+
 ## [0.3.1] - 2026-03-07
 
 ### Added

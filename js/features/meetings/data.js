@@ -1,5 +1,10 @@
 import { createEntity, getEntity, listEntities, updateEntity } from "../../db.js";
-import { assertValidMeeting, normalizeMeeting } from "./meeting-record.js";
+import {
+  assertValidMeeting,
+  DEFAULT_REVIEW_CHECKLIST,
+  normalizeMeeting,
+  normalizeReviewChecklist,
+} from "./meeting-record.js";
 
 const MEETINGS_STORE = "meetings";
 
@@ -22,9 +27,14 @@ const MEETINGS_STORE = "meetings";
  *   attendeeIds: string[],
  *   projectIds: string[],
  *   notes: string,
+ *   reviewChecklist: {
+ *     actionsReviewed: boolean,
+ *     decisionsReviewed: boolean,
+ *     updatesReviewed: boolean,
+ *   },
  *   createdAt: string,
  *   updatedAt: string,
- * }>}
+ * }>} 
  */
 export async function createMeeting(meetingInput) {
   assertValidMeeting(meetingInput);
@@ -40,6 +50,7 @@ export async function createMeeting(meetingInput) {
     attendeeIds: normalizedInput.attendeeIds,
     projectIds: normalizedInput.projectIds,
     notes: normalizedInput.notes,
+    reviewChecklist: normalizedInput.reviewChecklist,
     createdAt: nowIso,
     updatedAt: nowIso,
   };
@@ -68,9 +79,14 @@ export async function createMeeting(meetingInput) {
  *   attendeeIds: string[],
  *   projectIds: string[],
  *   notes: string,
+ *   reviewChecklist: {
+ *     actionsReviewed: boolean,
+ *     decisionsReviewed: boolean,
+ *     updatesReviewed: boolean,
+ *   },
  *   createdAt: string,
  *   updatedAt: string,
- * }|null>}
+ * }|null>} 
  */
 export async function getMeeting(meetingId) {
   const normalizedMeetingId =
@@ -104,6 +120,11 @@ export async function getMeeting(meetingId) {
  *   attendeeIds: string[],
  *   projectIds: string[],
  *   notes: string,
+ *   reviewChecklist: {
+ *     actionsReviewed: boolean,
+ *     decisionsReviewed: boolean,
+ *     updatesReviewed: boolean,
+ *   },
  *   createdAt: string,
  *   updatedAt: string,
  * }>>}
@@ -130,6 +151,11 @@ export async function listMeetings() {
  *   attendeeIds?: string[],
  *   projectIds?: string[],
  *   notes?: string,
+ *   reviewChecklist?: {
+ *     actionsReviewed?: boolean,
+ *     decisionsReviewed?: boolean,
+ *     updatesReviewed?: boolean,
+ *   },
  *   id?: string,
  *   createdAt?: string
  * }} patch
@@ -141,9 +167,14 @@ export async function listMeetings() {
  *   attendeeIds: string[],
  *   projectIds: string[],
  *   notes: string,
+ *   reviewChecklist: {
+ *     actionsReviewed: boolean,
+ *     decisionsReviewed: boolean,
+ *     updatesReviewed: boolean,
+ *   },
  *   createdAt: string,
  *   updatedAt: string,
- * }>}
+ * }>} 
  */
 export async function updateMeeting(meetingId, patch) {
   const normalizedMeetingId =
@@ -185,6 +216,12 @@ export async function updateMeeting(meetingId, patch) {
     !!patch && Object.prototype.hasOwnProperty.call(patch, "projectIds");
   const hasNotesUpdate =
     !!patch && Object.prototype.hasOwnProperty.call(patch, "notes");
+  const hasReviewChecklistUpdate =
+    !!patch && Object.prototype.hasOwnProperty.call(patch, "reviewChecklist");
+
+  const reviewChecklist = hasReviewChecklistUpdate
+    ? normalizeReviewChecklist(patch?.reviewChecklist, existingMeeting.reviewChecklist)
+    : normalizeReviewChecklist(existingMeeting.reviewChecklist, DEFAULT_REVIEW_CHECKLIST);
 
   const updatedMeeting = {
     id: existingMeeting.id,
@@ -198,6 +235,7 @@ export async function updateMeeting(meetingId, patch) {
       ? incomingPatch.projectIds
       : existingMeeting.projectIds,
     notes: hasNotesUpdate ? incomingPatch.notes : existingMeeting.notes,
+    reviewChecklist,
     createdAt: existingMeeting.createdAt,
     updatedAt: new Date().toISOString(),
   };

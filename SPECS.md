@@ -6,6 +6,7 @@ Programme Work Management App
 
 ## 0. Implementation Alignment Notes
 
+- v0.4.0 meeting review checklist extension: extend canonical meeting normalization/data helpers with a persisted `reviewChecklist` object (`actionsReviewed`, `decisionsReviewed`, `updatesReviewed`) using backward-compatible defaults for pre-existing records; render checklist toggles + completion summary in `#/meetings` detail and persist toggle changes through `updateMeeting(...)` so checklist state survives reload and JSON export/import.
 - v0.3.1 deterministic review/list ordering refinement: Meeting Review tables and meeting-filtered Actions/Decisions/Updates lists must apply centralized deterministic sort helpers. Actions sort by explicit status buckets (`open`, `in-progress`, `blocked`, `done`, fallback `unknown`) and then oldest `createdAt` first with stable tie-breakers; decisions and updates have no status buckets and therefore use oldest-first `createdAt` ordering with stable tie-breakers only.
 - v0.3.0 meeting-scoped list filtering extension: add a `Filter by meeting` select to the Actions/Decisions/Updates route toolbars with a default `All meetings` option and options populated from `listMeetings()` titles; route hydration must apply the selected meeting filter to rendered rows, selection reconciliation, and detail rendering so stale explicit selections surface existing missing-selection fallback messaging when filtered out; status text must report filtered totals and indicate active filter state.
 - v0.2.1 modal meeting-lock extension: extend `openNewActionModal`, `openNewDecisionModal`, and `openNewUpdateModal` to accept optional `lockedMeetingId`/`lockedMeetingLabel` config so meeting-scoped launches prefill and lock meeting linkage while standalone route launches retain optional editable meeting selection; submit payloads must always persist the locked meeting id when provided.
@@ -167,13 +168,13 @@ actions, decisions, or updates.
 
 Current implementation status: **Delivered in Milestone 4**.
 
-In the delivered MVP baseline, Meetings include a route frame with toolbar/status/list/detail containers, async list hydration from IndexedDB (`listMeetings`) plus related people/project lookups for name resolution, dense table rendering, selected-row highlighting, click + keyboard selection (Arrow Up/Down focus and Enter/Space select), escaped user-provided text rendering, modal-driven meeting creation with validation and predictable dismissal/focus restoration, and explicit empty/missing detail fallbacks including safe unknown-linked-ID labels. Meeting review linked rows now support inline edit/save/cancel with required-description validation and in-place persistence for actions, decisions, and updates.
+In the delivered MVP baseline, Meetings include a route frame with toolbar/status/list/detail containers, async list hydration from IndexedDB (`listMeetings`) plus related people/project lookups for name resolution, dense table rendering, selected-row highlighting, click + keyboard selection (Arrow Up/Down focus and Enter/Space select), escaped user-provided text rendering, modal-driven meeting creation with validation and predictable dismissal/focus restoration, and explicit empty/missing detail fallbacks including safe unknown-linked-ID labels. Meeting review linked rows now support inline edit/save/cancel with required-description validation and in-place persistence for actions, decisions, and updates. Meetings now also persist a per-meeting review checklist (`actionsReviewed`, `decisionsReviewed`, `updatesReviewed`) with checklist toggles and a completion summary rendered in the detail panel.
 
 
 
 #### Meetings Baseline Verification (Milestone 4)
 
-- Run `node js/features/meetings/meeting-record.check.mjs` and confirm all checks pass (normalization defaults/trimming, required-field validation failures, id-array deduplication, and create/get/list/update sanity checks).
+- Run `node js/features/meetings/meeting-record.check.mjs` and confirm all checks pass (normalization defaults/trimming including checklist defaults, required-field validation failures, id-array deduplication, and create/get/list/update sanity checks).
 - Open `#/meetings`, create a meeting via the modal with valid `title` + `date`, and confirm list/detail rehydrate without route reload.
 - Confirm keyboard row interaction (Arrow Up/Down focus movement, Enter/Space selection), attendee/project name resolution, and stale-link fallback labels in detail (`Unknown person`, `Unknown project`).
 

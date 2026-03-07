@@ -7,9 +7,34 @@ import { listPeople } from "../people/data.js";
 import { listProjects } from "../projects/data.js";
 import { updateUpdate } from "../updates/data.js";
 import { listUpdates } from "../updates/data.js";
-import { listMeetings } from "./data.js";
+import { listMeetings, updateMeeting } from "./data.js";
 import { openNewMeetingModal } from "./new-meeting-modal.js";
 import { sortActionsForDisplay, sortRecordsOldestFirst } from "../review-sort.js";
+
+const REVIEW_CHECKLIST_ITEMS = [
+  { key: "actionsReviewed", label: "Actions reviewed" },
+  { key: "decisionsReviewed", label: "Decisions reviewed" },
+  { key: "updatesReviewed", label: "Updates reviewed" },
+];
+
+/**
+ * Returns completion counts for meeting review checklist rendering.
+ *
+ * @param {{actionsReviewed?: boolean, decisionsReviewed?: boolean, updatesReviewed?: boolean}|undefined|null} checklist
+ */
+function getReviewChecklistSummary(checklist) {
+  const total = REVIEW_CHECKLIST_ITEMS.length;
+  const completed = REVIEW_CHECKLIST_ITEMS.reduce(
+    (count, item) => (checklist?.[item.key] ? count + 1 : count),
+    0
+  );
+
+  return {
+    completed,
+    total,
+    allComplete: completed === total,
+  };
+}
 
 /**
  * Escapes user-controlled strings before insertion into template literals.
@@ -125,7 +150,7 @@ function renderMeetingsList(listContainer, meetings, selectedMeetingId) {
  * Renders detail content for the selected meeting.
  *
  * @param {HTMLElement} detailContainer
- * @param {{id: string, title?: string, date?: string, type?: string, attendeeIds?: string[], projectIds?: string[], notes?: string}|null} meeting
+ * @param {{id: string, title?: string, date?: string, type?: string, attendeeIds?: string[], projectIds?: string[], notes?: string, reviewChecklist?: {actionsReviewed?: boolean, decisionsReviewed?: boolean, updatesReviewed?: boolean}}|null} meeting
  * @param {Map<string, string>} attendeeNamesById
  * @param {Map<string, string>} projectNamesById
  * @param {boolean} isMissingSelection
@@ -202,6 +227,21 @@ function renderMeetingDetail(
     projectNames.length === 0
       ? `<p class="small-note">No linked projects yet.</p>`
       : `<ul>${projectNames.map((projectName) => `<li>${projectName}</li>`).join("")}</ul>`;
+  const reviewChecklist = meeting.reviewChecklist ?? {};
+  const checklistSummary = getReviewChecklistSummary(reviewChecklist);
+  const checklistStatusText = checklistSummary.allComplete
+    ? "Meeting review complete."
+    : `Meeting review completion: ${checklistSummary.completed}/${checklistSummary.total}.`;
+  const checklistControlsHtml = REVIEW_CHECKLIST_ITEMS.map((item) => {
+    const checked = reviewChecklist[item.key] ? "checked" : "";
+
+    return `
+      <label style="display:flex;align-items:center;gap:.4rem;">
+        <input type="checkbox" data-role="meeting-review-checklist-toggle" data-checklist-key="${item.key}" ${checked} />
+        <span>${escapeHtml(item.label)}</span>
+      </label>
+    `;
+  }).join("");
 
   detailContainer.innerHTML = `
     <article class="project-detail-card" data-role="meeting-detail-card">
@@ -218,6 +258,13 @@ function renderMeetingDetail(
       </section>
       <h4>Notes</h4>
       <p>${notes}</p>
+      <section aria-label="Meeting review checklist" data-role="meeting-review-checklist">
+        <h4>Review Checklist</h4>
+        <p class="small-note" data-role="meeting-review-checklist-summary">${escapeHtml(
+          checklistStatusText
+        )}</p>
+        <div style="display:grid;gap:.35rem;">${checklistControlsHtml}</div>
+      </section>
       ${reviewHtml}
     </article>
   `;
@@ -757,6 +804,52 @@ export function renderMeetingsPage(outlets) {
     if (fieldName === "description" && target.value.trim()) {
       state.reviewEdit.error = "";
     }
+  });
+
+  detailContainer.addEventListener("change", (event) => {
+    const target = event.target;
+
+    if (!(target instanceof HTMLInputElement)) {
+      return;
+    }
+
+    if (target.dataset.role !== "meeting-review-checklist-toggle") {
+      return;
+    }
+
+    const checklistKey = target.dataset.checklistKey;
+    const selectedMeetingId = state.selectedMeetingId;
+
+    if (
+      !selectedMeetingId ||
+      (checklistKey !== "actionsReviewed" &&
+        checklistKey !== "decisionsReviewed" &&
+        checklistKey !== "updatesReviewed")
+    ) {
+      return;
+    }
+
+    const selectedMeeting = state.meetings.find((meeting) => meeting.id === selectedMeetingId);
+
+    if (!selectedMeeting) {
+      statusText.textContent = "Unable to update checklist: selected meeting is unavailable.";
+      return;
+    }
+
+    const nextChecklist = {
+      ...(selectedMeeting.reviewChecklist ?? {}),
+      [checklistKey]: target.checked,
+    };
+
+    updateMeeting(selectedMeetingId, { reviewChecklist: nextChecklist })
+      .then(async () => {
+        await refreshMeetingsView({ listContainer, detailContainer, statusText, state });
+        statusText.textContent = "Meeting review checklist updated.";
+      })
+      .catch(async (error) => {
+        await refreshMeetingsView({ listContainer, detailContainer, statusText, state });
+        statusText.textContent = `Unable to update checklist: ${error.message}`;
+      });
   });
 
   detailContainer.addEventListener("keydown", (event) => {
