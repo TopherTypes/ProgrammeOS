@@ -9,6 +9,7 @@ import { updateUpdate } from "../updates/data.js";
 import { listUpdates } from "../updates/data.js";
 import { listMeetings } from "./data.js";
 import { openNewMeetingModal } from "./new-meeting-modal.js";
+import { sortActionsForDisplay, sortRecordsOldestFirst } from "../review-sort.js";
 
 /**
  * Escapes user-controlled strings before insertion into template literals.
@@ -139,11 +140,15 @@ function renderMeetingDetail(
   editState
 ) {
   const selectedMeetingId = meeting?.id ?? "";
-  const actionsForMeeting = reviewItems.actions.filter((action) => action.meetingId === selectedMeetingId);
-  const decisionsForMeeting = reviewItems.decisions.filter(
-    (decision) => decision.meetingId === selectedMeetingId
+  const actionsForMeeting = sortActionsForDisplay(
+    reviewItems.actions.filter((action) => action.meetingId === selectedMeetingId)
   );
-  const updatesForMeeting = reviewItems.updates.filter((update) => update.meetingId === selectedMeetingId);
+  const decisionsForMeeting = sortRecordsOldestFirst(
+    reviewItems.decisions.filter((decision) => decision.meetingId === selectedMeetingId)
+  );
+  const updatesForMeeting = sortRecordsOldestFirst(
+    reviewItems.updates.filter((update) => update.meetingId === selectedMeetingId)
+  );
 
   const reviewHtml = renderMeetingReviewSectionGroup({
     actionsForMeeting,

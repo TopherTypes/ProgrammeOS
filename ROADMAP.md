@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-Current version: **0.3.0**
+Current version: **0.3.1**
 
 This file mirrors milestone planning in `PLANS.md` and exists as a lightweight roadmap index.
 
@@ -17,6 +17,8 @@ For detailed tasks and acceptance criteria, see `PLANS.md`.
 
 
 ## Recent fixes
+
+- v0.3.1: Added centralized deterministic sort helpers for Meeting Review and meeting-filtered Actions/Decisions/Updates lists (action status bucket order + oldest-first createdAt tie-breaks; decisions/updates oldest-first only).
 
 - v0.3.0: Added meeting-based filters to Actions, Decisions, and Updates pages with `All meetings` defaults, live meeting-title options, filtered list/detail selection reconciliation, and filter-aware status totals.
 
