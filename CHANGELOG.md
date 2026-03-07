@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.5.3] - 2026-03-07
+
+### Added
+- Added a refreshed manual smoke checklist in `README.md` covering people/projects/meetings creation, meeting logging, action/decision/update creation, communication tracking workflows, and JSON export/import validation prompts.
+- Added a lightweight check outcomes section in `README.md` documenting pass results for action/decision/update record checks and schema planning checks.
+
+### Changed
+- Updated release metadata to version `0.5.3` in `VERSION`, `README.md`, and `ROADMAP.md`.
+- Refreshed roadmap/plan milestone status wording to reflect current release tracking for communication tracking and import/export milestones.
+
+### Fixed
+- None.
+
+### Removed
+- None.
+
+---
+
 ## [0.5.2] - 2026-03-07
 
 ### Added

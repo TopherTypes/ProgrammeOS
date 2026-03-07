@@ -1,6 +1,6 @@
 # Programme Work Management App
 
-Current version: **0.5.2**
+Current version: **0.5.3**
 
 A local-first, zero-build programme management application designed to run directly in the browser and be deployable on GitHub Pages.
 
@@ -285,13 +285,22 @@ Milestone 3 is now delivered and provides the complete shipped baseline for Proj
 8. In detail panel, click **Mark Done**/**Mark Open** and confirm update status persists and list/detail refresh in-place.
 9. Run `node js/features/actions/action-record.check.mjs` and confirm action normalization defaults, required-field validation failures, ID deduplication, and create/get/list/update lifecycle sanity checks all pass with explicit PASS/FAIL output.
 
-## Smoke Checklist Outcomes (v0.0.27)
+## Manual Smoke Checklist (v0.5.3)
 
-- ✅ Entity creation: **People pass; Projects pass including modal-based UI creation flow**.
-- ✅ Meeting logging: **Pass — meetings model/data helpers, modal create flow, list/detail rendering, relationship name resolution, and keyboard interactions verified as delivered Milestone 4 baseline**.
-- ✅ Action/decision/update creation: **Pass — Actions, Decisions, and Updates now have create/list/detail baselines with modal-driven creation and in-route hydration.**
-- ⚠️ Communication tracking: **Pending milestone implementation**.
-- ⚠️ JSON export/import: **Pending milestone implementation**.
+Run this checklist for release smoke validation:
+
+1. **Create people/projects/meetings:** create at least one person, one project, and one meeting; confirm each appears in its route list and can be selected in detail panels.
+2. **Meeting logging:** open `#/meetings`, create a meeting with attendee/project links, and verify detail rendering resolves linked names and supports keyboard row navigation.
+3. **Action/decision/update creation:** from standalone routes and (where applicable) Meeting Review quick-create actions, create one action, one decision, and one update; confirm list/detail panes refresh without full reload.
+4. **Communication tracking workflows:** for each of action/decision/update records, add at least one `requires update` person, verify informed/outstanding counts, and confirm stale people IDs render as `Unknown person` fallback labels.
+5. **JSON export/import:** export a snapshot, reload the app, import the snapshot, and confirm core entities, meeting links, checklist state, and communication metadata survive round-trip restore.
+
+## Lightweight Check Outcomes (v0.5.3)
+
+- ✅ `node js/features/actions/action-record.check.mjs`
+- ✅ `node js/features/decisions/decision-record.check.mjs`
+- ✅ `node js/features/updates/update-record.check.mjs`
+- ✅ `node js/db-schema.check.mjs`
 
 ## Meetings Data Access Baseline (v0.0.21)
 
