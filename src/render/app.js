@@ -1,6 +1,7 @@
 /** Core rendering and modal/CRUD logic for ProgrammeOS; assumes static DOM ids from index.html exist. */
 import { navItems, state } from '../state/store.js';
 import { buildAttentionSnapshot } from '../state/attentionEngine.js';
+import { escapeAttribute, escapeHtml } from './safeRender.js';
 const nav = document.getElementById('nav');
 const left = document.getElementById('left-column');
 const right = document.getElementById('right-column');
@@ -40,19 +41,19 @@ function badgeClass(label){
   if (v.includes('pending') || v.includes('inform') || v.includes('action') || v.includes('other')) return 'purple';
   return 'slate';
 }
-function badge(text, cls){ return `<span class="badge ${cls || badgeClass(text)}">${text}</span>`; }
+function badge(text, cls){ return `<span class="badge ${cls || badgeClass(text)}">${escapeHtml(text)}</span>`; }
 
 function card(title, subtitle, contentHtml, rightBadge='', extraHead=''){
   return `<section class="card">
     <div class="card-head">
-      <div><h3>${title}</h3><p>${subtitle}</p></div>
+      <div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(subtitle)}</p></div>
       <div class="content-header-actions">${extraHead}${rightBadge}</div>
     </div>
     ${contentHtml}
   </section>`;
 }
 function table(headers, rows){
-  return `<table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
+  return `<table><thead><tr>${headers.map((h)=>`<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
 }
 function setLayout(isDashboard){
   content.className = isDashboard ? 'content dashboard' : 'content standard';
@@ -93,11 +94,11 @@ export function renderDashboard(){
       'Flagged by cadence breach or unresolved action pressure',
       table(['Project','Owner','Status','Start','Target','Attention'],
         snapshot.projects.map((p,i)=>`<tr data-click="project-${i}" data-source="dashboard">
-          <td><div class="primary-text">${p.name}</div><div class="secondary-text">${p.stage} · ${p.health} health</div></td>
-          <td>${p.owner}</td>
+          <td><div class="primary-text">${escapeHtml(p.name)}</div><div class="secondary-text">${escapeHtml(p.stage)} · ${escapeHtml(p.health)} health</div></td>
+          <td>${escapeHtml(p.owner)}</td>
           <td>${badge(p.status)}</td>
-          <td>${p.startDate}</td>
-          <td>${p.targetDate}</td>
+          <td>${escapeHtml(p.startDate)}</td>
+          <td>${escapeHtml(p.targetDate)}</td>
           <td>${attentionBadge(p.attention)}</td>
         </tr>`)
       ),
@@ -109,7 +110,7 @@ export function renderDashboard(){
       'Relationship upkeep and action pressure',
       table(['Person','Role','Last meeting','Cadence','Attention'],
         snapshot.people.map((p,i)=>`<tr data-click="person-${i}" data-source="dashboard">
-          <td><div class="primary-text">${p.name}</div></td><td>${p.role}</td><td>${p.lastMeeting}</td><td>${badge(p.cadence)}</td><td>${attentionBadge(p.attention)}</td>
+          <td><div class="primary-text">${escapeHtml(p.name)}</div></td><td>${escapeHtml(p.role)}</td><td>${escapeHtml(p.lastMeeting)}</td><td>${badge(p.cadence)}</td><td>${attentionBadge(p.attention)}</td>
         </tr>`)
       ),
       badge('People','purple'),
@@ -120,7 +121,7 @@ export function renderDashboard(){
       'Single log view; full page uses tabs by type',
       table(['Type','Description','Owner','Due','Status'],
         data.raidGlobal.map((r,i)=>`<tr data-click="raid-${i}" data-source="dashboard">
-          <td>${badge(r.type)}</td><td><div class="primary-text">${r.text}</div></td><td>${r.owner}</td><td>${r.due}</td><td>${badge(r.status)}</td>
+          <td>${badge(r.type)}</td><td><div class="primary-text">${escapeHtml(r.text)}</div></td><td>${escapeHtml(r.owner)}</td><td>${escapeHtml(r.due)}</td><td>${badge(r.status)}</td>
         </tr>`)
       ),
       badge('Hybrid tracking','purple'),
@@ -138,13 +139,13 @@ function meetingPanel(){
     </div>
     <div class="panel-body">
       <div class="eyebrow" style="color:#64748b;letter-spacing:.12em;">Context</div>
-      <div class="detail-title">${m.title}</div>
-      <div class="detail-subtitle">${m.context} · ${m.date}</div>
-      <div style="margin-top:18px;"><div style="font-weight:700;margin-bottom:10px;">Agenda</div><div class="agenda-list">${m.agenda.map(a=>`<div class="agenda-item">${a}</div>`).join('')}</div></div>
+      <div class="detail-title">${escapeHtml(m.title)}</div>
+      <div class="detail-subtitle">${escapeHtml(m.context)} · ${escapeHtml(m.date)}</div>
+      <div style="margin-top:18px;"><div style="font-weight:700;margin-bottom:10px;">Agenda</div><div class="agenda-list">${m.agenda.map(a=>`<div class="agenda-item">${escapeHtml(a)}</div>`).join('')}</div></div>
       <div style="margin-top:18px;" class="inform-grid">
-        <div class="inform-col"><h4><span>Updates</span>${badge('2 pending','purple')}</h4>${m.updates.map((u,i)=>`<label class="check-row ${u.informed?'done':''}"><input type="checkbox" ${u.informed?'checked':''} data-check="update-${i}"><span>${u.title}</span></label>`).join('')}</div>
-        <div class="inform-col"><h4><span>Decisions</span>${badge('1 pending','blue')}</h4>${m.decisions.map((d,i)=>`<label class="check-row ${d.informed?'done':''}"><input type="checkbox" ${d.informed?'checked':''} data-check="decision-${i}"><span>${d.title}</span></label>`).join('')}</div>
-        <div class="inform-col"><h4><span>Actions</span>${badge('1 pending','amber')}</h4>${m.actions.map((a,i)=>`<label class="check-row ${a.informed?'done':''}"><input type="checkbox" ${a.informed?'checked':''} data-check="action-${i}"><span>${a.title}</span></label>`).join('')}</div>
+        <div class="inform-col"><h4><span>Updates</span>${badge('2 pending','purple')}</h4>${m.updates.map((u,i)=>`<label class="check-row ${u.informed?'done':''}"><input type="checkbox" ${u.informed?'checked':''} data-check="update-${i}"><span>${escapeHtml(u.title)}</span></label>`).join('')}</div>
+        <div class="inform-col"><h4><span>Decisions</span>${badge('1 pending','blue')}</h4>${m.decisions.map((d,i)=>`<label class="check-row ${d.informed?'done':''}"><input type="checkbox" ${d.informed?'checked':''} data-check="decision-${i}"><span>${escapeHtml(d.title)}</span></label>`).join('')}</div>
+        <div class="inform-col"><h4><span>Actions</span>${badge('1 pending','amber')}</h4>${m.actions.map((a,i)=>`<label class="check-row ${a.informed?'done':''}"><input type="checkbox" ${a.informed?'checked':''} data-check="action-${i}"><span>${escapeHtml(a.title)}</span></label>`).join('')}</div>
       </div>
       <div style="margin-top:18px;">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;">
@@ -163,7 +164,7 @@ function meetingPanel(){
 function informPanel(){
   return card('Pending informs by person','Knowledge propagation queue',
     table(['Person','Pending items','Next opportunity'],
-      data.informs.map((i,idx)=>`<tr data-click="inform-${idx}" data-source="dashboard"><td><div class="primary-text">${i.person}</div></td><td>${badge(`${i.pending} to inform`)}</td><td>${i.next}</td></tr>`)
+      data.informs.map((i,idx)=>`<tr data-click="inform-${idx}" data-source="dashboard"><td><div class="primary-text">${escapeHtml(i.person)}</div></td><td>${badge(`${i.pending} to inform`)}</td><td>${escapeHtml(i.next)}</td></tr>`)
     ),
     badge('High leverage','purple'),
     dashboardGoToButton('people')
@@ -172,7 +173,7 @@ function informPanel(){
 function actionsPanel(){
   return card('Overdue and due actions','A clean, table-first action view',
     table(['Action','Owner','Due','Status','Project'],
-      data.actions.map((a,i)=>`<tr data-click="actionrow-${i}" data-source="dashboard"><td><div class="primary-text">${a.title}</div></td><td>${a.owner}</td><td>${a.due}</td><td>${badge(a.status)}</td><td>${a.project}</td></tr>`)
+      data.actions.map((a,i)=>`<tr data-click="actionrow-${i}" data-source="dashboard"><td><div class="primary-text">${escapeHtml(a.title)}</div></td><td>${escapeHtml(a.owner)}</td><td>${escapeHtml(a.due)}</td><td>${badge(a.status)}</td><td>${escapeHtml(a.project)}</td></tr>`)
     ),
     badge('Actions','amber'),
     dashboardGoToButton('actions')
@@ -189,8 +190,8 @@ export function renderProjects(){
     'Project rows open a full workspace modal. Create is available globally and in context.',
     table(['Project','Owner','Status','Start','Target','Stage','Attention'],
       snapshot.projects.map((p,i)=>`<tr data-click="project-${i}">
-        <td><div class="primary-text">${p.name}</div><div class="secondary-text">${p.description}</div></td>
-        <td>${p.owner}</td><td>${badge(p.status)}</td><td>${p.startDate}</td><td>${p.targetDate}</td><td>${badge(p.stage)}</td><td>${attentionBadge(p.attention)}</td>
+        <td><div class="primary-text">${escapeHtml(p.name)}</div><div class="secondary-text">${escapeHtml(p.description)}</div></td>
+        <td>${escapeHtml(p.owner)}</td><td>${badge(p.status)}</td><td>${escapeHtml(p.startDate)}</td><td>${escapeHtml(p.targetDate)}</td><td>${badge(p.stage)}</td><td>${attentionBadge(p.attention)}</td>
       </tr>`)
     ),
     badge('Projects','blue'),
@@ -204,7 +205,7 @@ export function renderPeople(){
   pageTitle.textContent = 'People';
   left.innerHTML = card('People list','Click a row to open details',
     table(['Person','Role','Last meeting','Cadence','Attention'],
-      snapshot.people.map((p,i)=>`<tr data-click="person-${i}"><td><div class="primary-text">${p.name}</div><div class="secondary-text">${p.summary}</div></td><td>${p.role}</td><td>${p.lastMeeting}</td><td>${badge(p.cadence)}</td><td>${attentionBadge(p.attention)}</td></tr>`)
+      snapshot.people.map((p,i)=>`<tr data-click="person-${i}"><td><div class="primary-text">${escapeHtml(p.name)}</div><div class="secondary-text">${p.summary}</div></td><td>${escapeHtml(p.role)}</td><td>${escapeHtml(p.lastMeeting)}</td><td>${badge(p.cadence)}</td><td>${attentionBadge(p.attention)}</td></tr>`)
     ),
     badge('People','purple'),
     `<button class="btn" data-create="Person" data-context="global">Create person</button>`
@@ -232,7 +233,7 @@ export function renderUpdates(){
   pageTitle.textContent = 'Updates';
   left.innerHTML = card('Updates log','Project modals now show richer update tables too',
     table(['Date logged','Update','Project','Meeting','People to inform','Status'],
-      data.updates.map((u,i)=>`<tr data-click="update-${i}"><td>${u.date}</td><td><div class="primary-text">${u.title}</div></td><td>${u.project}</td><td>${u.meeting}</td><td>${u.people}</td><td>${badge(u.status)}</td></tr>`)
+      data.updates.map((u,i)=>`<tr data-click="update-${i}"><td>${escapeHtml(u.date)}</td><td><div class="primary-text">${escapeHtml(u.title)}</div></td><td>${escapeHtml(u.project)}</td><td>${escapeHtml(u.meeting)}</td><td>${escapeHtml(u.people)}</td><td>${badge(u.status)}</td></tr>`)
     ),
     badge('Updates','purple'),
     `<button class="btn" data-create="Update" data-context="global">Create update</button>`
@@ -244,7 +245,7 @@ export function renderDecisions(){
   pageTitle.textContent = 'Decisions';
   left.innerHTML = card('Decisions log','Structured decisions with rationale and impact',
     table(['Date','Decision','Project','Rationale','Status'],
-      data.decisions.map((d,i)=>`<tr data-click="decisionrow-${i}"><td>${d.date}</td><td><div class="primary-text">${d.title}</div></td><td>${d.project}</td><td>${d.rationale}</td><td>${badge(d.status)}</td></tr>`)
+      data.decisions.map((d,i)=>`<tr data-click="decisionrow-${i}"><td>${escapeHtml(d.date)}</td><td><div class="primary-text">${escapeHtml(d.title)}</div></td><td>${escapeHtml(d.project)}</td><td>${escapeHtml(d.rationale)}</td><td>${badge(d.status)}</td></tr>`)
     ),
     badge('Decisions','blue'),
     `<button class="btn" data-create="Decision" data-context="global">Create decision</button>`
@@ -256,7 +257,7 @@ export function renderActions(){
   pageTitle.textContent = 'Actions';
   left.innerHTML = card('Actions log','Actions can be created globally or from meetings/projects',
     table(['Action','Owner','Due','Status','Project'],
-      data.actions.map((a,i)=>`<tr data-click="actionrow-${i}"><td><div class="primary-text">${a.title}</div><div class="secondary-text">${a.summary}</div></td><td>${a.owner}</td><td>${a.due}</td><td>${badge(a.status)}</td><td>${a.project}</td></tr>`)
+      data.actions.map((a,i)=>`<tr data-click="actionrow-${i}"><td><div class="primary-text">${escapeHtml(a.title)}</div><div class="secondary-text">${escapeHtml(a.summary)}</div></td><td>${escapeHtml(a.owner)}</td><td>${escapeHtml(a.due)}</td><td>${badge(a.status)}</td><td>${escapeHtml(a.project)}</td></tr>`)
     ),
     badge('Actions','amber'),
     `<button class="btn" data-create="Action" data-context="global">Create action</button>`
@@ -269,16 +270,16 @@ export function renderRaid(){
   const tabs = ['Risk','Action','Issue','Decision'].map(tab=>`<button class="tab ${state.currentRaidTab===tab?'active':''}" data-raid-tab="${tab}">${tab}</button>`).join('');
   const filtered = data.raidGlobal.filter(r=>r.type===state.currentRaidTab);
   let headers=['Type','Description','Owner','Due','Status'];
-  let rows=filtered.map(r=>`<tr data-click="raidfiltered-${data.raidGlobal.indexOf(r)}"><td>${badge(r.type)}</td><td><div class="primary-text">${r.text}</div></td><td>${r.owner}</td><td>${r.due}</td><td>${badge(r.status)}</td></tr>`);
+  let rows=filtered.map(r=>`<tr data-click="raidfiltered-${data.raidGlobal.indexOf(r)}"><td>${badge(r.type)}</td><td><div class="primary-text">${escapeHtml(r.text)}</div></td><td>${escapeHtml(r.owner)}</td><td>${escapeHtml(r.due)}</td><td>${badge(r.status)}</td></tr>`);
   if (state.currentRaidTab==='Decision'){
     headers=['Type','Decision','Owner','Status','Impact'];
-    rows=filtered.map(r=>`<tr data-click="raidfiltered-${data.raidGlobal.indexOf(r)}"><td>${badge(r.type)}</td><td><div class="primary-text">${r.text}</div></td><td>${r.owner}</td><td>${badge(r.status)}</td><td>${r.impact}</td></tr>`);
+    rows=filtered.map(r=>`<tr data-click="raidfiltered-${data.raidGlobal.indexOf(r)}"><td>${badge(r.type)}</td><td><div class="primary-text">${escapeHtml(r.text)}</div></td><td>${escapeHtml(r.owner)}</td><td>${badge(r.status)}</td><td>${escapeHtml(r.impact)}</td></tr>`);
   } else if (state.currentRaidTab==='Risk' || state.currentRaidTab==='Issue'){
     headers=['Type','Description','Project','Owner','Status'];
-    rows=filtered.map(r=>`<tr data-click="raidfiltered-${data.raidGlobal.indexOf(r)}"><td>${badge(r.type)}</td><td><div class="primary-text">${r.text}</div></td><td>${r.project}</td><td>${r.owner}</td><td>${badge(r.status)}</td></tr>`);
+    rows=filtered.map(r=>`<tr data-click="raidfiltered-${data.raidGlobal.indexOf(r)}"><td>${badge(r.type)}</td><td><div class="primary-text">${escapeHtml(r.text)}</div></td><td>${escapeHtml(r.project)}</td><td>${escapeHtml(r.owner)}</td><td>${badge(r.status)}</td></tr>`);
   } else if (state.currentRaidTab==='Action'){
     headers=['Type','Action','Project','Owner','Due','Status'];
-    rows=filtered.map(r=>`<tr data-click="raidfiltered-${data.raidGlobal.indexOf(r)}"><td>${badge(r.type)}</td><td><div class="primary-text">${r.text}</div></td><td>${r.project}</td><td>${r.owner}</td><td>${r.due}</td><td>${badge(r.status)}</td></tr>`);
+    rows=filtered.map(r=>`<tr data-click="raidfiltered-${data.raidGlobal.indexOf(r)}"><td>${badge(r.type)}</td><td><div class="primary-text">${escapeHtml(r.text)}</div></td><td>${escapeHtml(r.project)}</td><td>${escapeHtml(r.owner)}</td><td>${escapeHtml(r.due)}</td><td>${badge(r.status)}</td></tr>`);
   }
   left.innerHTML = card('RAID log','Single table with tabs filtering by type and changing columns as needed',
     `<div class="tabs">${tabs}</div>${table(headers,rows)}`,
@@ -322,13 +323,13 @@ export function dashboardProjectPanel(index){
   const p = attentionSnapshot().projects[index];
   return card('Project detail','Dashboard side panel with direct jump to the full entity page',
     `<div class="panel-body">
-      <div class="detail-title">${p.name}</div>
-      <div class="detail-subtitle">Owner: ${p.owner} · Start: ${p.startDate} · Target: ${p.targetDate}</div>
+      <div class="detail-title">${escapeHtml(p.name)}</div>
+      <div class="detail-subtitle">Owner: ${escapeHtml(p.owner)} · Start: ${escapeHtml(p.startDate)} · Target: ${escapeHtml(p.targetDate)}</div>
       <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">${badge(p.status)} ${attentionBadge(p.attention)} ${badge(p.stage)}</div>
       <div style="margin-top:16px;" class="meta-grid">
         <div class="meta-block"><div class="meta-label">Last review</div><div class="meta-value">${p.lastReview}</div></div>
         <div class="meta-block"><div class="meta-label">Cadence</div><div class="meta-value">${p.cadence}</div></div>
-        <div class="meta-block"><div class="meta-label">Health</div><div class="meta-value">${p.health}</div></div>
+        <div class="meta-block"><div class="meta-label">Health</div><div class="meta-value">${escapeHtml(p.health)}</div></div>
         <div class="meta-block"><div class="meta-label">People</div><div class="meta-value">${p.people.length}</div></div>
       </div>
       <div style="margin-top:18px;" class="mini-list">
@@ -347,8 +348,8 @@ export function dashboardPersonPanel(index){
   const p = attentionSnapshot().people[index];
   return card('Person detail','Dashboard side panel',
     `<div class="panel-body">
-      <div class="detail-title">${p.name}</div>
-      <div class="detail-subtitle">${p.role} · Last meeting: ${p.lastMeeting}</div>
+      <div class="detail-title">${escapeHtml(p.name)}</div>
+      <div class="detail-subtitle">${escapeHtml(p.role)} · Last meeting: ${escapeHtml(p.lastMeeting)}</div>
       <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">${badge(p.cadence)} ${attentionBadge(p.attention)}</div>
       <div style="margin-top:18px;" class="mini-list">
         <div class="mini-item"><strong>Summary</strong><div class="secondary-text">${p.summary}</div></div>
@@ -362,11 +363,11 @@ export function dashboardActionPanel(index){
   const a = data.actions[index];
   return card('Action detail','Dashboard side panel',
     `<div class="panel-body">
-      <div class="detail-title">${a.title}</div>
-      <div class="detail-subtitle">${a.project} · Owner: ${a.owner} · Due: ${a.due}</div>
+      <div class="detail-title">${escapeHtml(a.title)}</div>
+      <div class="detail-subtitle">${escapeHtml(a.project)} · Owner: ${escapeHtml(a.owner)} · Due: ${escapeHtml(a.due)}</div>
       <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">${badge(a.status)} ${badge('Action record','amber')}</div>
       <div style="margin-top:18px;" class="mini-list">
-        <div class="mini-item"><strong>Summary</strong><div class="secondary-text">${a.summary}</div></div>
+        <div class="mini-item"><strong>Summary</strong><div class="secondary-text">${escapeHtml(a.summary)}</div></div>
         <div class="mini-item"><strong>Progress</strong><div class="secondary-text">${a.progress.join(' · ')}</div></div>
       </div>
       <div style="margin-top:16px;"><button class="ghost-link" data-goto="actions">Go to details</button></div>
@@ -379,11 +380,11 @@ export function dashboardRaidPanel(index){
   return card('RAID detail','Dashboard side panel',
     `<div class="panel-body">
       <div class="detail-title">${r.type}</div>
-      <div class="detail-subtitle">${r.project} · Owner: ${r.owner}</div>
+      <div class="detail-subtitle">${escapeHtml(r.project)} · Owner: ${escapeHtml(r.owner)}</div>
       <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">${badge(r.type)} ${badge(r.status)}</div>
       <div style="margin-top:18px;" class="mini-list">
-        <div class="mini-item"><strong>Description</strong><div class="secondary-text">${r.text}</div></div>
-        <div class="mini-item"><strong>Impact</strong><div class="secondary-text">${r.impact}</div></div>
+        <div class="mini-item"><strong>Description</strong><div class="secondary-text">${escapeHtml(r.text)}</div></div>
+        <div class="mini-item"><strong>Impact</strong><div class="secondary-text">${escapeHtml(r.impact)}</div></div>
       </div>
       <div style="margin-top:16px;"><button class="ghost-link" data-goto="raid">Go to details</button></div>
     </div>`,
@@ -433,7 +434,7 @@ function projectHeaderActions(){
 function renderProjectModal(index, tab, edit){
   const p = data.projects[index];
   modalTitle.textContent = p.name;
-  modalSubtitle.textContent = `${p.status} · Owner: ${p.owner} · Start: ${p.startDate} · Target: ${p.targetDate}`;
+  modalSubtitle.textContent = `${escapeHtml(p.status)} · Owner: ${escapeHtml(p.owner)} · Start: ${escapeHtml(p.startDate)} · Target: ${escapeHtml(p.targetDate)}`;
   modalTabs.innerHTML = `
     <div class="segmented">
       ${projectTabButton('overview','Overview')}
@@ -454,12 +455,12 @@ function renderProjectModal(index, tab, edit){
 }
 function projectMetaBlocks(p){
   return `<div class="meta-grid">
-    <div class="meta-block"><div class="meta-label">Status</div><div class="meta-value">${p.status}</div></div>
-    <div class="meta-block"><div class="meta-label">Health</div><div class="meta-value">${p.health}</div></div>
-    <div class="meta-block"><div class="meta-label">Stage</div><div class="meta-value">${p.stage}</div></div>
-    <div class="meta-block"><div class="meta-label">Owner</div><div class="meta-value">${p.owner}</div></div>
-    <div class="meta-block"><div class="meta-label">Start date</div><div class="meta-value">${p.startDate}</div></div>
-    <div class="meta-block"><div class="meta-label">Target date</div><div class="meta-value">${p.targetDate}</div></div>
+    <div class="meta-block"><div class="meta-label">Status</div><div class="meta-value">${escapeHtml(p.status)}</div></div>
+    <div class="meta-block"><div class="meta-label">Health</div><div class="meta-value">${escapeHtml(p.health)}</div></div>
+    <div class="meta-block"><div class="meta-label">Stage</div><div class="meta-value">${escapeHtml(p.stage)}</div></div>
+    <div class="meta-block"><div class="meta-label">Owner</div><div class="meta-value">${escapeHtml(p.owner)}</div></div>
+    <div class="meta-block"><div class="meta-label">Start date</div><div class="meta-value">${escapeHtml(p.startDate)}</div></div>
+    <div class="meta-block"><div class="meta-label">Target date</div><div class="meta-value">${escapeHtml(p.targetDate)}</div></div>
     <div class="meta-block"><div class="meta-label">Last review</div><div class="meta-value">${p.lastReview}</div></div>
     <div class="meta-block"><div class="meta-label">Review cadence</div><div class="meta-value">${p.cadence}</div></div>
   </div>`;
@@ -469,52 +470,52 @@ export function projectViewBody(index, tab){
   if (tab==='overview'){
     return `<div class="detail-grid">
       ${projectMetaBlocks(p)}
-      <div class="mini-item"><h4 class="section-title">Description</h4><div class="secondary-text">${p.description}</div></div>
+      <div class="mini-item"><h4 class="section-title">Description</h4><div class="secondary-text">${escapeHtml(p.description)}</div></div>
       <div class="modal-grid">
         <div class="detail-grid">
           <div class="mini-item"><h4 class="section-title">Latest updates</h4><div class="mini-list">${p.updates.map(u=>`<div class="agenda-item"><strong>${u.dateLogged}</strong><div class="secondary-text">${u.text}</div></div>`).join('')}</div></div>
-          <div class="mini-item"><h4 class="section-title">Key RAID pressure</h4><div class="mini-list">${p.raid.map(r=>`<div class="agenda-item"><strong>${r.type}</strong> · ${r.title}<div class="secondary-text">${r.status} · ${r.owner}</div></div>`).join('')}</div></div>
+          <div class="mini-item"><h4 class="section-title">Key RAID pressure</h4><div class="mini-list">${p.raid.map(r=>`<div class="agenda-item"><strong>${r.type}</strong> · ${r.title}<div class="secondary-text">${r.status} · ${escapeHtml(r.owner)}</div></div>`).join('')}</div></div>
         </div>
         <div class="detail-grid">
-          <div class="mini-item"><h4 class="section-title">People on project</h4><div class="mini-list">${p.people.map(x=>`<div class="agenda-item"><strong>${x.name}</strong><div class="secondary-text">${x.role} · latest meeting ${x.latestMeeting}</div></div>`).join('')}</div></div>
-          <div class="mini-item"><h4 class="section-title">Recent meetings</h4><div class="mini-list">${p.meetings.map(x=>`<div class="agenda-item"><strong>${x.date}</strong> · ${x.title}<div class="secondary-text">${x.outputs}</div></div>`).join('')}</div></div>
+          <div class="mini-item"><h4 class="section-title">People on project</h4><div class="mini-list">${p.people.map(x=>`<div class="agenda-item"><strong>${escapeHtml(x.name)}</strong><div class="secondary-text">${escapeHtml(x.role)} · latest meeting ${escapeHtml(x.latestMeeting)}</div></div>`).join('')}</div></div>
+          <div class="mini-item"><h4 class="section-title">Recent meetings</h4><div class="mini-list">${p.meetings.map(x=>`<div class="agenda-item"><strong>${x.date}</strong> · ${escapeHtml(x.title)}<div class="secondary-text">${x.outputs}</div></div>`).join('')}</div></div>
         </div>
       </div>
     </div>`;
   }
   if (tab==='raid'){
     return cardLikeTable(['Type','Title','Date logged','Owner','Status','Due','Severity','Mitigation','Meeting','Last updated'],
-      p.raid.map(r=>`<tr><td>${badge(r.type)}</td><td><div class="primary-text">${r.title}</div></td><td>${r.dateLogged}</td><td>${r.owner}</td><td>${badge(r.status)}</td><td>${r.due}</td><td>${r.severity}</td><td>${r.mitigation}</td><td>${r.meeting}</td><td>${r.lastUpdated}</td></tr>`),
+      p.raid.map(r=>`<tr><td>${badge(r.type)}</td><td><div class="primary-text">${r.title}</div></td><td>${r.dateLogged}</td><td>${escapeHtml(r.owner)}</td><td>${badge(r.status)}</td><td>${escapeHtml(r.due)}</td><td>${r.severity}</td><td>${r.mitigation}</td><td>${r.meeting}</td><td>${r.lastUpdated}</td></tr>`),
       'Expanded project RAID register'
     );
   }
   if (tab==='updates'){
     return cardLikeTable(['Date logged','Update','Related meeting','Informed progress','Status'],
-      p.updates.map(u=>`<tr><td>${u.dateLogged}</td><td><div class="primary-text">${u.text}</div></td><td>${u.meeting}</td><td>${u.inform}</td><td>${badge(u.status)}</td></tr>`),
+      p.updates.map(u=>`<tr><td>${u.dateLogged}</td><td><div class="primary-text">${u.text}</div></td><td>${escapeHtml(u.meeting)}</td><td>${u.inform}</td><td>${badge(u.status)}</td></tr>`),
       'Project-scoped update log with audit fields'
     );
   }
   if (tab==='meetings'){
     return cardLikeTable(['Date','Meeting','Attendees','Outputs'],
-      p.meetings.map(m=>`<tr><td>${m.date}</td><td><div class="primary-text">${m.title}</div></td><td>${m.attendees}</td><td>${m.outputs}</td></tr>`),
+      p.meetings.map(m=>`<tr><td>${escapeHtml(m.date)}</td><td><div class="primary-text">${escapeHtml(m.title)}</div></td><td>${m.attendees}</td><td>${m.outputs}</td></tr>`),
       'Meeting history attached to this project'
     );
   }
   if (tab==='people'){
     return cardLikeTable(['Person','Project role','Latest meeting','Pending informs','Open actions'],
-      p.people.map(x=>`<tr><td><div class="primary-text">${x.name}</div></td><td>${badge(x.role)}</td><td>${x.latestMeeting}</td><td>${x.pendingInforms}</td><td>${x.openActions}</td></tr>`),
+      p.people.map(x=>`<tr><td><div class="primary-text">${escapeHtml(x.name)}</div></td><td>${badge(x.role)}</td><td>${escapeHtml(x.latestMeeting)}</td><td>${escapeHtml(x.pendingInforms)}</td><td>${escapeHtml(x.openActions)}</td></tr>`),
       'Project-people join view with role assignment'
     );
   }
   if (tab==='actions'){
     return cardLikeTable(['Action','Owner','Due','Status'],
-      p.actions.map(a=>`<tr><td><div class="primary-text">${a.title}</div></td><td>${a.owner}</td><td>${a.due}</td><td>${badge(a.status)}</td></tr>`),
+      p.actions.map(a=>`<tr><td><div class="primary-text">${escapeHtml(a.title)}</div></td><td>${escapeHtml(a.owner)}</td><td>${escapeHtml(a.due)}</td><td>${badge(a.status)}</td></tr>`),
       'Project action log'
     );
   }
   if (tab==='decisions'){
     return cardLikeTable(['Date logged','Decision','Rationale','Impact'],
-      p.decisions.map(d=>`<tr><td>${d.dateLogged}</td><td><div class="primary-text">${d.decision}</div></td><td>${d.rationale}</td><td>${d.impact}</td></tr>`),
+      p.decisions.map(d=>`<tr><td>${d.dateLogged}</td><td><div class="primary-text">${d.decision}</div></td><td>${escapeHtml(d.rationale)}</td><td>${d.impact}</td></tr>`),
       'Project decision log'
     );
   }
@@ -526,16 +527,16 @@ export function projectEditBody(index, tab){
       <div class="mini-item">
         <h4 class="section-title">Edit project</h4>
         <div class="field-grid">
-          <div class="field"><label>Project name</label><input value="${p.name}"></div>
-          <div class="field"><label>Owner</label><input value="${p.owner}"></div>
-          <div class="field"><label>Status</label><select><option selected>${p.status}</option><option>Planning</option><option>Active</option><option>Closed</option></select></div>
-          <div class="field"><label>Stage</label><select><option selected>${p.stage}</option><option>Design</option><option>Delivery</option><option>Closure</option></select></div>
-          <div class="field"><label>Health</label><select><option selected>${p.health}</option><option>Green</option><option>Amber</option><option>Red</option></select></div>
+          <div class="field"><label>Project name</label><input value="${escapeHtml(p.name)}"></div>
+          <div class="field"><label>Owner</label><input value="${escapeHtml(p.owner)}"></div>
+          <div class="field"><label>Status</label><select><option selected>${escapeHtml(p.status)}</option><option>Planning</option><option>Active</option><option>Closed</option></select></div>
+          <div class="field"><label>Stage</label><select><option selected>${escapeHtml(p.stage)}</option><option>Design</option><option>Delivery</option><option>Closure</option></select></div>
+          <div class="field"><label>Health</label><select><option selected>${escapeHtml(p.health)}</option><option>Green</option><option>Amber</option><option>Red</option></select></div>
           <div class="field"><label>Review cadence</label><select><option selected>${p.cadence}</option><option>Weekly</option><option>Monthly</option><option>Quarterly</option></select></div>
-          <div class="field"><label>Start date</label><input value="${p.startDate}"></div>
-          <div class="field"><label>Target date</label><input value="${p.targetDate}"></div>
+          <div class="field"><label>Start date</label><input value="${escapeHtml(p.startDate)}"></div>
+          <div class="field"><label>Target date</label><input value="${escapeHtml(p.targetDate)}"></div>
         </div>
-        <div class="field" style="margin-top:14px"><label>Description</label><textarea>${p.description}</textarea></div>
+        <div class="field" style="margin-top:14px"><label>Description</label><textarea>${escapeHtml(p.description)}</textarea></div>
       </div>
       <div class="mini-item">
         <h4 class="section-title">Edit mode pattern</h4>
@@ -548,7 +549,7 @@ export function projectEditBody(index, tab){
       <h4 class="section-title">Edit project people roles</h4>
       <div class="field-grid">
         ${p.people.map(x=>`
-          <div class="field"><label>${x.name}</label><select>
+          <div class="field"><label>${escapeHtml(x.name)}</label><select>
             <option ${x.role==='Owner'?'selected':''}>Owner</option>
             <option ${x.role==='SME'?'selected':''}>SME</option>
             <option ${x.role==='Approver'?'selected':''}>Approver</option>
@@ -588,14 +589,14 @@ export function meetingModalBody(){
   const m = data.meeting;
   return `<div class="modal-grid">
     <div class="detail-grid">
-      <div class="mini-item"><h4 class="section-title">Agenda</h4><div class="agenda-list">${m.agenda.map(a=>`<div class="agenda-item">${a}</div>`).join('')}</div></div>
+      <div class="mini-item"><h4 class="section-title">Agenda</h4><div class="agenda-list">${m.agenda.map(a=>`<div class="agenda-item">${escapeHtml(a)}</div>`).join('')}</div></div>
       <div class="mini-item"><h4 class="section-title">Notes</h4><div class="notes">Meeting notes area / live capture surface</div></div>
     </div>
     <div class="detail-grid">
       <div class="mini-item"><h4 class="section-title">Items to inform</h4>
         <div class="inform-grid" style="grid-template-columns:1fr;">
-          <div class="inform-col"><h4><span>Updates</span>${badge('2 pending','purple')}</h4>${m.updates.map((u,i)=>`<label class="check-row ${u.informed?'done':''}"><input type="checkbox" ${u.informed?'checked':''} data-check="mu-${i}"><span>${u.title}</span></label>`).join('')}</div>
-          <div class="inform-col"><h4><span>Decisions</span>${badge('1 pending','blue')}</h4>${m.decisions.map((d,i)=>`<label class="check-row ${d.informed?'done':''}"><input type="checkbox" ${d.informed?'checked':''} data-check="md-${i}"><span>${d.title}</span></label>`).join('')}</div>
+          <div class="inform-col"><h4><span>Updates</span>${badge('2 pending','purple')}</h4>${m.updates.map((u,i)=>`<label class="check-row ${u.informed?'done':''}"><input type="checkbox" ${u.informed?'checked':''} data-check="mu-${i}"><span>${escapeHtml(u.title)}</span></label>`).join('')}</div>
+          <div class="inform-col"><h4><span>Decisions</span>${badge('1 pending','blue')}</h4>${m.decisions.map((d,i)=>`<label class="check-row ${d.informed?'done':''}"><input type="checkbox" ${d.informed?'checked':''} data-check="md-${i}"><span>${escapeHtml(d.title)}</span></label>`).join('')}</div>
         </div>
       </div>
     </div>
@@ -605,37 +606,37 @@ export function updateModalBody(index){
   const u = data.updates[index];
   return `<div class="modal-grid">
     <div class="detail-grid">
-      <div class="mini-item"><h4 class="section-title">Update text</h4><div class="secondary-text">${u.title}</div></div>
+      <div class="mini-item"><h4 class="section-title">Update text</h4><div class="secondary-text">${escapeHtml(u.title)}</div></div>
       <div class="mini-item"><h4 class="section-title">Audit trail</h4><div class="mini-list">
-        <div class="agenda-item"><strong>Date logged</strong><div class="secondary-text">${u.date}</div></div>
-        <div class="agenda-item"><strong>Project</strong><div class="secondary-text">${u.project}</div></div>
-        <div class="agenda-item"><strong>Related meeting</strong><div class="secondary-text">${u.meeting}</div></div>
+        <div class="agenda-item"><strong>Date logged</strong><div class="secondary-text">${escapeHtml(u.date)}</div></div>
+        <div class="agenda-item"><strong>Project</strong><div class="secondary-text">${escapeHtml(u.project)}</div></div>
+        <div class="agenda-item"><strong>Related meeting</strong><div class="secondary-text">${escapeHtml(u.meeting)}</div></div>
       </div></div>
     </div>
     <div class="detail-grid">
-      <div class="mini-item"><h4 class="section-title">Inform workflow</h4><div class="secondary-text">${u.people}</div><div style="margin-top:12px">${badge(u.status)}</div></div>
+      <div class="mini-item"><h4 class="section-title">Inform workflow</h4><div class="secondary-text">${escapeHtml(u.people)}</div><div style="margin-top:12px">${badge(u.status)}</div></div>
     </div>
   </div>`;
 }
 export function decisionModalBody(index){
   const d = data.decisions[index];
   return `<div class="modal-grid">
-    <div class="detail-grid"><div class="mini-item"><h4 class="section-title">Rationale</h4><div class="secondary-text">${d.rationale}</div></div></div>
+    <div class="detail-grid"><div class="mini-item"><h4 class="section-title">Rationale</h4><div class="secondary-text">${escapeHtml(d.rationale)}</div></div></div>
     <div class="detail-grid"><div class="mini-item"><h4 class="section-title">Status</h4>${badge(d.status)}</div></div>
   </div>`;
 }
 export function actionModalBody(index){
   const a = data.actions[index];
   return `<div class="modal-grid">
-    <div class="detail-grid"><div class="mini-item"><h4 class="section-title">Summary</h4><div class="secondary-text">${a.summary}</div></div></div>
+    <div class="detail-grid"><div class="mini-item"><h4 class="section-title">Summary</h4><div class="secondary-text">${escapeHtml(a.summary)}</div></div></div>
     <div class="detail-grid"><div class="mini-item"><h4 class="section-title">Progress updates</h4><div class="mini-list">${a.progress.map(x=>`<div class="agenda-item">${x}</div>`).join('')}</div></div></div>
   </div>`;
 }
 export function raidModalBody(index){
   const r = data.raidGlobal[index];
   return `<div class="modal-grid">
-    <div class="detail-grid"><div class="mini-item"><h4 class="section-title">Description</h4><div class="secondary-text">${r.text}</div></div></div>
-    <div class="detail-grid"><div class="mini-item"><h4 class="section-title">Impact</h4><div class="secondary-text">${r.impact}</div></div></div>
+    <div class="detail-grid"><div class="mini-item"><h4 class="section-title">Description</h4><div class="secondary-text">${escapeHtml(r.text)}</div></div></div>
+    <div class="detail-grid"><div class="mini-item"><h4 class="section-title">Impact</h4><div class="secondary-text">${escapeHtml(r.impact)}</div></div></div>
   </div>`;
 }
 
@@ -675,21 +676,21 @@ function crudValue(field, fallback = '') {
 }
 
 function crudError(field) {
-  return state.crudState.errors?.[field] ? `<div class="field-error">${state.crudState.errors[field]}</div>` : '';
+  return state.crudState.errors?.[field] ? `<div class="field-error">${escapeHtml(state.crudState.errors[field])}</div>` : '';
 }
 
 function inputField(field, label, placeholder = '') {
-  const value = String(crudValue(field, '')).replaceAll('"', '&quot;');
-  return `<div class="field"><label>${label}</label><input data-crud-field="${field}" name="${state.crudState.type}-${field}" placeholder="${placeholder}" value="${value}">${crudError(field)}</div>`;
+  const value = escapeAttribute(crudValue(field, ''));
+  return `<div class="field"><label>${escapeHtml(label)}</label><input data-crud-field="${escapeAttribute(field)}" name="${escapeAttribute(state.crudState.type)}-${escapeAttribute(field)}" placeholder="${escapeAttribute(placeholder)}" value="${value}">${crudError(field)}</div>`;
 }
 
 function textAreaField(field, label, placeholder = '') {
-  return `<div class="field"><label>${label}</label><textarea data-crud-field="${field}" name="${state.crudState.type}-${field}" placeholder="${placeholder}">${crudValue(field, '')}</textarea>${crudError(field)}</div>`;
+  return `<div class="field"><label>${escapeHtml(label)}</label><textarea data-crud-field="${escapeAttribute(field)}" name="${escapeAttribute(state.crudState.type)}-${escapeAttribute(field)}" placeholder="${escapeAttribute(placeholder)}">${escapeHtml(crudValue(field, ''))}</textarea>${crudError(field)}</div>`;
 }
 
 function selectField(field, label, options) {
   const current = crudValue(field, options[0] || '');
-  return `<div class="field"><label>${label}</label><select data-crud-field="${field}" name="${state.crudState.type}-${field}">${options.map((option)=>`<option ${option===current?'selected':''}>${option}</option>`).join('')}</select>${crudError(field)}</div>`;
+  return `<div class="field"><label>${escapeHtml(label)}</label><select data-crud-field="${escapeAttribute(field)}" name="${escapeAttribute(state.crudState.type)}-${escapeAttribute(field)}">${options.map((option)=>`<option ${option===current?'selected':''}>${escapeHtml(option)}</option>`).join('')}</select>${crudError(field)}</div>`;
 }
 
 export function openCrud(type='Project', context='global', options = {}){

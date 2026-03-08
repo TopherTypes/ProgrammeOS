@@ -2,6 +2,7 @@
 import { repository } from '../data/repository.js';
 import { state, setAppData } from '../state/store.js';
 import { handleDataClick, openCrud, render, renderCrud, renderModal, renderRaid, wireChecks } from '../render/app.js';
+import { validateCrudStep, validateCrudValues } from '../state/validation.js';
 
 let wired = false;
 
@@ -48,21 +49,12 @@ function collectCrudStepValues() {
   });
 }
 
-function validateCrudValues(type, values) {
-  const requiredByType = {
-    Project: ['name', 'owner'],
-    Person: ['name'],
-    Meeting: ['title', 'date'],
-    Update: ['title'],
-    Decision: ['title'],
-    Action: ['title', 'owner'],
-    'RAID item': ['type', 'text']
+function validationContext() {
+  const people = state.appData?.people || [];
+  return {
+    people,
+    personIds: people.map((person) => person.id).filter(Boolean)
   };
-  const errors = {};
-  (requiredByType[type] || []).forEach((field) => {
-    if (!String(values[field] || '').trim()) errors[field] = 'This field is required.';
-  });
-  return errors;
 }
 
 function payloadForCrud(type, values, mode) {
@@ -168,7 +160,7 @@ async function refreshFromRepository({ keepModalOpen = false } = {}) {
 
 async function saveCrudFlow() {
   collectCrudStepValues();
-  const errors = validateCrudValues(state.crudState.type, state.crudState.values);
+  const errors = validateCrudValues(state.crudState.type, state.crudState.values, validationContext());
   if (Object.keys(errors).length > 0) {
     state.crudState.errors = errors;
     state.crudState.feedback = 'Please fix highlighted fields before saving.';
@@ -298,6 +290,13 @@ export function wireInteractions() {
       collectCrudStepValues();
       const max = (stepCounts[state.crudState.type] || stepCounts.Project) - 1;
       if (state.crudState.step < max) {
+        const stepErrors = validateCrudStep(state.crudState.type, state.crudState.step, state.crudState.values, validationContext());
+        if (Object.keys(stepErrors).length > 0) {
+          state.crudState.errors = { ...state.crudState.errors, ...stepErrors };
+          state.crudState.feedback = 'Please fix highlighted fields before continuing.';
+          renderCrud();
+          return;
+        }
         state.crudState.step += 1;
         state.crudState.errors = {};
         state.crudState.feedback = '';
