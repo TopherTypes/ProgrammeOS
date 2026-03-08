@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.7 --- Validation Module + Safe Render Hardening
+
+Added:
+
+- entity validation module covering required fields, date formats, enum constraints, and owner relationship integrity checks
+- shared safe render helpers for escaping HTML/attribute content in template interpolation points
+- regression tests for escaping behaviour and validation edge cases (empty text, malformed dates, unknown owner IDs)
+
+Changed:
+
+- CRUD flow now performs step-level validation and blocks forward/save actions until invalid fields are fixed
+- CRUD inputs now render inline field errors from centralized validation rules
+- card/table/modal template interpolation now escapes dynamic values before insertion into HTML
+
 ## v0.6 --- Derived Attention Engine + Person Cadence Snooze
 
 Added:
