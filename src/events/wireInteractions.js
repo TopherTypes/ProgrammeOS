@@ -1,14 +1,21 @@
 /** Delegated event wiring for all dynamic UI content; assumes renderers update DOM using stable data-* attributes. */
-import { state } from '../state/store.js';
+import { repository } from '../data/repository.js';
+import { state, setAppData } from '../state/store.js';
 import { handleDataClick, openCrud, render, renderCrud, renderModal, renderRaid, wireChecks } from '../render/app.js';
 
 let wired = false;
+
+async function refreshFromRepository() {
+  const appData = await repository.getAppData();
+  setAppData(appData);
+  render();
+}
 
 export function wireInteractions() {
   if (wired) return;
   wired = true;
 
-  document.addEventListener('click', (event) => {
+  document.addEventListener('click', async (event) => {
     const clickRow = event.target.closest('[data-click]');
     if (clickRow) {
       handleDataClick(clickRow.dataset.click, clickRow.dataset.source === 'dashboard');
@@ -26,6 +33,13 @@ export function wireInteractions() {
     if (gotoBtn) {
       state.currentView = gotoBtn.dataset.goto;
       render();
+      return;
+    }
+
+    const actionBtn = event.target.closest('[data-action]');
+    if (actionBtn?.dataset.action === 'load-sample-data') {
+      await repository.loadSampleData();
+      await refreshFromRepository();
       return;
     }
 
@@ -87,7 +101,6 @@ export function wireInteractions() {
     if (event.target.id === 'crud-context') {
       state.crudState.context = state.crudState.context === 'global' ? 'contextual' : 'global';
       renderCrud();
-      return;
     }
   });
 
