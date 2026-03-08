@@ -16,6 +16,16 @@ export const state = {
   currentView: 'dashboard',
   currentRaidTab: 'Risk',
   modalState: { type: null, index: null, tab: 'overview', edit: false },
+  listViewState: {
+    projects: { query: '', status: 'All' },
+    updates: { query: '', status: 'All' },
+    actions: { query: '', status: 'All' },
+    raid: { query: '', status: 'All' }
+  },
+  uiState: {
+    crudDirty: false,
+    modalDirty: false
+  },
   crudState: {
     type: 'Project',
     step: 0,

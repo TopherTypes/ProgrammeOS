@@ -60,6 +60,43 @@ function setLayout(isDashboard){
   right.style.display = isDashboard ? '' : 'none';
 }
 
+function listState(viewKey){
+  if (!state.listViewState[viewKey]) state.listViewState[viewKey] = { query: '', status: 'All' };
+  return state.listViewState[viewKey];
+}
+
+function normalizedText(value) {
+  return String(value || '').toLowerCase();
+}
+
+function matchesListFilters(item, query, status, fields, statusField = 'status') {
+  const q = normalizedText(query).trim();
+  const textMatch = q.length === 0 || fields.some((field) => normalizedText(item[field]).includes(q));
+  const statusMatch = status === 'All' || String(item[statusField] || '') === status;
+  return textMatch && statusMatch;
+}
+
+function tableStateContent({ allRows, filteredRows, headers, emptyTitle, emptyDescription, noResultsTitle, noResultsDescription }) {
+  if (allRows.length === 0) {
+    return `<div class="panel-body"><div class="empty-state"><h4>${escapeHtml(emptyTitle)}</h4><p>${escapeHtml(emptyDescription)}</p></div></div>`;
+  }
+  if (filteredRows.length === 0) {
+    return `<div class="panel-body"><div class="empty-state"><h4>${escapeHtml(noResultsTitle)}</h4><p>${escapeHtml(noResultsDescription)}</p></div></div>`;
+  }
+  return table(headers, filteredRows);
+}
+
+function renderListControls(viewKey, statusOptions = ['All']) {
+  const current = listState(viewKey);
+  return `<div class="table-toolbar">
+    <input class="search" data-list-query="${escapeAttribute(viewKey)}" placeholder="Search ${escapeAttribute(viewKey)}" value="${escapeAttribute(current.query || '')}">
+    <div class="content-header-actions">
+      <label class="hint" for="${escapeAttribute(viewKey)}-status-filter">Status</label>
+      <select id="${escapeAttribute(viewKey)}-status-filter" data-list-status="${escapeAttribute(viewKey)}">${statusOptions.map((opt)=>`<option value="${escapeAttribute(opt)}" ${opt===current.status?'selected':''}>${escapeHtml(opt)}</option>`).join('')}</select>
+    </div>
+  </div>`;
+}
+
 function attentionSnapshot() {
   return buildAttentionSnapshot(state.appData || EMPTY_DATA);
 }
@@ -182,18 +219,28 @@ function actionsPanel(){
 
 export function renderProjects(){
   const snapshot = attentionSnapshot();
+  const listFilters = listState('projects');
+  const projectRows = snapshot.projects.map((p,i)=> ({
+    index: i,
+    row: `<tr data-click="project-${i}"><td><div class="primary-text">${escapeHtml(p.name)}</div><div class="secondary-text">${escapeHtml(p.description)}</div></td><td>${escapeHtml(p.owner)}</td><td>${badge(p.status)}</td><td>${escapeHtml(p.startDate)}</td><td>${escapeHtml(p.targetDate)}</td><td>${badge(p.stage)}</td><td>${attentionBadge(p.attention)}</td></tr>`,
+    item: p
+  }));
+  const filteredRows = projectRows.filter((entry) => matchesListFilters(entry.item, listFilters.query, listFilters.status, ['name','description','owner','stage'], 'status')).map((entry) => entry.row);
   setLayout(false);
   pageKicker.textContent = 'Entity view';
   pageTitle.textContent = 'Projects';
   left.innerHTML = card(
     'Project list',
     'Project rows open a full workspace modal. Create is available globally and in context.',
-    table(['Project','Owner','Status','Start','Target','Stage','Attention'],
-      snapshot.projects.map((p,i)=>`<tr data-click="project-${i}">
-        <td><div class="primary-text">${escapeHtml(p.name)}</div><div class="secondary-text">${escapeHtml(p.description)}</div></td>
-        <td>${escapeHtml(p.owner)}</td><td>${badge(p.status)}</td><td>${escapeHtml(p.startDate)}</td><td>${escapeHtml(p.targetDate)}</td><td>${badge(p.stage)}</td><td>${attentionBadge(p.attention)}</td>
-      </tr>`)
-    ),
+    `${renderListControls('projects', ['All','Planning','In progress','At risk','Complete'])}${tableStateContent({
+      allRows: projectRows,
+      filteredRows,
+      headers: ['Project','Owner','Status','Start','Target','Stage','Attention'],
+      emptyTitle: 'No projects yet',
+      emptyDescription: 'Create your first project to begin tracking delivery and governance.',
+      noResultsTitle: 'No matching projects',
+      noResultsDescription: 'Try broadening your search terms or clearing the status filter.'
+    })}`,
     badge('Projects','blue'),
     `<button class="btn" data-create="Project" data-context="global">Create project</button>`
   );
@@ -228,13 +275,25 @@ export function renderMeetings(){
   );
 }
 export function renderUpdates(){
+  const listFilters = listState('updates');
+  const updateRows = data.updates.map((u,i)=>({
+    row: `<tr data-click="update-${i}"><td>${escapeHtml(u.date)}</td><td><div class="primary-text">${escapeHtml(u.title)}</div></td><td>${escapeHtml(u.project)}</td><td>${escapeHtml(u.meeting)}</td><td>${escapeHtml(u.people)}</td><td>${badge(u.status)}</td></tr>`,
+    item: u
+  }));
+  const filteredRows = updateRows.filter((entry) => matchesListFilters(entry.item, listFilters.query, listFilters.status, ['title','project','meeting','people'], 'status')).map((entry) => entry.row);
   setLayout(false);
   pageKicker.textContent = 'Knowledge log';
   pageTitle.textContent = 'Updates';
   left.innerHTML = card('Updates log','Project modals now show richer update tables too',
-    table(['Date logged','Update','Project','Meeting','People to inform','Status'],
-      data.updates.map((u,i)=>`<tr data-click="update-${i}"><td>${escapeHtml(u.date)}</td><td><div class="primary-text">${escapeHtml(u.title)}</div></td><td>${escapeHtml(u.project)}</td><td>${escapeHtml(u.meeting)}</td><td>${escapeHtml(u.people)}</td><td>${badge(u.status)}</td></tr>`)
-    ),
+    `${renderListControls('updates', ['All','Open','In progress','Complete'])}${tableStateContent({
+      allRows: updateRows,
+      filteredRows,
+      headers: ['Date logged','Update','Project','Meeting','People to inform','Status'],
+      emptyTitle: 'No updates logged',
+      emptyDescription: 'Capture updates from meetings or add one manually to keep the narrative current.',
+      noResultsTitle: 'No matching updates',
+      noResultsDescription: 'Adjust your search or choose a different status filter.'
+    })}`,
     badge('Updates','purple'),
     `<button class="btn" data-create="Update" data-context="global">Create update</button>`
   );
@@ -252,23 +311,37 @@ export function renderDecisions(){
   );
 }
 export function renderActions(){
+  const listFilters = listState('actions');
+  const actionRows = data.actions.map((a,i)=>({
+    row: `<tr data-click="actionrow-${i}"><td><div class="primary-text">${escapeHtml(a.title)}</div><div class="secondary-text">${escapeHtml(a.summary)}</div></td><td>${escapeHtml(a.owner)}</td><td>${escapeHtml(a.due)}</td><td>${badge(a.status)}</td><td>${escapeHtml(a.project)}</td></tr>`,
+    item: a
+  }));
+  const filteredRows = actionRows.filter((entry) => matchesListFilters(entry.item, listFilters.query, listFilters.status, ['title','summary','owner','project'], 'status')).map((entry) => entry.row);
   setLayout(false);
   pageKicker.textContent = 'Knowledge log';
   pageTitle.textContent = 'Actions';
   left.innerHTML = card('Actions log','Actions can be created globally or from meetings/projects',
-    table(['Action','Owner','Due','Status','Project'],
-      data.actions.map((a,i)=>`<tr data-click="actionrow-${i}"><td><div class="primary-text">${escapeHtml(a.title)}</div><div class="secondary-text">${escapeHtml(a.summary)}</div></td><td>${escapeHtml(a.owner)}</td><td>${escapeHtml(a.due)}</td><td>${badge(a.status)}</td><td>${escapeHtml(a.project)}</td></tr>`)
-    ),
+    `${renderListControls('actions', ['All','Open','In progress','Complete','Overdue'])}${tableStateContent({
+      allRows: actionRows,
+      filteredRows,
+      headers: ['Action','Owner','Due','Status','Project'],
+      emptyTitle: 'No actions tracked',
+      emptyDescription: 'Create an action to assign ownership and keep delivery momentum visible.',
+      noResultsTitle: 'No matching actions',
+      noResultsDescription: 'Clear filters or search for a different owner, project, or keyword.'
+    })}`,
     badge('Actions','amber'),
     `<button class="btn" data-create="Action" data-context="global">Create action</button>`
   );
 }
 export function renderRaid(){
+  const listFilters = listState('raid');
   setLayout(false);
   pageKicker.textContent = 'Programme level';
   pageTitle.textContent = 'Programme RAID';
   const tabs = ['Risk','Action','Issue','Decision'].map(tab=>`<button class="tab ${state.currentRaidTab===tab?'active':''}" data-raid-tab="${tab}">${tab}</button>`).join('');
-  const filtered = data.raidGlobal.filter(r=>r.type===state.currentRaidTab);
+  const filteredByTab = data.raidGlobal.filter((r)=>r.type===state.currentRaidTab);
+  const filtered = filteredByTab.filter((r)=>matchesListFilters(r, listFilters.query, listFilters.status, ['text','owner','project','impact'], 'status'));
   let headers=['Type','Description','Owner','Due','Status'];
   let rows=filtered.map(r=>`<tr data-click="raidfiltered-${data.raidGlobal.indexOf(r)}"><td>${badge(r.type)}</td><td><div class="primary-text">${escapeHtml(r.text)}</div></td><td>${escapeHtml(r.owner)}</td><td>${escapeHtml(r.due)}</td><td>${badge(r.status)}</td></tr>`);
   if (state.currentRaidTab==='Decision'){
@@ -282,7 +355,15 @@ export function renderRaid(){
     rows=filtered.map(r=>`<tr data-click="raidfiltered-${data.raidGlobal.indexOf(r)}"><td>${badge(r.type)}</td><td><div class="primary-text">${escapeHtml(r.text)}</div></td><td>${escapeHtml(r.project)}</td><td>${escapeHtml(r.owner)}</td><td>${escapeHtml(r.due)}</td><td>${badge(r.status)}</td></tr>`);
   }
   left.innerHTML = card('RAID log','Single table with tabs filtering by type and changing columns as needed',
-    `<div class="tabs">${tabs}</div>${table(headers,rows)}`,
+    `<div class="tabs">${tabs}</div>${renderListControls('raid', ['All','Open','In progress','Mitigated','Closed'])}${tableStateContent({
+      allRows: filteredByTab,
+      filteredRows: rows,
+      headers,
+      emptyTitle: `No ${state.currentRaidTab.toLowerCase()} items`,
+      emptyDescription: 'Capture RAID items to make programme-level governance explicit.',
+      noResultsTitle: `No matching ${state.currentRaidTab.toLowerCase()} items`,
+      noResultsDescription: 'Try a different search phrase or status filter.'
+    })}`,
     badge('RAID','purple'),
     `<button class="btn" data-create="RAID item" data-context="global">Create RAID item</button>`
   );
@@ -294,11 +375,14 @@ export function renderSettings(){
   pageTitle.textContent='Settings';
   left.innerHTML = card(
     'Data management',
-    'IndexedDB persistence with migration and sample seed controls',
+    'IndexedDB persistence with migration, sample seed controls, and portable JSON backup',
     `<div class="panel-body">
-      <p class="secondary-text">Use this menu to replace current data with the baseline sample dataset.</p>
+      <p class="secondary-text">Use this menu to replace current data with the baseline sample dataset or move data between environments while backend integration is pending.</p>
       <div class="content-header-actions" style="margin-top:14px;">
         <button class="btn" data-action="load-sample-data">Load sample data</button>
+        <button class="btn" data-action="export-data-json">Export JSON</button>
+        <button class="btn" data-action="import-data-json">Import JSON</button>
+        <input type="file" id="import-data-json-input" accept="application/json" style="display:none">
       </div>
     </div>`,
     badge('Persistence','blue')
@@ -394,6 +478,7 @@ export function dashboardRaidPanel(index){
 
 export function openModal(type, index){
   state.modalState = { type, index, tab: type==='project'?'overview':'details', edit:false };
+  state.uiState.modalDirty = false;
   renderModal();
   modalBackdrop.classList.add('open');
 }
@@ -414,7 +499,7 @@ function simpleModal(title, subtitle, body){
   modalTitle.textContent = title;
   modalSubtitle.textContent = subtitle;
   modalTabs.innerHTML = `
-    <div class="hint">Read-only view. Use actions for full lifecycle management.</div>
+    <div class="hint">Read-only view. Use actions for full lifecycle management. Closing the modal in edit mode will warn before discarding unsaved changes.</div>
     ${supportsLifecycle ? `<div class="content-header-actions"><button class="btn" data-modal-action="edit">Edit record</button><button class="btn" data-modal-action="delete">Delete record</button></div>` : ''}
   `;
   modalBody.innerHTML = body;
@@ -705,6 +790,7 @@ export function openCrud(type='Project', context='global', options = {}){
     errors: {},
     feedback: ''
   };
+  state.uiState.crudDirty = false;
   renderCrud();
   document.getElementById('crud-backdrop').classList.add('open');
 }
@@ -714,6 +800,7 @@ export function renderCrud(){
   const modeLabel = state.crudState.mode === 'edit' ? 'Edit' : 'Create';
   document.getElementById('crud-title').textContent = `${modeLabel} ${state.crudState.type}`;
   document.getElementById('crud-subtitle').textContent = `${state.crudState.context === 'global' ? 'Global create flow' : 'Contextual create flow'} · progressive disclosure`;
+  document.getElementById('crud-subtitle').dataset.dirty = state.uiState.crudDirty ? 'true' : 'false';
   document.getElementById('crud-note').innerHTML = `${cfg.note}${state.crudState.feedback ? `<br><span class="crud-feedback">${state.crudState.feedback}</span>` : ''}`;
   document.getElementById('crud-steps').innerHTML = cfg.steps.map((s,i)=>`<div class="step ${i<state.crudState.step?'done':i===state.crudState.step?'active':''}">${i+1}. ${s}</div>`).join('');
   document.getElementById('crud-content').innerHTML = crudStepBody(state.crudState.type, state.crudState.step);

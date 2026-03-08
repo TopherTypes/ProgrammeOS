@@ -540,6 +540,13 @@ async function persistAndReturn() {
   return toLegacyShape(cache);
 }
 
+function validateNormalizedSnapshot(normalized) {
+  if (!normalized || typeof normalized !== 'object') return false;
+  if (!normalized.entities || !normalized.counters) return false;
+  const requiredCollections = Object.values(ENTITY_KEYS);
+  return requiredCollections.every((key) => normalized.entities[key] && Array.isArray(normalized.entities[key].allIds) && typeof normalized.entities[key].byId === 'object');
+}
+
 function resolveCollection(entityType) {
   const key = ENTITY_KEYS[entityType];
   if (!key) throw new Error(`Unknown entity type: ${entityType}`);
@@ -606,6 +613,14 @@ export const repository = {
   },
   async clearAllData() {
     cache = createEmptyNormalized();
+    return persistAndReturn();
+  },
+  async importNormalizedSnapshot(normalizedSnapshot) {
+    if (!validateNormalizedSnapshot(normalizedSnapshot)) {
+      throw new Error('Invalid normalized snapshot payload');
+    }
+    cache = clone(normalizedSnapshot);
+    if (!cache.schemaVersion) cache.schemaVersion = SCHEMA_VERSION;
     return persistAndReturn();
   },
   projects: {

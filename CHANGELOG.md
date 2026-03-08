@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.8 --- List Filtering, UX Safeguards, and JSON Backup
+
+Added:
+
+- list query/status filtering state persisted in the central UI store for high-volume views (Projects, Updates, Actions, RAID)
+- explicit empty-state and no-results UX for major list views so users get guided feedback instead of blank tables
+- non-destructive confirmation prompts for modal delete actions
+- unsaved-change warnings for modal edit mode and CRUD wizard dismissal
+- lightweight JSON export/import controls in Settings for portable backup and restore while backend integration is pending
+
+Changed:
+
+- settings page now includes backup/restore controls alongside sample-data reset actions
+- repository now accepts validated normalized snapshot imports
+
 ## v0.7 --- Validation Module + Safe Render Hardening
 
 Added:
