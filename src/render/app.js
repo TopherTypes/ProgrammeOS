@@ -520,6 +520,9 @@ function renderProjectModal(index, tab, edit){
   const p = data.projects[index];
   modalTitle.textContent = p.name;
   modalSubtitle.textContent = `${escapeHtml(p.status)} · Owner: ${escapeHtml(p.owner)} · Start: ${escapeHtml(p.startDate)} · Target: ${escapeHtml(p.targetDate)}`;
+  const modalActions = edit
+    ? `<button class="btn primary" data-modal-action="project-save">Save changes</button><button class="btn" data-modal-action="project-cancel">Cancel</button>`
+    : projectHeaderActions();
   modalTabs.innerHTML = `
     <div class="segmented">
       ${projectTabButton('overview','Overview')}
@@ -530,7 +533,7 @@ function renderProjectModal(index, tab, edit){
       ${projectTabButton('actions','Actions')}
       ${projectTabButton('decisions','Decisions')}
     </div>
-    <div class="content-header-actions">${projectHeaderActions()}</div>
+    <div class="content-header-actions">${modalActions}</div>
   `;
   if (edit) {
     modalBody.innerHTML = projectEditBody(index, tab);
@@ -605,6 +608,17 @@ export function projectViewBody(index, tab){
     );
   }
 }
+function projectEditField({ field, label, value, type = 'text' }) {
+  return `<div class="field"><label for="project-${escapeAttribute(field)}">${escapeHtml(label)}</label><input id="project-${escapeAttribute(field)}" type="${escapeAttribute(type)}" data-crud-field="${escapeAttribute(field)}" name="project-${escapeAttribute(field)}" value="${escapeAttribute(value || '')}"></div>`;
+}
+
+function projectEditSelect({ field, label, value, options }) {
+  return `<div class="field"><label for="project-${escapeAttribute(field)}">${escapeHtml(label)}</label><select id="project-${escapeAttribute(field)}" data-crud-field="${escapeAttribute(field)}" name="project-${escapeAttribute(field)}">${options.map((option)=>`<option value="${escapeAttribute(option)}" ${option===value?'selected':''}>${escapeHtml(option)}</option>`).join('')}</select></div>`;
+}
+
+function projectEditTextArea({ field, label, value }) {
+  return `<div class="field"><label for="project-${escapeAttribute(field)}">${escapeHtml(label)}</label><textarea id="project-${escapeAttribute(field)}" data-crud-field="${escapeAttribute(field)}" name="project-${escapeAttribute(field)}">${escapeHtml(value || '')}</textarea></div>`;
+}
 export function projectEditBody(index, tab){
   const p = data.projects[index];
   if (tab==='overview'){
@@ -612,20 +626,40 @@ export function projectEditBody(index, tab){
       <div class="mini-item">
         <h4 class="section-title">Edit project</h4>
         <div class="field-grid">
-          <div class="field"><label>Project name</label><input value="${escapeHtml(p.name)}"></div>
-          <div class="field"><label>Owner</label><input value="${escapeHtml(p.owner)}"></div>
-          <div class="field"><label>Status</label><select><option selected>${escapeHtml(p.status)}</option><option>Planning</option><option>Active</option><option>Closed</option></select></div>
-          <div class="field"><label>Stage</label><select><option selected>${escapeHtml(p.stage)}</option><option>Design</option><option>Delivery</option><option>Closure</option></select></div>
-          <div class="field"><label>Health</label><select><option selected>${escapeHtml(p.health)}</option><option>Green</option><option>Amber</option><option>Red</option></select></div>
-          <div class="field"><label>Review cadence</label><select><option selected>${p.cadence}</option><option>Weekly</option><option>Monthly</option><option>Quarterly</option></select></div>
-          <div class="field"><label>Start date</label><input value="${escapeHtml(p.startDate)}"></div>
-          <div class="field"><label>Target date</label><input value="${escapeHtml(p.targetDate)}"></div>
+          ${projectEditField({ field: 'name', label: 'Project name', value: p.name })}
+          ${projectEditField({ field: 'owner', label: 'Owner', value: p.owner })}
+          ${projectEditSelect({ field: 'status', label: 'Status', value: p.status, options: ['Planning','In progress','At risk','Complete'] })}
+          ${projectEditSelect({ field: 'stage', label: 'Stage', value: p.stage, options: ['Design','Discovery','Delivery','Closure'] })}
         </div>
-        <div class="field" style="margin-top:14px"><label>Description</label><textarea>${escapeHtml(p.description)}</textarea></div>
+        <div style="margin-top:14px">${projectEditTextArea({ field: 'description', label: 'Description', value: p.description })}</div>
       </div>
-      <div class="mini-item">
-        <h4 class="section-title">Edit mode pattern</h4>
-        <div class="wizard-note">This is the intended CRUD behaviour: open a full record in view mode, click Edit mode, and swap display sections into structured inline fields. Clean, stable, far less cursed than spreadsheet soup.</div>
+    </div>`;
+  }
+  if (tab==='raid'){
+    return `<div class="mini-item">
+      <h4 class="section-title">Edit RAID governance</h4>
+      <div class="field-grid">
+        ${projectEditSelect({ field: 'health', label: 'Health', value: p.health, options: ['Green','Amber','Red'] })}
+        ${projectEditSelect({ field: 'cadence', label: 'Review cadence', value: p.cadence, options: ['Weekly','Monthly','Quarterly'] })}
+        ${projectEditField({ field: 'lastReview', label: 'Last review', value: p.lastReview })}
+      </div>
+    </div>`;
+  }
+  if (tab==='updates'){
+    return `<div class="mini-item">
+      <h4 class="section-title">Edit update context defaults</h4>
+      <div class="field-grid">
+        ${projectEditField({ field: 'startDate', label: 'Start date', value: p.startDate })}
+        ${projectEditField({ field: 'targetDate', label: 'Target date', value: p.targetDate })}
+      </div>
+    </div>`;
+  }
+  if (tab==='meetings'){
+    return `<div class="mini-item">
+      <h4 class="section-title">Edit meeting alignment</h4>
+      <div class="field-grid">
+        ${projectEditField({ field: 'owner', label: 'Meeting owner', value: p.owner })}
+        ${projectEditSelect({ field: 'cadence', label: 'Meeting cadence', value: p.cadence, options: ['Weekly','Monthly','Quarterly'] })}
       </div>
     </div>`;
   }
@@ -634,7 +668,7 @@ export function projectEditBody(index, tab){
       <h4 class="section-title">Edit project people roles</h4>
       <div class="field-grid">
         ${p.people.map(x=>`
-          <div class="field"><label>${escapeHtml(x.name)}</label><select>
+          <div class="field"><label for="project-person-${escapeAttribute(x.name)}">${escapeHtml(x.name)}</label><select id="project-person-${escapeAttribute(x.name)}" data-crud-field="owner" name="project-owner">
             <option ${x.role==='Owner'?'selected':''}>Owner</option>
             <option ${x.role==='SME'?'selected':''}>SME</option>
             <option ${x.role==='Approver'?'selected':''}>Approver</option>
@@ -647,10 +681,12 @@ export function projectEditBody(index, tab){
       </div>
     </div>`;
   }
-  return `<div class="mini-item">
-    <h4 class="section-title">Edit ${tab}</h4>
-    <div class="wizard-note">For this prototype, edit mode is fully mocked on the Overview and People tabs. The pattern extends to ${tab} with inline fields, add/remove controls, and a Save / Cancel footer.</div>
-  </div>`;
+  if (tab==='actions'){
+    return `<div class="mini-item"><h4 class="section-title">Edit delivery controls</h4><div class="field-grid">${projectEditSelect({ field: 'status', label: 'Project status', value: p.status, options: ['Planning','In progress','At risk','Complete'] })}${projectEditField({ field: 'targetDate', label: 'Target date', value: p.targetDate })}</div></div>`;
+  }
+  if (tab==='decisions'){
+    return `<div class="mini-item"><h4 class="section-title">Edit decision framing</h4><div class="field-grid">${projectEditSelect({ field: 'stage', label: 'Stage', value: p.stage, options: ['Design','Discovery','Delivery','Closure'] })}${projectEditSelect({ field: 'health', label: 'Health', value: p.health, options: ['Green','Amber','Red'] })}</div><div style="margin-top:14px">${projectEditTextArea({ field: 'description', label: 'Decision context', value: p.description })}</div></div>`;
+  }
 }
 function cardLikeTable(headers, rows, hint){
   return `<div class="detail-grid">

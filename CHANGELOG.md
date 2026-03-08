@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.9 --- Project Modal Editing Across All Tabs
+
+Added:
+
+- full edit-mode bodies for every project modal tab (overview, RAID, updates, meetings, people, actions, decisions)
+- stable `data-crud-field` and `name` attributes for project modal edit controls so values can be collected consistently
+- project-modal save/cancel actions wired directly to repository persistence (`repository.projects.update`)
+- regression tests for project modal edit-field coverage and project patch-building behavior
+
+Changed:
+
+- project modal edit mode now exits only through explicit save/cancel actions in the modal tab header area
+- project edit changes now refresh repository-backed state and re-open the modal in view mode with updated values
+
 ## v0.8 --- List Filtering, UX Safeguards, and JSON Backup
 
 Added:
