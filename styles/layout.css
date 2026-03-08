@@ -1,0 +1,95 @@
+.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+
+.sidebar{
+  background:linear-gradient(180deg,#050b16,#0b1220 45%,#101827);
+  border-right:1px solid var(--line);
+  padding:24px 16px;
+}
+
+.brand{padding:8px 12px 24px;border-bottom:1px solid var(--line);margin-bottom:16px}
+
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);font-weight:700}
+
+.brand h1{margin:12px 0 8px;font-size:28px;line-height:1.05}
+
+.brand p{margin:0;color:var(--muted)}
+
+.nav-title{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#64748b;padding:0 12px 8px;font-weight:700}
+
+.nav-item{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#cbd5e1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 14px;
+  margin-bottom:4px;
+  border-radius:14px;
+  font-size:14px;
+  cursor:pointer;
+  text-align:left;
+}
+
+.nav-item:hover{background:rgba(255,255,255,.05)}
+
+.nav-item.active{
+  background:linear-gradient(180deg,rgba(34,211,238,.12),rgba(34,211,238,.05));
+  border:1px solid rgba(34,211,238,.18);
+  color:#fff;
+}
+
+.dot{width:8px;height:8px;border-radius:999px;background:var(--accent);opacity:0}
+
+.nav-item.active .dot{opacity:1}
+
+.focus-card{margin:18px 8px 0;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:20px;padding:16px}
+
+.focus-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;font-size:14px;color:#dbe6f5}
+
+.main{min-width:0;display:flex;flex-direction:column}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:rgba(8,16,29,.86);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  padding:24px 32px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+}
+
+.topbar h2{margin:6px 0 0;font-size:32px}
+
+.subtle{color:var(--muted);font-size:14px}
+
+.toolbar{display:flex;gap:12px;align-items:center}
+
+.content.dashboard{
+  padding:28px 32px 32px;
+  display:grid;
+  grid-template-columns:minmax(0,1.24fr) minmax(360px,.86fr);
+  gap:24px;
+  align-items:start;
+}
+
+.content.standard{padding:28px 32px 32px;display:block}
+
+.stack{display:grid;gap:24px}
+
+@media (max-width:1280px){
+  .content.dashboard{grid-template-columns:1fr}
+}
+
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .topbar{padding:20px;flex-direction:column;align-items:stretch}
+  .content.dashboard,.content.standard{padding:20px}
+  .toolbar{width:100%;flex-wrap:wrap}
+}
