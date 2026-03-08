@@ -78,7 +78,6 @@ function payloadForCrud(type, values, mode) {
       cadence: values.cadence || 'Monthly',
       health: values.health || 'Green',
       description: values.description || '',
-      attention: 'On track',
       lastReview: '-',
       peopleIds: [],
       meetingIds: [],
@@ -88,7 +87,17 @@ function payloadForCrud(type, values, mode) {
       raidItemIds: []
     };
   }
-  if (type === 'Person') return { name: values.name, role: values.role || 'Other', summary: values.notes || '', cadence: values.cadence || 'Monthly', attention: 'On track', lastMeeting: '-' };
+  if (type === 'Person') {
+    return {
+      name: values.name,
+      role: values.role || 'Other',
+      summary: values.notes || '',
+      cadence: values.cadence || 'Monthly',
+      lastMeeting: values.lastMeeting || '-',
+      lastInteraction: values.lastInteraction || '-',
+      cadenceSnoozeDays: Number(values.cadenceSnoozeDays) || 0
+    };
+  }
   if (type === 'Meeting') return { title: values.title, date: values.date, project: values.related || 'Programme', context: values.context || 'Programme', attendeePersonIds: [], outputs: 'Capture pending', source };
   if (type === 'Update') return { title: values.title, text: values.title, project: values.project || 'Programme', meeting: values.meeting || '-', status: 'Open', inform: values.people || '-', source };
   if (type === 'Decision') return { title: values.title, decision: values.title, project: values.project || 'Programme', meeting: values.meeting || '-', rationale: values.rationale || '-', impact: values.impact || '-', status: 'Open', source };
@@ -108,7 +117,15 @@ async function resolveEntityIdForModalType(modalType, index) {
 function valuesFromModalData(modalType, index) {
   if (modalType === 'person') {
     const person = state.appData.people[index];
-    return { name: person?.name || '', role: person?.role || '', notes: person?.summary || '', cadence: person?.cadence || 'Monthly' };
+    return {
+      name: person?.name || '',
+      role: person?.role || '',
+      notes: person?.summary || '',
+      cadence: person?.cadence || 'Monthly',
+      lastMeeting: person?.lastMeeting || '-',
+      lastInteraction: person?.lastInteraction || '-',
+      cadenceSnoozeDays: String(person?.cadenceSnoozeDays || 0)
+    };
   }
   if (modalType === 'update') {
     const update = state.appData.updates[index];

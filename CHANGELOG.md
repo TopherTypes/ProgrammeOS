@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.6 --- Derived Attention Engine + Person Cadence Snooze
+
+Added:
+
+-   attention engine module that derives project/person attention from canonical date/status fields at render time
+-   person cadence snooze support using `lastInteraction` plus per-person `cadenceSnoozeDays`
+
+Changed:
+
+-   dashboard and table views now consume computed attention labels instead of static seed text
+-   sample people/project data now stores only source-of-truth inputs for attention logic
+-   person CRUD payloads now capture cadence inputs used by the derived attention model
+
 ## v0.5 --- CRUD Save + Modal Lifecycle Actions
 
 Added:

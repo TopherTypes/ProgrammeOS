@@ -89,6 +89,13 @@ People flagged when:
 
 -   meeting cadence exceeded
 -   actions assigned to them overdue
+-   short interaction snooze has expired (if configured)
+
+People cadence snooze rule:
+
+-   each person can store `lastInteraction` and `cadenceSnoozeDays`
+-   interaction snooze temporarily nudges the cadence due threshold without updating `lastMeeting`
+-   this supports short-touchpoint logging without falsely resetting full-meeting cadence
 
 
 ## Data Layer

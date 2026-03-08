@@ -1,5 +1,6 @@
 /** Core rendering and modal/CRUD logic for ProgrammeOS; assumes static DOM ids from index.html exist. */
 import { navItems, state } from '../state/store.js';
+import { buildAttentionSnapshot } from '../state/attentionEngine.js';
 const nav = document.getElementById('nav');
 const left = document.getElementById('left-column');
 const right = document.getElementById('right-column');
@@ -57,20 +58,31 @@ function setLayout(isDashboard){
   content.className = isDashboard ? 'content dashboard' : 'content standard';
   right.style.display = isDashboard ? '' : 'none';
 }
+
+function attentionSnapshot() {
+  return buildAttentionSnapshot(state.appData || EMPTY_DATA);
+}
+
+function attentionBadge(attention) {
+  if (!attention) return badge('Current');
+  return badge(attention.label || 'Current');
+}
 export function renderNav(){
   nav.innerHTML = navItems.map(item => `<button class="nav-item ${state.currentView===item.key?'active':''}" data-view="${item.key}"><span>${item.label}</span><span class="dot"></span></button>`).join('');
 }
 function metrics(){
+  const snapshot = attentionSnapshot();
   return `<section class="metrics">
-    <div class="metric"><div style="display:flex;justify-content:space-between;gap:12px;align-items:start;"><div><div class="label">Projects needing review</div><div class="value">2</div></div>${badge('Cadence breaches','amber')}</div></div>
-    <div class="metric"><div style="display:flex;justify-content:space-between;gap:12px;align-items:start;"><div><div class="label">People needing meeting</div><div class="value">1</div></div>${badge('Relationship upkeep','blue')}</div></div>
-    <div class="metric"><div style="display:flex;justify-content:space-between;gap:12px;align-items:start;"><div><div class="label">Overdue actions</div><div class="value">1</div></div>${badge('Immediate pressure','red')}</div></div>
-    <div class="metric"><div style="display:flex;justify-content:space-between;gap:12px;align-items:start;"><div><div class="label">Items to inform</div><div class="value">9</div></div>${badge('Knowledge backlog','purple')}</div></div>
+    <div class="metric"><div style="display:flex;justify-content:space-between;gap:12px;align-items:start;"><div><div class="label">Projects needing review</div><div class="value">${snapshot.metrics.projectsNeedingReview}</div></div>${badge('Cadence breaches','amber')}</div></div>
+    <div class="metric"><div style="display:flex;justify-content:space-between;gap:12px;align-items:start;"><div><div class="label">People needing meeting</div><div class="value">${snapshot.metrics.peopleNeedingMeeting}</div></div>${badge('Relationship upkeep','blue')}</div></div>
+    <div class="metric"><div style="display:flex;justify-content:space-between;gap:12px;align-items:start;"><div><div class="label">Overdue actions</div><div class="value">${snapshot.metrics.overdueActions}</div></div>${badge('Immediate pressure','red')}</div></div>
+    <div class="metric"><div style="display:flex;justify-content:space-between;gap:12px;align-items:start;"><div><div class="label">Items to inform</div><div class="value">${snapshot.metrics.itemsToInform}</div></div>${badge('Knowledge backlog','purple')}</div></div>
   </section>`;
 }
 function dashboardGoToButton(viewKey){ return `<button class="ghost-link" data-goto="${viewKey}">Go to details</button>`; }
 
 export function renderDashboard(){
+  const snapshot = attentionSnapshot();
   setLayout(true);
   pageKicker.textContent = 'Monday focus';
   pageTitle.textContent = 'Attention Dashboard';
@@ -80,13 +92,13 @@ export function renderDashboard(){
       'Projects needing review',
       'Flagged by cadence breach or unresolved action pressure',
       table(['Project','Owner','Status','Start','Target','Attention'],
-        data.projects.map((p,i)=>`<tr data-click="project-${i}" data-source="dashboard">
+        snapshot.projects.map((p,i)=>`<tr data-click="project-${i}" data-source="dashboard">
           <td><div class="primary-text">${p.name}</div><div class="secondary-text">${p.stage} · ${p.health} health</div></td>
           <td>${p.owner}</td>
           <td>${badge(p.status)}</td>
           <td>${p.startDate}</td>
           <td>${p.targetDate}</td>
-          <td>${badge(p.attention)}</td>
+          <td>${attentionBadge(p.attention)}</td>
         </tr>`)
       ),
       badge('Projects','blue'),
@@ -96,8 +108,8 @@ export function renderDashboard(){
       'People needing meeting',
       'Relationship upkeep and action pressure',
       table(['Person','Role','Last meeting','Cadence','Attention'],
-        data.people.map((p,i)=>`<tr data-click="person-${i}" data-source="dashboard">
-          <td><div class="primary-text">${p.name}</div></td><td>${p.role}</td><td>${p.lastMeeting}</td><td>${badge(p.cadence)}</td><td>${badge(p.attention)}</td>
+        snapshot.people.map((p,i)=>`<tr data-click="person-${i}" data-source="dashboard">
+          <td><div class="primary-text">${p.name}</div></td><td>${p.role}</td><td>${p.lastMeeting}</td><td>${badge(p.cadence)}</td><td>${attentionBadge(p.attention)}</td>
         </tr>`)
       ),
       badge('People','purple'),
@@ -168,6 +180,7 @@ function actionsPanel(){
 }
 
 export function renderProjects(){
+  const snapshot = attentionSnapshot();
   setLayout(false);
   pageKicker.textContent = 'Entity view';
   pageTitle.textContent = 'Projects';
@@ -175,9 +188,9 @@ export function renderProjects(){
     'Project list',
     'Project rows open a full workspace modal. Create is available globally and in context.',
     table(['Project','Owner','Status','Start','Target','Stage','Attention'],
-      data.projects.map((p,i)=>`<tr data-click="project-${i}">
+      snapshot.projects.map((p,i)=>`<tr data-click="project-${i}">
         <td><div class="primary-text">${p.name}</div><div class="secondary-text">${p.description}</div></td>
-        <td>${p.owner}</td><td>${badge(p.status)}</td><td>${p.startDate}</td><td>${p.targetDate}</td><td>${badge(p.stage)}</td><td>${badge(p.attention)}</td>
+        <td>${p.owner}</td><td>${badge(p.status)}</td><td>${p.startDate}</td><td>${p.targetDate}</td><td>${badge(p.stage)}</td><td>${attentionBadge(p.attention)}</td>
       </tr>`)
     ),
     badge('Projects','blue'),
@@ -185,12 +198,13 @@ export function renderProjects(){
   );
 }
 export function renderPeople(){
+  const snapshot = attentionSnapshot();
   setLayout(false);
   pageKicker.textContent = 'Entity view';
   pageTitle.textContent = 'People';
   left.innerHTML = card('People list','Click a row to open details',
     table(['Person','Role','Last meeting','Cadence','Attention'],
-      data.people.map((p,i)=>`<tr data-click="person-${i}"><td><div class="primary-text">${p.name}</div><div class="secondary-text">${p.summary}</div></td><td>${p.role}</td><td>${p.lastMeeting}</td><td>${badge(p.cadence)}</td><td>${badge(p.attention)}</td></tr>`)
+      snapshot.people.map((p,i)=>`<tr data-click="person-${i}"><td><div class="primary-text">${p.name}</div><div class="secondary-text">${p.summary}</div></td><td>${p.role}</td><td>${p.lastMeeting}</td><td>${badge(p.cadence)}</td><td>${attentionBadge(p.attention)}</td></tr>`)
     ),
     badge('People','purple'),
     `<button class="btn" data-create="Person" data-context="global">Create person</button>`
@@ -305,12 +319,12 @@ export function renderReports(){
 }
 
 export function dashboardProjectPanel(index){
-  const p = data.projects[index];
+  const p = attentionSnapshot().projects[index];
   return card('Project detail','Dashboard side panel with direct jump to the full entity page',
     `<div class="panel-body">
       <div class="detail-title">${p.name}</div>
       <div class="detail-subtitle">Owner: ${p.owner} · Start: ${p.startDate} · Target: ${p.targetDate}</div>
-      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">${badge(p.status)} ${badge(p.attention)} ${badge(p.stage)}</div>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">${badge(p.status)} ${attentionBadge(p.attention)} ${badge(p.stage)}</div>
       <div style="margin-top:16px;" class="meta-grid">
         <div class="meta-block"><div class="meta-label">Last review</div><div class="meta-value">${p.lastReview}</div></div>
         <div class="meta-block"><div class="meta-label">Cadence</div><div class="meta-value">${p.cadence}</div></div>
@@ -330,12 +344,12 @@ export function dashboardProjectPanel(index){
   );
 }
 export function dashboardPersonPanel(index){
-  const p = data.people[index];
+  const p = attentionSnapshot().people[index];
   return card('Person detail','Dashboard side panel',
     `<div class="panel-body">
       <div class="detail-title">${p.name}</div>
       <div class="detail-subtitle">${p.role} · Last meeting: ${p.lastMeeting}</div>
-      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">${badge(p.cadence)} ${badge(p.attention)}</div>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">${badge(p.cadence)} ${attentionBadge(p.attention)}</div>
       <div style="margin-top:18px;" class="mini-list">
         <div class="mini-item"><strong>Summary</strong><div class="secondary-text">${p.summary}</div></div>
       </div>
@@ -560,10 +574,10 @@ function cardLikeTable(headers, rows, hint){
 }
 
 export function personModalBody(index){
-  const p = data.people[index];
+  const p = attentionSnapshot().people[index];
   return `<div class="modal-grid">
     <div class="detail-grid">
-      <div class="mini-item"><h4 class="section-title">Overview</h4><div class="secondary-text">${p.summary}</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">${badge(p.cadence)} ${badge(p.attention)}</div></div>
+      <div class="mini-item"><h4 class="section-title">Overview</h4><div class="secondary-text">${p.summary}</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">${badge(p.cadence)} ${attentionBadge(p.attention)}</div><div class="secondary-text" style="margin-top:10px;">Last interaction: ${p.lastInteraction || '-'} · Snooze: ${p.cadenceSnoozeDays || 0} day(s)</div></div>
     </div>
     <div class="detail-grid">
       <div class="mini-item"><h4 class="section-title">Suggested actions</h4><div class="secondary-text">Add person globally, or attach them to a project in Owner / SME / Approver / Other role.</div></div>
@@ -739,7 +753,15 @@ export function crudStepBody(type, step){
   }
   if (type==='Person'){
     if (step===0) return `<div class="field-grid">${inputField('name','Name')}${inputField('role','Role/title')}</div>`;
-    if (step===1) return `<div class="field-grid">${inputField('notes','Email / notes')}${selectField('cadence','Cadence',['Optional','Monthly'])}</div>`;
+    if (step===1) {
+      return `<div class="field-grid">
+        ${inputField('notes','Email / notes')}
+        ${selectField('cadence','Cadence',['Optional','Monthly'])}
+        ${inputField('lastMeeting','Last full meeting','DD MMM YYYY')}
+        ${inputField('lastInteraction','Last short interaction','DD MMM YYYY')}
+        ${inputField('cadenceSnoozeDays','Interaction snooze days','e.g. 5')}
+      </div>`;
+    }
     return `<div class="wizard-note">Create globally, then attach to projects in Owner / SME / Approver / Other roles as needed.</div>`;
   }
   if (type==='RAID item'){
@@ -789,4 +811,3 @@ export function render(){
   if (state.currentView==='settings') return renderSettings();
   return renderReports();
 }
-
