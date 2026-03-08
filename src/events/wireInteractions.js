@@ -27,6 +27,7 @@ const crudRepositoryMap = {
 };
 
 const modalCrudTypeMap = {
+  project: 'Project',
   person: 'Person',
   meeting: 'Meeting',
   update: 'Update',
@@ -36,6 +37,7 @@ const modalCrudTypeMap = {
 };
 
 const modalCollectionMap = {
+  project: 'projects',
   person: 'people',
   update: 'updates',
   decision: 'decisions',
@@ -138,6 +140,56 @@ function valuesFromModalData(modalType, index) {
   return {};
 }
 
+
+
+function collectProjectModalValues() {
+  const values = {};
+  document.querySelectorAll('#modal-body [data-crud-field]').forEach((field) => {
+    const key = field.dataset.crudField;
+    if (!key || values[key] !== undefined) return;
+    values[key] = field.value;
+  });
+  return values;
+}
+
+export function buildProjectUpdatePatch(current, values, people) {
+  const ownerName = String(values.owner || '').trim();
+  const ownerMatch = people.find((person) => person.name === ownerName);
+
+  const patch = {
+    name: values.name ?? current.name,
+    status: values.status ?? current.status,
+    stage: values.stage ?? current.stage,
+    health: values.health ?? current.health,
+    cadence: values.cadence ?? current.cadence,
+    startDate: values.startDate ?? current.startDate,
+    targetDate: values.targetDate ?? current.targetDate,
+    lastReview: values.lastReview ?? current.lastReview,
+    description: values.description ?? current.description
+  };
+
+  if (ownerMatch) patch.ownerPersonId = ownerMatch.id;
+  return patch;
+}
+
+async function saveProjectModalEdits() {
+  const modalIndex = state.modalState.index;
+  const projectId = await resolveEntityIdForModalType('project', modalIndex);
+  if (!projectId) return;
+
+  const values = collectProjectModalValues();
+  const projects = await repository.projects.list();
+  const current = projects.find((project) => project.id === projectId);
+  if (!current) return;
+
+  const people = await repository.people.list();
+  const patch = buildProjectUpdatePatch(current, values, people);
+
+  await repository.projects.update(projectId, patch);
+  state.uiState.modalDirty = false;
+  state.modalState.edit = false;
+  await refreshFromRepository({ keepModalOpen: true });
+}
 function refreshModalIfPossible() {
   if (!state.modalState.type) return;
   const collectionKey = modalCollectionMap[state.modalState.type];
@@ -280,10 +332,25 @@ export function wireInteractions() {
     if (modalAction) {
       const modalType = state.modalState.type;
       const modalIndex = state.modalState.index;
+      const modalActionType = modalAction.dataset.modalAction;
+
+      if (modalType === 'project' && modalActionType === 'project-save') {
+        await saveProjectModalEdits();
+        return;
+      }
+
+      if (modalType === 'project' && modalActionType === 'project-cancel') {
+        if (state.uiState.modalDirty && !shouldDiscardUnsavedChanges()) return;
+        state.uiState.modalDirty = false;
+        state.modalState.edit = false;
+        renderModal();
+        return;
+      }
+
       const crudType = modalCrudTypeMap[modalType];
       if (!crudType) return;
 
-      if (modalAction.dataset.modalAction === 'edit') {
+      if (modalActionType === 'edit') {
         const entityId = await resolveEntityIdForModalType(modalType, modalIndex);
         if (!entityId) return;
         openCrud(crudType, 'contextual', {
@@ -295,7 +362,7 @@ export function wireInteractions() {
         return;
       }
 
-      if (modalAction.dataset.modalAction === 'delete') {
+      if (modalActionType === 'delete') {
         const entityId = await resolveEntityIdForModalType(modalType, modalIndex);
         if (!entityId) return;
         const approved = window.confirm(`Delete this ${crudType} record? This action cannot be undone.`);
