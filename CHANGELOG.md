@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.9.1 --- Project Modal CRUD Routing Fixes
+
+Added:
+
+- regression coverage for project modal lifecycle actions to assert edit opens CRUD in `mode: 'edit'` and delete removes the correct repository project id
+
+Changed:
+
+- modal CRUD mapping is now unified so project modal type resolves to both the `Project` CRUD type and `projects` collection consistently
+- project modal edit now preloads existing project values (name, owner, cadence, dates, status, stage, health, review date, description)
+- project modal id resolution now prefers ids from the denormalized app projection and safely falls back to repository ordering when ids are unavailable
+
 ## v0.9 --- Project Modal Editing Across All Tabs
 
 Added:

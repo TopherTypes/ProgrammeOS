@@ -26,24 +26,23 @@ const crudRepositoryMap = {
   'RAID item': 'raidItems'
 };
 
-const modalCrudTypeMap = {
-  project: 'Project',
-  person: 'Person',
-  meeting: 'Meeting',
-  update: 'Update',
-  decision: 'Decision',
-  action: 'Action',
-  raid: 'RAID item'
+const modalEntityMap = {
+  project: { crudType: 'Project', collection: 'projects' },
+  person: { crudType: 'Person', collection: 'people' },
+  meeting: { crudType: 'Meeting', collection: 'meetings' },
+  update: { crudType: 'Update', collection: 'updates' },
+  decision: { crudType: 'Decision', collection: 'decisions' },
+  action: { crudType: 'Action', collection: 'actions' },
+  raid: { crudType: 'RAID item', collection: 'raidGlobal' }
 };
 
-const modalCollectionMap = {
-  project: 'projects',
-  person: 'people',
-  update: 'updates',
-  decision: 'decisions',
-  action: 'actions',
-  raid: 'raidGlobal'
-};
+const modalCrudTypeMap = Object.fromEntries(
+  Object.entries(modalEntityMap).map(([key, value]) => [key, value.crudType])
+);
+
+const modalCollectionMap = Object.fromEntries(
+  Object.entries(modalEntityMap).map(([key, value]) => [key, value.collection])
+);
 
 function collectCrudStepValues() {
   document.querySelectorAll('#crud-content [data-crud-field]').forEach((field) => {
@@ -101,14 +100,33 @@ function payloadForCrud(type, values, mode) {
 }
 
 async function resolveEntityIdForModalType(modalType, index) {
-  const crudType = modalCrudTypeMap[modalType];
-  if (!crudType) return null;
+  const modalEntity = modalEntityMap[modalType];
+  if (!modalEntity) return null;
+  const appCollection = state.appData?.[modalEntity.collection];
+  const appEntity = Array.isArray(appCollection) ? appCollection[index] : null;
+  if (appEntity?.id) return appEntity.id;
+  const crudType = modalEntity.crudType;
   const repoKey = crudRepositoryMap[crudType];
   const entities = await repository[repoKey].list();
   return entities[index]?.id || null;
 }
 
 function valuesFromModalData(modalType, index) {
+  if (modalType === 'project') {
+    const project = state.appData.projects[index];
+    return {
+      name: project?.name || '',
+      owner: project?.owner || '',
+      status: project?.status || 'Planning',
+      stage: project?.stage || 'Design',
+      health: project?.health || 'Green',
+      cadence: project?.cadence || 'Monthly',
+      startDate: project?.startDate || '-',
+      targetDate: project?.targetDate || '-',
+      lastReview: project?.lastReview || '-',
+      description: project?.description || ''
+    };
+  }
   if (modalType === 'person') {
     const person = state.appData.people[index];
     return {
