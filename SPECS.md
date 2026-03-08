@@ -89,3 +89,12 @@ People flagged when:
 
 -   meeting cadence exceeded
 -   actions assigned to them overdue
+
+
+## Data Layer
+
+-   Repository API is the single read/write boundary for UI modules.
+-   Persistence target: IndexedDB (schema-versioned).
+-   Initial migration source: existing mock-data structure.
+-   Stored model is normalized, with shared entities linked by IDs.
+-   Settings view includes a user-triggered sample data reload action.

@@ -1,5 +1,4 @@
 /** Core rendering and modal/CRUD logic for ProgrammeOS; assumes static DOM ids from index.html exist. */
-import { data } from '../data/mockData.js';
 import { navItems, state } from '../state/store.js';
 const nav = document.getElementById('nav');
 const left = document.getElementById('left-column');
@@ -12,6 +11,24 @@ const modalBody = document.getElementById('modal-body');
 const modalTabs = document.getElementById('modal-tabs');
 const modalTitle = document.getElementById('modal-title');
 const modalSubtitle = document.getElementById('modal-subtitle');
+
+const EMPTY_DATA = {
+  projects: [],
+  people: [],
+  actions: [],
+  updates: [],
+  decisions: [],
+  informs: [],
+  meeting: { title: '-', context: '-', date: '-', agenda: [], updates: [], decisions: [], actions: [] },
+  raidGlobal: []
+};
+
+const data = new Proxy({}, {
+  get(_target, key) {
+    const source = state.appData || EMPTY_DATA;
+    return source[key];
+  }
+});
 
 function badgeClass(label){
   const v = String(label).toLowerCase();
@@ -255,6 +272,24 @@ export function renderRaid(){
     `<button class="btn" data-create="RAID item" data-context="global">Create RAID item</button>`
   );
 }
+
+export function renderSettings(){
+  setLayout(false);
+  pageKicker.textContent='System';
+  pageTitle.textContent='Settings';
+  left.innerHTML = card(
+    'Data management',
+    'IndexedDB persistence with migration and sample seed controls',
+    `<div class="panel-body">
+      <p class="secondary-text">Use this menu to replace current data with the baseline sample dataset.</p>
+      <div class="content-header-actions" style="margin-top:14px;">
+        <button class="btn" data-action="load-sample-data">Load sample data</button>
+      </div>
+    </div>`,
+    badge('Persistence','blue')
+  );
+}
+
 export function renderReports(){
   setLayout(false);
   pageKicker.textContent='Reporting layer';
@@ -616,7 +651,7 @@ const crudConfigs = {
   }
 };
 
-function openCrud(type='Project', context='global'){
+export function openCrud(type='Project', context='global'){
   state.crudState = { type, step:0, context };
   renderCrud();
   document.getElementById('crud-backdrop').classList.add('open');
@@ -726,6 +761,7 @@ export function render(){
   if (state.currentView==='decisions') return renderDecisions();
   if (state.currentView==='actions') return renderActions();
   if (state.currentView==='raid') return renderRaid();
+  if (state.currentView==='settings') return renderSettings();
   return renderReports();
 }
 

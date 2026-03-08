@@ -70,3 +70,13 @@ CRUD concepts.
 
 Current stage: Prototype / Design Validation Next stage: Data model and
 CRUD implementation.
+
+
+### Data Layer & Persistence
+
+The prototype now hydrates from an IndexedDB-backed repository (`src/data/repository.js`).
+
+- Data is stored in a schema-versioned normalized structure.
+- Shared entities (especially people) are linked by IDs in storage.
+- Existing mock-data shape is migrated into the normalized schema on first run.
+- A **Settings** view in main navigation includes **Load sample data** to reseed the dataset.
