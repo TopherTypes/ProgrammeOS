@@ -80,3 +80,4 @@ The prototype now hydrates from an IndexedDB-backed repository (`src/data/reposi
 - Shared entities (especially people) are linked by IDs in storage.
 - Existing mock-data shape is migrated into the normalized schema on first run.
 - A **Settings** view in main navigation includes **Load sample data** to reseed the dataset.
+- Settings also supports lightweight **Export JSON** and **Import JSON** backup/restore for temporary portability before backend sync is available.

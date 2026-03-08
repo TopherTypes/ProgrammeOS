@@ -221,3 +221,14 @@ textarea{min-height:120px;resize:vertical}
   color:#9ae6c0;
   font-weight:600;
 }
+
+
+.empty-state{
+  border:1px dashed var(--line2);
+  border-radius:16px;
+  padding:22px;
+  background:rgba(255,255,255,.02);
+}
+
+.empty-state h4{margin:0 0 8px;font-size:18px}
+.empty-state p{margin:0;color:var(--muted)}

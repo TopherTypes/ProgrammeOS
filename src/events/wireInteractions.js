@@ -182,6 +182,46 @@ async function saveCrudFlow() {
   await refreshFromRepository({ keepModalOpen: Boolean(state.crudState.sourceModal) });
 }
 
+async function exportDataAsJson() {
+  const snapshot = await repository.getNormalizedSnapshot();
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    schemaVersion: snapshot.schemaVersion,
+    normalized: snapshot
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `programmeos-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(link.href);
+}
+
+async function importDataFromJson(file) {
+  if (!file) return;
+  const text = await file.text();
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    window.alert('Import failed: file is not valid JSON.');
+    return;
+  }
+  const normalized = parsed?.normalized || parsed;
+  if (!normalized?.entities || !normalized?.counters) {
+    window.alert('Import failed: JSON must contain a normalized ProgrammeOS snapshot.');
+    return;
+  }
+  await repository.importNormalizedSnapshot(normalized);
+  await refreshFromRepository();
+}
+
+function shouldDiscardUnsavedChanges() {
+  return window.confirm('You have unsaved changes. Discard them and continue?');
+}
+
 export function wireInteractions() {
   if (wired) return;
   wired = true;
@@ -211,6 +251,14 @@ export function wireInteractions() {
     if (actionBtn?.dataset.action === 'load-sample-data') {
       await repository.loadSampleData();
       await refreshFromRepository();
+      return;
+    }
+    if (actionBtn?.dataset.action === 'export-data-json') {
+      await exportDataAsJson();
+      return;
+    }
+    if (actionBtn?.dataset.action === 'import-data-json') {
+      document.getElementById('import-data-json-input')?.click();
       return;
     }
 
@@ -250,6 +298,8 @@ export function wireInteractions() {
       if (modalAction.dataset.modalAction === 'delete') {
         const entityId = await resolveEntityIdForModalType(modalType, modalIndex);
         if (!entityId) return;
+        const approved = window.confirm(`Delete this ${crudType} record? This action cannot be undone.`);
+        if (!approved) return;
         const repoKey = crudRepositoryMap[crudType];
         await repository[repoKey].remove(entityId);
         await refreshFromRepository({ keepModalOpen: true });
@@ -264,12 +314,16 @@ export function wireInteractions() {
     }
 
     if (event.target.id === 'modal-close') {
+      if (state.modalState.edit && state.uiState.modalDirty && !shouldDiscardUnsavedChanges()) return;
+      state.uiState.modalDirty = false;
       document.getElementById('modal-backdrop').classList.remove('open');
       return;
     }
 
     if (event.target.id === 'modal-edit-btn') {
+      if (state.modalState.edit && state.uiState.modalDirty && !shouldDiscardUnsavedChanges()) return;
       state.modalState.edit = !state.modalState.edit;
+      if (!state.modalState.edit) state.uiState.modalDirty = false;
       event.target.textContent = state.modalState.edit ? 'View mode' : 'Edit mode';
       renderModal();
       return;
@@ -277,6 +331,8 @@ export function wireInteractions() {
 
     if (event.target.id === 'global-create') return openCrud('Project', 'global');
     if (event.target.id === 'crud-close' || event.target.id === 'crud-cancel') {
+      if (state.uiState.crudDirty && !shouldDiscardUnsavedChanges()) return;
+      state.uiState.crudDirty = false;
       document.getElementById('crud-backdrop').classList.remove('open');
       return;
     }
@@ -312,18 +368,51 @@ export function wireInteractions() {
     }
   });
 
-  document.addEventListener('change', (event) => {
+  document.addEventListener('change', async (event) => {
     if (event.target.matches('[data-check]')) {
       event.target.closest('.check-row')?.classList.toggle('done', event.target.checked);
     }
     if (event.target.matches('#crud-content [data-crud-field]')) {
       state.crudState.values[event.target.dataset.crudField] = event.target.value;
+      state.uiState.crudDirty = true;
       delete state.crudState.errors[event.target.dataset.crudField];
+    }
+    if (event.target.matches('[data-list-status]')) {
+      const viewKey = event.target.dataset.listStatus;
+      state.listViewState[viewKey] = {
+        ...(state.listViewState[viewKey] || { query: '', status: 'All' }),
+        status: event.target.value
+      };
+      render();
+    }
+    if (event.target.id === 'import-data-json-input') {
+      const [file] = event.target.files || [];
+      await importDataFromJson(file);
+      event.target.value = '';
+    }
+  });
+
+  document.addEventListener('input', (event) => {
+    if (event.target.matches('[data-list-query]')) {
+      const viewKey = event.target.dataset.listQuery;
+      state.listViewState[viewKey] = {
+        ...(state.listViewState[viewKey] || { query: '', status: 'All' }),
+        query: event.target.value
+      };
+      render();
+      return;
+    }
+    if (event.target.matches('#modal-body input, #modal-body textarea, #modal-body select')) {
+      state.uiState.modalDirty = true;
     }
   });
 
   document.getElementById('modal-backdrop').addEventListener('click', (event) => {
-    if (event.target.id === 'modal-backdrop') event.target.classList.remove('open');
+    if (event.target.id === 'modal-backdrop') {
+      if (state.modalState.edit && state.uiState.modalDirty && !shouldDiscardUnsavedChanges()) return;
+      state.uiState.modalDirty = false;
+      event.target.classList.remove('open');
+    }
   });
 
   wireChecks();
