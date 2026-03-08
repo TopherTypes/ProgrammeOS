@@ -2,7 +2,7 @@
 export const data = {
   projects: [
     {
-      name:'Retention Hub', owner:'Chris', status:'Active', lastReview:'02 Mar 2026', cadence:'Monthly', attention:'Needs attention',
+      name:'Retention Hub', owner:'Chris', status:'Active', lastReview:'02 Mar 2026', cadence:'Monthly',
       description:'Cross-programme work focused on retention-related resources, actions, and reporting alignment.',
       startDate:'15 Jan 2026', targetDate:'30 Jun 2026', stage:'Delivery', health:'Amber',
       updates:[
@@ -36,7 +36,7 @@ export const data = {
       ]
     },
     {
-      name:'Supervision Hub Phase 3', owner:'Chris', status:'Active', lastReview:'18 Feb 2026', cadence:'Monthly', attention:'On track',
+      name:'Supervision Hub Phase 3', owner:'Chris', status:'Active', lastReview:'18 Feb 2026', cadence:'Monthly',
       description:'Phase 3 enhancements and rollout readiness for the Supervision Hub capability.',
       startDate:'20 Feb 2026', targetDate:'15 May 2026', stage:'Delivery', health:'Green',
       updates:[{dateLogged:'03 Mar 2026', text:'Content pack signed off', meeting:'Phase 3 review', inform:'0/1 informed', status:'Open'}],
@@ -51,7 +51,7 @@ export const data = {
       ]
     },
     {
-      name:'Board CPD Framework', owner:'Megan', status:'Planning', lastReview:'09 Jan 2026', cadence:'Monthly', attention:'Needs attention',
+      name:'Board CPD Framework', owner:'Megan', status:'Planning', lastReview:'09 Jan 2026', cadence:'Monthly',
       description:'Board development framework workstream spanning learning design and governance approach.',
       startDate:'10 Jan 2026', targetDate:'31 Jul 2026', stage:'Design', health:'Amber',
       updates:[{dateLogged:'05 Mar 2026', text:'Board members requested revised reporting format', meeting:'Stakeholder review', inform:'0/2 informed', status:'Open'}],
@@ -67,9 +67,9 @@ export const data = {
     }
   ],
   people: [
-    {name:'Harri Evans', role:'Programme Sponsor', lastMeeting:'29 Jan 2026', cadence:'Monthly', attention:'Needs meeting', summary:'Longest gap since last 1:1. Also has one overdue action.'},
-    {name:'Sarah Jones', role:'Project Lead', lastMeeting:'26 Feb 2026', cadence:'Monthly', attention:'Current', summary:'Cadence healthy. Two pending informs remain.'},
-    {name:'Jo Morgan', role:'PMO Analyst', lastMeeting:'05 Mar 2026', cadence:'Optional', attention:'Current', summary:'Recent conversation held. Light follow-up load.'}
+    {name:'Harri Evans', role:'Programme Sponsor', lastMeeting:'29 Jan 2026', cadence:'Monthly', cadenceSnoozeDays:5, lastInteraction:'07 Mar 2026', summary:'Longest gap since last 1:1. Also has one overdue action.'},
+    {name:'Sarah Jones', role:'Project Lead', lastMeeting:'26 Feb 2026', cadence:'Monthly', cadenceSnoozeDays:0, lastInteraction:'-', summary:'Cadence healthy. Two pending informs remain.'},
+    {name:'Jo Morgan', role:'PMO Analyst', lastMeeting:'05 Mar 2026', cadence:'Optional', cadenceSnoozeDays:0, lastInteraction:'-', summary:'Recent conversation held. Light follow-up load.'}
   ],
   actions: [
     {title:'Confirm revised delivery milestone', owner:'Harri Evans', due:'06 Mar 2026', status:'Overdue', project:'Retention Hub', summary:'Milestone sign-off has slipped and now affects review status.', progress:['Reminder sent 05 Mar 2026','Still awaiting sponsor response']},

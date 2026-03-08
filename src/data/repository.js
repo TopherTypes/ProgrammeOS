@@ -111,7 +111,8 @@ function normaliseFromMock(source) {
       role: fallback.role || 'Other',
       lastMeeting: fallback.lastMeeting || '-',
       cadence: fallback.cadence || 'Monthly',
-      attention: fallback.attention || 'On track',
+      lastInteraction: fallback.lastInteraction || '-',
+      cadenceSnoozeDays: Number(fallback.cadenceSnoozeDays) || 0,
       summary: fallback.summary || ''
     });
     personNameToId.set(key, id);
@@ -225,7 +226,6 @@ function normaliseFromMock(source) {
       status: project.status,
       lastReview: project.lastReview,
       cadence: project.cadence,
-      attention: project.attention,
       description: project.description,
       startDate: project.startDate,
       targetDate: project.targetDate,
@@ -347,7 +347,6 @@ function toLegacyShape(normalized) {
       status: project.status,
       lastReview: project.lastReview,
       cadence: project.cadence,
-      attention: project.attention,
       description: project.description,
       startDate: project.startDate,
       targetDate: project.targetDate,
@@ -481,7 +480,8 @@ function toLegacyShape(normalized) {
       role: person.role,
       lastMeeting: person.lastMeeting,
       cadence: person.cadence,
-      attention: person.attention,
+      lastInteraction: person.lastInteraction || '-',
+      cadenceSnoozeDays: Number(person.cadenceSnoozeDays) || 0,
       summary: person.summary
     })),
     actions,
