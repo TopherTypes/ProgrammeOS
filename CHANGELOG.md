@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.5 --- CRUD Save + Modal Lifecycle Actions
+
+Added:
+
+-   deterministic CRUD field names/selectors across wizard steps so values can be persisted between steps
+-   modal lifecycle actions for person/update/decision/action/meeting/RAID records (edit + delete)
+-   inline validation messaging in CRUD save flow
+
+Changed:
+
+-   final CRUD step now saves via repository create/update methods rather than only closing the modal
+-   post-save and post-delete flows now refresh the app data projection and preserve modal state when appropriate
+
 ## v0.4 --- IndexedDB Repository and Seed Controls
 
 Added:
