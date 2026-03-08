@@ -394,9 +394,14 @@ export function renderModal(){
   if (type==='raid') return simpleModal('RAID record', data.raidGlobal[index].text, raidModalBody(index));
 }
 function simpleModal(title, subtitle, body){
+  const modalType = state.modalState.type;
+  const supportsLifecycle = ['person','meeting','update','decision','action','raid'].includes(modalType);
   modalTitle.textContent = title;
   modalSubtitle.textContent = subtitle;
-  modalTabs.innerHTML = `<div class="hint">Read-only view. Click "Edit mode" to see inline editable sections.</div>`;
+  modalTabs.innerHTML = `
+    <div class="hint">Read-only view. Use actions for full lifecycle management.</div>
+    ${supportsLifecycle ? `<div class="content-header-actions"><button class="btn" data-modal-action="edit">Edit record</button><button class="btn" data-modal-action="delete">Delete record</button></div>` : ''}
+  `;
   modalBody.innerHTML = body;
 }
 function projectTabButton(key,label){
@@ -651,76 +656,96 @@ const crudConfigs = {
   }
 };
 
-export function openCrud(type='Project', context='global'){
-  state.crudState = { type, step:0, context };
+function crudValue(field, fallback = '') {
+  return state.crudState.values?.[field] ?? fallback;
+}
+
+function crudError(field) {
+  return state.crudState.errors?.[field] ? `<div class="field-error">${state.crudState.errors[field]}</div>` : '';
+}
+
+function inputField(field, label, placeholder = '') {
+  const value = String(crudValue(field, '')).replaceAll('"', '&quot;');
+  return `<div class="field"><label>${label}</label><input data-crud-field="${field}" name="${state.crudState.type}-${field}" placeholder="${placeholder}" value="${value}">${crudError(field)}</div>`;
+}
+
+function textAreaField(field, label, placeholder = '') {
+  return `<div class="field"><label>${label}</label><textarea data-crud-field="${field}" name="${state.crudState.type}-${field}" placeholder="${placeholder}">${crudValue(field, '')}</textarea>${crudError(field)}</div>`;
+}
+
+function selectField(field, label, options) {
+  const current = crudValue(field, options[0] || '');
+  return `<div class="field"><label>${label}</label><select data-crud-field="${field}" name="${state.crudState.type}-${field}">${options.map((option)=>`<option ${option===current?'selected':''}>${option}</option>`).join('')}</select>${crudError(field)}</div>`;
+}
+
+export function openCrud(type='Project', context='global', options = {}){
+  state.crudState = {
+    type,
+    step:0,
+    context,
+    mode: options.mode || 'create',
+    entityId: options.entityId || null,
+    values: options.values || {},
+    sourceModal: options.sourceModal || null,
+    errors: {},
+    feedback: ''
+  };
   renderCrud();
   document.getElementById('crud-backdrop').classList.add('open');
 }
+
 export function renderCrud(){
   const cfg = crudConfigs[state.crudState.type] || crudConfigs['Project'];
-  document.getElementById('crud-title').textContent = `Create ${state.crudState.type}`;
+  const modeLabel = state.crudState.mode === 'edit' ? 'Edit' : 'Create';
+  document.getElementById('crud-title').textContent = `${modeLabel} ${state.crudState.type}`;
   document.getElementById('crud-subtitle').textContent = `${state.crudState.context === 'global' ? 'Global create flow' : 'Contextual create flow'} · progressive disclosure`;
-  document.getElementById('crud-note').textContent = cfg.note;
+  document.getElementById('crud-note').innerHTML = `${cfg.note}${state.crudState.feedback ? `<br><span class="crud-feedback">${state.crudState.feedback}</span>` : ''}`;
   document.getElementById('crud-steps').innerHTML = cfg.steps.map((s,i)=>`<div class="step ${i<state.crudState.step?'done':i===state.crudState.step?'active':''}">${i+1}. ${s}</div>`).join('');
   document.getElementById('crud-content').innerHTML = crudStepBody(state.crudState.type, state.crudState.step);
   document.getElementById('crud-prev').style.visibility = state.crudState.step === 0 ? 'hidden' : 'visible';
-  document.getElementById('crud-next').textContent = state.crudState.step === cfg.steps.length-1 ? 'Create' : 'Next';
+  document.getElementById('crud-next').textContent = state.crudState.step === cfg.steps.length-1 ? (state.crudState.mode === 'edit' ? 'Save' : 'Create') : 'Next';
 }
+
 export function crudStepBody(type, step){
   if (type==='Project'){
-    if (step===0) return `<div class="field-grid">
-      <div class="field"><label>Project name</label><input placeholder="e.g. Retention Hub"></div>
-      <div class="field"><label>Owner</label><select><option>Chris</option><option>Megan</option></select></div>
-      <div class="field"><label>Status</label><select><option>Planning</option><option>Active</option></select></div>
-      <div class="field"><label>Stage</label><select><option>Design</option><option>Delivery</option></select></div>
-    </div>`;
-    if (step===1) return `<div class="field-grid">
-      <div class="field"><label>Start date</label><input placeholder="DD MMM YYYY"></div>
-      <div class="field"><label>Target date</label><input placeholder="DD MMM YYYY"></div>
-      <div class="field"><label>Review cadence</label><select><option>Weekly</option><option selected>Monthly</option><option>Quarterly</option></select></div>
-      <div class="field"><label>Health</label><select><option>Green</option><option>Amber</option><option>Red</option></select></div>
-    </div>`;
-    if (step===2) return `<div class="field"><label>Description</label><textarea placeholder="Project purpose, intended outcome, important context..."></textarea></div>`;
-    return `<div class="field-grid">
-      <div class="field"><label>Attach person</label><select><option>Harri Evans</option><option>Sarah Jones</option><option>Jo Morgan</option></select></div>
-      <div class="field"><label>Role</label><select><option>Owner</option><option>SME</option><option>Approver</option><option>Other</option></select></div>
-      <div class="field"><label>Attach person</label><select><option>Sarah Jones</option><option>Jo Morgan</option></select></div>
-      <div class="field"><label>Role</label><select><option>SME</option><option>Approver</option><option>Other</option></select></div>
-    </div>`;
+    if (step===0) return `<div class="field-grid">${inputField('name','Project name','e.g. Retention Hub')}${selectField('owner','Owner',['Chris','Megan'])}${selectField('status','Status',['Planning','Active'])}${selectField('stage','Stage',['Design','Delivery'])}</div>`;
+    if (step===1) return `<div class="field-grid">${inputField('startDate','Start date','DD MMM YYYY')}${inputField('targetDate','Target date','DD MMM YYYY')}${selectField('cadence','Review cadence',['Weekly','Monthly','Quarterly'])}${selectField('health','Health',['Green','Amber','Red'])}</div>`;
+    if (step===2) return textAreaField('description','Description','Project purpose, intended outcome, important context...');
+    return `<div class="field-grid">${inputField('personA','Attach person')}${selectField('roleA','Role',['Owner','SME','Approver','Other'])}${inputField('personB','Attach person')}${selectField('roleB','Role',['SME','Approver','Other'])}</div>`;
   }
   if (type==='Update'){
-    if (step===0) return `<div class="field"><label>Update text</label><textarea placeholder="What changed?"></textarea></div>`;
-    if (step===1) return `<div class="field-grid"><div class="field"><label>Project</label><select><option>Retention Hub</option><option>Supervision Hub Phase 3</option></select></div><div class="field"><label>Related meeting</label><select><option>Programme Board prep</option><option>Harri Evans 1:1</option></select></div></div>`;
-    if (step===2) return `<div class="field-grid"><div class="field"><label>People to inform</label><select><option>Harri Evans</option><option>Sarah Jones</option><option>Jo Morgan</option></select></div><div class="field"><label>Logged by</label><input value="Chris"></div></div>`;
+    if (step===0) return textAreaField('title','Update text','What changed?');
+    if (step===1) return `<div class="field-grid">${inputField('project','Project')}${inputField('meeting','Related meeting')}</div>`;
+    if (step===2) return `<div class="field-grid">${inputField('people','People to inform')}${inputField('loggedBy','Logged by')}</div>`;
     return `<div class="wizard-note">Review your update, then create. Further editing can happen later in Edit mode on the full record.</div>`;
   }
   if (type==='Decision'){
-    if (step===0) return `<div class="field"><label>Decision text</label><textarea placeholder="What was decided?"></textarea></div>`;
-    if (step===1) return `<div class="field-grid"><div class="field"><label>Project</label><select><option>Programme</option><option>Retention Hub</option></select></div><div class="field"><label>Related meeting</label><select><option>Stakeholder review</option><option>Programme Board prep</option></select></div></div>`;
-    if (step===2) return `<div class="field-grid"><div class="field"><label>Rationale</label><textarea></textarea></div><div class="field"><label>Impact</label><textarea></textarea></div></div>`;
-    return `<div class="field"><label>People to inform</label><select><option>Harri Evans</option><option>Sarah Jones</option></select></div>`;
+    if (step===0) return textAreaField('title','Decision text','What was decided?');
+    if (step===1) return `<div class="field-grid">${inputField('project','Project')}${inputField('meeting','Related meeting')}</div>`;
+    if (step===2) return `<div class="field-grid">${textAreaField('rationale','Rationale')}${textAreaField('impact','Impact')}</div>`;
+    return inputField('people','People to inform');
   }
   if (type==='Action'){
-    if (step===0) return `<div class="field"><label>Action text</label><textarea placeholder="What needs doing?"></textarea></div>`;
-    if (step===1) return `<div class="field-grid"><div class="field"><label>Owner</label><select><option>Harri Evans</option><option>Sarah Jones</option></select></div><div class="field"><label>Due date</label><input placeholder="DD MMM YYYY"></div></div>`;
-    if (step===2) return `<div class="field-grid"><div class="field"><label>Project</label><select><option>Retention Hub</option></select></div><div class="field"><label>Meeting</label><select><option>Harri Evans 1:1</option></select></div></div>`;
-    return `<div class="field"><label>People to inform</label><select><option>Sarah Jones</option><option>Harri Evans</option></select></div>`;
+    if (step===0) return textAreaField('title','Action text','What needs doing?');
+    if (step===1) return `<div class="field-grid">${inputField('owner','Owner')}${inputField('due','Due date','DD MMM YYYY')}</div>`;
+    if (step===2) return `<div class="field-grid">${inputField('project','Project')}${inputField('meeting','Meeting')}</div>`;
+    return inputField('people','People to inform');
   }
   if (type==='Meeting'){
-    if (step===0) return `<div class="field-grid"><div class="field"><label>Meeting title</label><input></div><div class="field"><label>Date & time</label><input></div></div>`;
-    if (step===1) return `<div class="field-grid"><div class="field"><label>Context</label><select><option>Project</option><option>Person</option><option>Programme</option></select></div><div class="field"><label>Related project/person</label><select><option>Retention Hub</option><option>Harri Evans</option></select></div></div>`;
-    if (step===2) return `<div class="field"><label>Attendees</label><textarea placeholder="Comma-separated for now in the prototype"></textarea></div>`;
+    if (step===0) return `<div class="field-grid">${inputField('title','Meeting title')}${inputField('date','Date & time')}</div>`;
+    if (step===1) return `<div class="field-grid">${selectField('context','Context',['Project','Person','Programme'])}${inputField('related','Related project/person')}</div>`;
+    if (step===2) return textAreaField('attendees','Attendees','Comma-separated for now in the prototype');
     return `<div class="wizard-note">Create the meeting, then capture updates, decisions, and actions from within the meeting workspace.</div>`;
   }
   if (type==='Person'){
-    if (step===0) return `<div class="field-grid"><div class="field"><label>Name</label><input></div><div class="field"><label>Role/title</label><input></div></div>`;
-    if (step===1) return `<div class="field-grid"><div class="field"><label>Email / notes</label><input></div><div class="field"><label>Cadence</label><select><option>Optional</option><option>Monthly</option></select></div></div>`;
+    if (step===0) return `<div class="field-grid">${inputField('name','Name')}${inputField('role','Role/title')}</div>`;
+    if (step===1) return `<div class="field-grid">${inputField('notes','Email / notes')}${selectField('cadence','Cadence',['Optional','Monthly'])}</div>`;
     return `<div class="wizard-note">Create globally, then attach to projects in Owner / SME / Approver / Other roles as needed.</div>`;
   }
   if (type==='RAID item'){
-    if (step===0) return `<div class="field-grid"><div class="field"><label>Type</label><select><option>Risk</option><option>Action</option><option>Issue</option><option>Decision</option></select></div><div class="field"><label>Title / text</label><input></div></div>`;
-    if (step===1) return `<div class="field-grid"><div class="field"><label>Owner</label><select><option>Harri Evans</option><option>Sarah Jones</option></select></div><div class="field"><label>Due date</label><input></div></div>`;
-    if (step===2) return `<div class="field-grid"><div class="field"><label>Project</label><select><option>Retention Hub</option><option>Programme</option></select></div><div class="field"><label>Related meeting</label><select><option>Programme Board prep</option></select></div></div>`;
+    if (step===0) return `<div class="field-grid">${selectField('type','Type',['Risk','Action','Issue','Decision'])}${inputField('text','Title / text')}</div>`;
+    if (step===1) return `<div class="field-grid">${inputField('owner','Owner')}${inputField('due','Due date')}</div>`;
+    if (step===2) return `<div class="field-grid">${inputField('project','Project')}${inputField('meeting','Related meeting')}</div>`;
     return `<div class="wizard-note">Create now, then enrich severity, mitigation, and history in the full detail record.</div>`;
   }
   return `<div class="wizard-note">Wizard body</div>`;

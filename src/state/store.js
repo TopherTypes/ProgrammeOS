@@ -16,7 +16,17 @@ export const state = {
   currentView: 'dashboard',
   currentRaidTab: 'Risk',
   modalState: { type: null, index: null, tab: 'overview', edit: false },
-  crudState: { type: 'Project', step: 0, context: 'global' },
+  crudState: {
+    type: 'Project',
+    step: 0,
+    context: 'global',
+    mode: 'create',
+    entityId: null,
+    values: {},
+    sourceModal: null,
+    errors: {},
+    feedback: ''
+  },
   appData: null
 };
 
